@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+/* TODO create custom variables here 
+@theme {
+  
+}
+*/
+
+/* Enable dark styles whenever .dark is present in parent element.
+ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}

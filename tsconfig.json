@@ -19,7 +19,9 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@style/*": ["./app/style/*"],
+      "@lib/*": ["./app/_lib/*"],
+      "@component/*": ["./app/component/*"]
     }
   },
   "include": [
