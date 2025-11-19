@@ -3,14 +3,19 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "_dev": "next dev --turbopack --port $PORT",
+    "dev": "dotenv-run-script -- _dev",
     "build": "next build",
-    "start": "next start",
+    "_start": "next start --port $PORT",
+    "start": "dotenv-run-script -- _start",
+    "start-forever": "forever start -c 'npm run start' .",
     "lint": "eslint"
   },
   "dependencies": {
+    "dotenv-run-script": "^0.4.1",
     "next": "16.0.3",
     "react": "19.2.0",
+    "react-bootstrap-icons": "^1.11.6",
     "react-dom": "19.2.0"
   },
   "devDependencies": {
@@ -22,5 +27,8 @@
     "eslint-config-next": "16.0.3",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "optionalDependencies": {
+    "forever": "^4.0.3"
   }
 }
