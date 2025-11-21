@@ -1,34 +1,33 @@
 import GridDimensions from "@lib/gridDimensions"
 import KeyCell from "./keyCell"
+import KeyboardDefinition from "@lib/keyboardDefinition"
 import KeyLabel from "@lib/keyLabel"
 import KeyMap from "@lib/keyMap"
-import { AbstractTouchGesture, TouchGestureType } from "@lib/touchGesture"
-import KeyStroke from "@lib/keyStroke"
 
 export default function KeyGrid(
-  { dimensions }: {
-    dimensions: GridDimensions
+  { dimensions, keyboard }: {
+    dimensions: GridDimensions,
+    keyboard: KeyboardDefinition
   }
 ) {
   function* getKeyCells(row: number) {
     for (let col=0; col<dimensions.width; col++) {
-      const keystroke = new KeyStroke(String.fromCodePoint((
-        'a'.charCodeAt(0) 
-        + row*dimensions.height 
-        + col*dimensions.width
-      )))
-
-      yield (
-        <KeyCell 
-          key={`${row},${col}`}
-          label={new KeyLabel({ center: keystroke.toString() })}
-          map={new KeyMap([
-            [
-              new AbstractTouchGesture(TouchGestureType.TOUCH), 
-              keystroke
-            ]
-          ])} />
-      )
+      if (row < keyboard.keys.length && col < keyboard.keys[row].length) {
+        yield (
+          <KeyCell 
+            key={`${row},${col}`}
+            label={keyboard.keys[row][col].label}
+            map={keyboard.keys[row][col].map} />
+        )
+      }
+      else {
+        yield (
+          <KeyCell 
+            key={`${row},${col}`}
+            label={new KeyLabel({ center: '' })}
+            map={ new KeyMap() } />
+        )
+      }
     }
   }
 

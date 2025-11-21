@@ -117,21 +117,21 @@ export default function KeyCell(
       }} >
       <div
         className="flex flex-row justify-evenly">
-        <span>{label.upleft}</span>
-        <span>{label.up}</span>
-        <span>{label.upright}</span>
+        <pre>{label.upleft}</pre>
+        <pre>{label.up}</pre>
+        <pre>{label.upright}</pre>
       </div>
       <div
         className="flex flex-row justify-evenly">
-        <span>{label.left}</span>
-        <span>{label.center}</span>
-        <span>{label.right}</span>
+        <pre>{label.left}</pre>
+        <pre>{label.center}</pre>
+        <pre>{label.right}</pre>
       </div>
       <div
         className="flex flex-row justify-evenly">
-        <span>{label.downleft}</span>
-        <span>{label.down}</span>
-        <span>{label.downright}</span>
+        <pre>{label.downleft}</pre>
+        <pre>{label.down}</pre>
+        <pre>{label.downright}</pre>
       </div>
     </div>
   )

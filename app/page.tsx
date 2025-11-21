@@ -1,6 +1,5 @@
 'use client'
 
-import Image from "next/image"
 import { websiteBasePath } from "@lib/path"
 import Header from "@component/header"
 import KeyGrid from "@component/keyGrid"
@@ -9,9 +8,13 @@ import IncDec from "@component/incDec"
 import { Orientation } from "@lib/orientation"
 import { useRef, useState } from "react"
 import { PageCanvasCtx } from "@context/pageCanvasCtx"
+import { frthenKeyboard } from "@lib/keyboardDefinitions/eng_frthen"
 
 export default function Home() {
-  const [gridDimensions, setGridDimensions] = useState(new GridDimensions(1, 1))
+  const [gridDimensions, setGridDimensions] = useState(new GridDimensions(
+    frthenKeyboard.keys[0].length, 
+    frthenKeyboard.keys.length
+  ))
   const canvas = useRef(null as unknown as HTMLCanvasElement)
   
   return (
@@ -49,7 +52,7 @@ export default function Home() {
       </div>
 
       <PageCanvasCtx value={canvas}>
-        <KeyGrid dimensions={gridDimensions} />
+        <KeyGrid dimensions={gridDimensions} keyboard={frthenKeyboard} />
       </PageCanvasCtx>
     </div>
   )

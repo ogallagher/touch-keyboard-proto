@@ -7,7 +7,7 @@ export default class KeyMap {
   constructor(v: [AbstractTouchGesture, KeyStroke][] = []) {
     for (let [gesture, keystroke] of v) {
       this.gestureToKeystroke.set(gesture.id, keystroke)
-      console.log(`gesture.id=${gesture.id} keystroke=${keystroke}`)
+      console.log(`gesture.id="${gesture.id}" keystroke=${keystroke}`)
     }
   }
 
