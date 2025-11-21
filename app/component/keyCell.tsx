@@ -1,9 +1,9 @@
 import KeyLabel from "@lib/keyLabel"
 import TouchGesture from "@lib/touchGesture"
 import pino from "pino"
-import { MouseEvent, RefObject, TouchEvent, useRef, useContext, useEffect, useState } from "react"
+import { useRef, useContext, useEffect, useState } from "react"
 import { PageCanvasCtx } from "@context/pageCanvasCtx"
-import { CanvasForm, CanvasSpace, Circle } from "pts"
+import { CanvasSpace, Circle } from "pts"
 
 const logger = pino({
   name: 'key-cell'
@@ -25,7 +25,7 @@ export default function KeyCell(
   // draw gesture
   useEffect(() => {
     if (canvas.current && gesture) {
-      logger.info('use canvas')
+      // logger.info('use canvas')
       const space = new CanvasSpace(canvas.current)
       space.background = 'transparent'
       const form = space.getForm()
@@ -58,7 +58,7 @@ export default function KeyCell(
     }
   }, [gesture])
 
-  const onGesture = () => {
+  function onGesture(gesture: TouchGesture) {
     logger.info(`keystroke for gesture=${gesture}`)
   }
 
