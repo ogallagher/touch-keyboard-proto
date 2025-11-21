@@ -1,17 +1,19 @@
 import KeyLabel from "@lib/keyLabel"
-import TouchGesture from "@lib/touchGesture"
+import TouchGesture, { TouchGestureType } from "@lib/touchGesture"
 import pino from "pino"
 import { useRef, useContext, useEffect, useState } from "react"
 import { PageCanvasCtx } from "@context/pageCanvasCtx"
 import { CanvasSpace, Circle } from "pts"
+import KeyMap from "@lib/keyMap"
 
 const logger = pino({
   name: 'key-cell'
 })
 
 export default function KeyCell(
-  { label }: {
-    label: KeyLabel
+  { label, keyMap }: {
+    label: KeyLabel,
+    keyMap: KeyMap
   }
 ) {
   const self = useRef(null as HTMLDivElement|null)
@@ -59,7 +61,22 @@ export default function KeyCell(
   }, [gesture])
 
   function onGesture(gesture: TouchGesture) {
-    logger.info(`keystroke for gesture=${gesture}`)
+    const keystroke = keyMap.getKeystroke(gesture)
+
+    if (!keystroke) {
+      logger.info(`no keystroke for gesture=${gesture}`)
+    }
+    else {
+      logger.info(`keystroke=${keystroke} for gesture=${gesture}`)
+      let target = document.activeElement || document
+        
+      if (
+        target instanceof HTMLTextAreaElement || 
+        (target instanceof HTMLInputElement && target.type === 'text')
+      ) {
+        keystroke.dispatch(target)
+      }
+    }
   }
 
   return (
@@ -69,13 +86,14 @@ export default function KeyCell(
         'dark:bg-zinc-900 dark:hover:bg-zinc-800 bg-zinc-100 hover:bg-zinc-200',
         'select-none',
         'grow',
-        'flex flex-col justify-center text-center',
+        'flex flex-col justify-evenly',
         'rounded-lg'
       ].join(' ')}
       onTouchStart={(e) => {
         setGesture(TouchGesture.create(e, getGestureSegmentLength(), onGesture))
       }}
       onMouseDown={(e) => {
+        e.preventDefault()
         setGesture(TouchGesture.create(e, getGestureSegmentLength(), onGesture))
       }}
       onTouchMove={(e) => {
@@ -97,7 +115,24 @@ export default function KeyCell(
       onTouchCancel={() => {
         setGesture(null)
       }} >
-      <span>{label.center}</span>
+      <div
+        className="flex flex-row justify-evenly">
+        <span>{label.upleft}</span>
+        <span>{label.up}</span>
+        <span>{label.upright}</span>
+      </div>
+      <div
+        className="flex flex-row justify-evenly">
+        <span>{label.left}</span>
+        <span>{label.center}</span>
+        <span>{label.right}</span>
+      </div>
+      <div
+        className="flex flex-row justify-evenly">
+        <span>{label.downleft}</span>
+        <span>{label.down}</span>
+        <span>{label.downright}</span>
+      </div>
     </div>
   )
 }

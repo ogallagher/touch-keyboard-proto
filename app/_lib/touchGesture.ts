@@ -47,36 +47,12 @@ export function isReturn(d1: Direction, d2: Direction) {
   return (isCardinal(d1) === isCardinal(d2)) && (toOpposite(d1) == d2)
 }
 
-export default class TouchGesture {
-  private _type: TouchGestureType
-  private _direction?: Direction
-  private _cornerDirection?: Direction
-  private _complete: boolean
-  private onComplete?: (g: TouchGesture) => any
-  private _points: Group
-  private times: Date[] = []
-  private readonly segmentLength: number
-  private holdTimeout?: NodeJS.Timeout
-
+export class AbstractTouchGesture {
   constructor(
-    {type, direction, origin, whenStart, segmentLength, onComplete}: {
-      type: TouchGestureType
-      direction?: Direction
-      origin: IPt
-      whenStart: Date
-      segmentLength: number
-      onComplete?: (g: TouchGesture) => any
-    }
-  ) {
-    this._type = type
-    this._direction = direction
-    this._complete = false
-    this.onComplete = onComplete
-    this._points = new Group(new Pt(origin))
-    this.times.push(whenStart)
-    this.segmentLength = segmentLength
-    this.startHoldTimeout()
-  }
+    protected _type: TouchGestureType,
+    protected _direction?: Direction,
+    protected _cornerDirection?: Direction
+  ) {}
 
   get type() { 
     return this._type 
@@ -88,6 +64,67 @@ export default class TouchGesture {
 
   get cornerDirection() {
     return this._cornerDirection
+  }
+
+  equals(other: AbstractTouchGesture) {
+    return (
+      other._type === this._type
+      && other._direction === this._direction
+      && other._cornerDirection === this._cornerDirection
+    )
+  }
+
+  get id(): string {
+    return (
+      `type=${this._type}`
+      + (
+        this.direction === undefined
+        ? ''
+        : (
+          ` direction=`
+          + (
+            this._cornerDirection === undefined 
+            ? this._direction 
+            : `${this._direction}-${this._cornerDirection}`
+          )
+        )
+      )
+    )
+  }
+
+  toString() {
+    return (
+      `TG[${this.id}]`
+    )
+  }
+}
+
+export default class TouchGesture extends AbstractTouchGesture {
+  private _complete: boolean
+  private onComplete?: (g: TouchGesture) => any
+  private _points: Group
+  private times: Date[] = []
+  private readonly segmentLength: number
+  private holdTimeout?: NodeJS.Timeout
+
+  constructor(
+    {type, direction, cornerDirection, origin, whenStart, segmentLength, onComplete}: {
+      type: TouchGestureType
+      direction?: Direction
+      cornerDirection?: Direction
+      origin: IPt
+      whenStart: Date
+      segmentLength: number
+      onComplete?: (g: TouchGesture) => any
+    }
+  ) {
+    super(type, direction, cornerDirection)
+    this._complete = false
+    this.onComplete = onComplete
+    this._points = new Group(new Pt(origin))
+    this.times.push(whenStart)
+    this.segmentLength = segmentLength
+    this.startHoldTimeout()
   }
 
   get complete() {
@@ -255,17 +292,5 @@ export default class TouchGesture {
       default:
         logger.warn(`skip update touch event type=${e.type}`)
     }
-  }
-
-  toString() {
-    return (
-      `TouchGesture[`
-      + `type=${this._type} `
-      + `direction=${
-        this._cornerDirection === undefined 
-        ? this._direction 
-        : `${this._direction}-${this._cornerDirection}`
-      }]`
-    )
   }
 }
