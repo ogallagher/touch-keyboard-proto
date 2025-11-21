@@ -1,6 +1,6 @@
-import { Cardinal, Diagonal, Direction, headingToDirection, isAcute, isCardinal, isPerpendicular, toOpposite } from "@lib/orientation"
+import { Cardinal, Diagonal, Direction, directionToUnitVector, headingToDirection, isAcute, isCardinal, isPerpendicular, toOpposite } from "@lib/orientation"
 import type { MouseEvent, TouchEvent } from "react"
-import { Group, IPt, Pt } from "pts-math"
+import { Group, IPt, Pt } from "pts"
 import pino from "pino"
 
 const logger = pino({
@@ -53,7 +53,7 @@ export default class TouchGesture {
   private _cornerDirection?: Direction
   private _complete: boolean
   private onComplete?: () => any
-  private points: Group
+  private _points: Group
   private times: Date[] = []
   private readonly segmentLength: number
   private holdTimeout?: NodeJS.Timeout
@@ -72,7 +72,7 @@ export default class TouchGesture {
     this._direction = direction
     this._complete = false
     this.onComplete = onComplete
-    this.points = new Group(new Pt(origin))
+    this._points = new Group(new Pt(origin))
     this.times.push(whenStart)
     this.segmentLength = segmentLength
     this.startHoldTimeout()
@@ -92,6 +92,10 @@ export default class TouchGesture {
 
   get complete() {
     return this._complete
+  }
+
+  get points() {
+    return this._points
   }
 
   set complete(v: boolean) {
@@ -168,13 +172,14 @@ export default class TouchGesture {
     switch (e.type) {
       case 'touchmove':
       case 'mousemove':
-        const diff = p.$subtract(this.points.q1)
+        const diff = p.$subtract(this._points.q1)
         const length = diff.magnitude()
+        const dir = headingToDirection(diff.angle())
+
         if (length > this.segmentLength) {
-          const dir = headingToDirection(diff.angle())
           if (this._type == TouchGestureType.TOUCH) {
             // swipe from center
-            this.points.push(p)
+            this._points.push(p)
             this._direction = dir
             this._type = (
               isCardinal(dir) ? TouchGestureType.CARDINAL_SWIPE : TouchGestureType.DIAGONAL_SWIPE
@@ -186,11 +191,12 @@ export default class TouchGesture {
             (this._type === TouchGestureType.CARDINAL_SWIPE || this._type === TouchGestureType.DIAGONAL_SWIPE)
             && this._direction !== dir
           ) {
+            logger.info(`[${this._points.join(' ')}]: ${this._direction} -L-> ${dir}`)
             // return or corner
             if (isReturn(this._direction!, dir)) {
               if (length > this.returnSegmentMax) {
                 // over return
-                this.points.push(p)
+                this._points.push(p)
                 this._type = (
                   this._type === TouchGestureType.CARDINAL_SWIPE
                   ? TouchGestureType.CARDINAL_RETURN_OVER_SWIPE
@@ -199,29 +205,42 @@ export default class TouchGesture {
               }
               else {
                 // return
-                this.points.push(p)
+                this._points.push(p)
                 this._type = (
                   this._type === TouchGestureType.CARDINAL_SWIPE
                   ? TouchGestureType.CARDINAL_RETURN_SWIPE
                   : TouchGestureType.DIAGONAL_RETURN_SWIPE
                 )
               }
+
+              // no hold beyond basic swipe
+              this.clearHoldTimeout()
             }
             else if (isCorner(this._direction!, dir)) {
               // corner
-              this.points.push(p)
+              this._points.push(p)
               this._cornerDirection = dir
               this._type = (
                 this._type === TouchGestureType.CARDINAL_SWIPE
                 ? TouchGestureType.CARDINAL_CORNER_SWIPE
                 : TouchGestureType.DIAGONAL_CORNER_SWIPE
               )
+
+              // no hold beyond basic swipe
+              this.clearHoldTimeout()
             }
             else {
               logger.warn(`ignore unsupported segment direction=${dir} after ${this}`)
             }
           }
           // else, ignore additional segments
+        }
+        else if (
+          this._direction === dir
+          && (this._type === TouchGestureType.CARDINAL_SWIPE || this._type === TouchGestureType.DIAGONAL_SWIPE)
+        ) {
+          // update last point to extend
+          this._points.q1.set(p)
         }
         break
 
@@ -236,6 +255,14 @@ export default class TouchGesture {
   }
 
   toString() {
-    return `TouchGesture[type=${this._type} direction=${this._direction}]`
+    return (
+      `TouchGesture[`
+      + `type=${this._type} `
+      + `direction=${
+        this._cornerDirection === undefined 
+        ? this._direction 
+        : `${this._direction}-${this._cornerDirection}`
+      }]`
+    )
   }
 }

@@ -7,14 +7,21 @@ import KeyGrid from "@component/keyGrid"
 import GridDimensions from "@lib/gridDimensions"
 import IncDec from "@component/incDec"
 import { Orientation } from "@lib/orientation"
-import { useState } from "react"
+import { RefObject, useRef, useState } from "react"
+import { PageCanvasCtx } from "@context/pageCanvasCtx"
 
 export default function Home() {
   const [gridDimensions, setGridDimensions] = useState(new GridDimensions(1, 1))
+  const canvas = useRef(null as unknown as HTMLCanvasElement)
   
   return (
     <div 
       className="min-h-screen flex flex-col justify-start gap-2">
+      {/* overlay graphics canvas */}
+      <canvas
+        ref={canvas}
+        className="fixed z-10 w-full h-full pointer-events-none" />
+
       <Header />
 
       <div
@@ -31,7 +38,9 @@ export default function Home() {
           onInc={() => setGridDimensions(gridDimensions.rowAdd(+1))} />
       </div>
 
-      <KeyGrid dimensions={gridDimensions} />
+      <PageCanvasCtx value={canvas}>
+        <KeyGrid dimensions={gridDimensions} />
+      </PageCanvasCtx>
     </div>
   )
 }

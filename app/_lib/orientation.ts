@@ -1,3 +1,5 @@
+import { Pt } from "pts"
+
 export enum Orientation {
   Horizontal = 'h',
   Vertical = 'v'
@@ -73,6 +75,44 @@ export function headingToDirection(heading: number): Direction {
   else {
     return Direction.UPRIGHT
   }
+}
+
+export function directionToUnitVector(d: Direction|Cardinal|Diagonal): Pt {
+  let heading: number
+  let v = new Pt({x: 1, y: 0})
+
+  switch (d) {
+    case Direction.UP:
+      heading = -Math.PI / 2
+      break
+    case Direction.RIGHT:
+      heading = 0
+      break
+    case Direction.DOWN:
+      heading = Math.PI / 2
+      break
+    case Direction.LEFT:
+      heading = Math.PI
+      break
+    
+    case Direction.UPRIGHT:
+      heading = -Math.PI / 4
+      break
+    case Direction.DOWNRIGHT:
+      heading = Math.PI / 4
+      break
+    case Direction.DOWNLEFT:
+      heading = 3 * Math.PI / 4
+      break
+    case Direction.UPLEFT:
+      heading = -3 * Math.PI / 4
+      break
+
+    default:
+      throw new Error(`cannot determine unit fector of unknown direction=${d}`)
+  }
+
+  return v.toAngle(heading, 1)
 }
 
 export function toOpposite(d: Direction|Cardinal|Diagonal) {
