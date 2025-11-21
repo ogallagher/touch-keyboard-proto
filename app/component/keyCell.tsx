@@ -11,9 +11,9 @@ const logger = pino({
 })
 
 export default function KeyCell(
-  { label, keyMap }: {
+  { label, map }: {
     label: KeyLabel,
-    keyMap: KeyMap
+    map: KeyMap
   }
 ) {
   const self = useRef(null as HTMLDivElement|null)
@@ -61,7 +61,7 @@ export default function KeyCell(
   }, [gesture])
 
   function onGesture(gesture: TouchGesture) {
-    const keystroke = keyMap.getKeystroke(gesture)
+    const keystroke = map.getKeystroke(gesture)
 
     if (!keystroke) {
       logger.info(`no keystroke for gesture=${gesture}`)

@@ -35,18 +35,18 @@ Consonants grouped by similarity of sound and relative frequency[^1]. Relative f
 
 Where there was extra space (ex. below t, th) I added a couple bigrams (letter pairs). Top 10 by relative frequency[^1]:
 
-- th = .039 [x]
-- he = .037 [x]
+- th = .039
+- he = .037
 - in = .023
 - er = .022
 - an = .021
-- re = .018 [x]
-- nd = .016 [x]
-- ha = .012 [x]
-- to = .012 [x]
-- hi = .011 [x]
-- ng = .011 [x]
-- sh = ?    [x]
+- re = .018
+- nd = .016
+- ha = .012
+- to = .012
+- hi = .011
+- ng = .011
+- sh = ?   
 
 Whitespace and punctuation adds a bottom row; all numbers and other symbols would be in a separate view.
 

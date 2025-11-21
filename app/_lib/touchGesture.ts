@@ -48,11 +48,19 @@ export function isReturn(d1: Direction, d2: Direction) {
 }
 
 export class AbstractTouchGesture {
+  protected _type: TouchGestureType
+  protected _direction?: Direction
+  protected _cornerDirection?: Direction
+
   constructor(
-    protected _type: TouchGestureType,
-    protected _direction?: Direction,
-    protected _cornerDirection?: Direction
-  ) {}
+    type: TouchGestureType,
+    direction?: Direction,
+    cornerDirection?: Direction
+  ) {
+    this._type = type
+    this._direction = direction
+    this._cornerDirection = cornerDirection
+  }
 
   get type() { 
     return this._type 

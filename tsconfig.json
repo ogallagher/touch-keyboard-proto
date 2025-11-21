@@ -22,7 +22,8 @@
       "@style/*": ["./app/style/*"],
       "@lib/*": ["./app/_lib/*"],
       "@component/*": ["./app/component/*"],
-      "@context/*": ["./app/context/*"]
+      "@context/*": ["./app/context/*"],
+      "@keyboardDefinitions/*": ["./app/keyboardDefinitions/*"]
     }
   },
   "include": [

@@ -22,7 +22,7 @@ export default function KeyGrid(
         <KeyCell 
           key={`${row},${col}`}
           label={new KeyLabel({ center: keystroke.toString() })}
-          keyMap={new KeyMap([
+          map={new KeyMap([
             [
               new AbstractTouchGesture(TouchGestureType.TOUCH), 
               keystroke
