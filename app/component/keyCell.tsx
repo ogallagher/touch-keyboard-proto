@@ -38,13 +38,13 @@ export default function KeyCell(
 
         if (gesture.points.length > 1) {
           form
-          .strokeOnly('#fff1', getGestureSegmentLength() * 0.05, 'round', 'round')
+          .strokeOnly('#fffa', getGestureSegmentLength() * 0.05, 'round', 'round')
           .line(gesture.points)
         }
 
         for (let p of gesture.points) {
           form
-          .fillOnly('#09f1')
+          .fillOnly('#09fa')
           .circle(Circle.fromCenter(
             p,
             getGestureSegmentLength() * 0.1
@@ -67,7 +67,7 @@ export default function KeyCell(
       logger.info(`no keystroke for gesture=${gesture}`)
     }
     else {
-      logger.info(`keystroke=${keystroke} for gesture=${gesture}`)
+      logger.info(`keystroke=${keystroke} for gesture=${gesture} points=${gesture.points}`)
       let target = document.activeElement || document
         
       if (
@@ -90,28 +90,33 @@ export default function KeyCell(
         'rounded-lg'
       ].join(' ')}
       onTouchStart={(e) => {
-        setGesture(TouchGesture.create(e, getGestureSegmentLength(), onGesture))
-      }}
-      onMouseDown={(e) => {
         e.preventDefault()
         setGesture(TouchGesture.create(e, getGestureSegmentLength(), onGesture))
       }}
+      // TODO handle both touch screen and mouse without duplicate events
+      // onMouseDown={(e) => {
+      //   e.preventDefault()
+      //   setGesture(TouchGesture.create(e, getGestureSegmentLength(), onGesture))
+      // }}
       onTouchMove={(e) => {
         if (gesture && !gesture.complete) {
+          e.preventDefault()
           gesture.update(e)
         }
       }}
-      onMouseMove={(e) => {
-        if (gesture && !gesture.complete) {
-          gesture.update(e)         
-        }
-      }}
+      // onMouseMove={(e) => {
+      //   if (gesture && !gesture.complete) {
+      //     gesture.update(e)         
+      //   }
+      // }}
       onTouchEnd={(e) => {
+        e.preventDefault()
         gesture?.update(e)
       }}
-      onMouseUp={(e) => {
-        gesture?.update(e)
-      }}
+      // onMouseUp={(e) => {
+      //   e.preventDefault()
+      //   gesture?.update(e)
+      // }}
       onTouchCancel={() => {
         setGesture(null)
       }} >

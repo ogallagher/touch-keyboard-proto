@@ -47,6 +47,8 @@ export function isReturn(d1: Direction, d2: Direction) {
   return (isCardinal(d1) === isCardinal(d2)) && (toOpposite(d1) == d2)
 }
 
+export const isTouch = (e: TouchEvent|MouseEvent) => e.type.indexOf('touch') !== -1
+
 export class AbstractTouchGesture {
   protected _type: TouchGestureType
   protected _direction?: Direction
@@ -178,8 +180,8 @@ export default class TouchGesture extends AbstractTouchGesture {
     return new TouchGesture({ 
       type: TouchGestureType.TOUCH,
       origin: {
-        x: (e instanceof TouchEvent) ? e.touches[0].clientX : (e as MouseEvent).clientX,
-        y: (e instanceof TouchEvent) ? e.touches[0].clientY : (e as MouseEvent).clientY
+        x: isTouch(e) ? (e as TouchEvent).touches[0].clientX : (e as MouseEvent).clientX,
+        y: isTouch(e) ? (e as TouchEvent).touches[0].clientY : (e as MouseEvent).clientY
       },
       whenStart: new Date(),
       segmentLength,
@@ -210,8 +212,9 @@ export default class TouchGesture extends AbstractTouchGesture {
     if (this._complete) return
 
     const p = new Pt({
-      x: (e instanceof TouchEvent) ? e.touches[0].clientX : (e as MouseEvent).clientX,
-      y: (e instanceof TouchEvent) ? e.touches[0].clientY : (e as MouseEvent).clientY
+      // touch coordinates are not defined for touchend
+      x: isTouch(e) ? (e as TouchEvent).touches[0]?.clientX : (e as MouseEvent).clientX,
+      y: isTouch(e) ? (e as TouchEvent).touches[0]?.clientY : (e as MouseEvent).clientY
     })
 
     switch (e.type) {

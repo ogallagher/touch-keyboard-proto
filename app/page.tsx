@@ -6,7 +6,7 @@ import KeyGrid from "@component/keyGrid"
 import GridDimensions from "@lib/gridDimensions"
 import IncDec from "@component/incDec"
 import { Orientation } from "@lib/orientation"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { PageCanvasCtx } from "@context/pageCanvasCtx"
 import { frthenKeyboard } from "@lib/keyboardDefinitions/eng_frthen"
 
@@ -16,6 +16,13 @@ export default function Home() {
     frthenKeyboard.keys.length
   ))
   const canvas = useRef(null as unknown as HTMLCanvasElement)
+  const textArea = useRef(null as unknown as HTMLTextAreaElement)
+
+  useEffect(
+    () => {
+      textArea.current.focus()
+    }
+  )
   
   return (
     <div 
@@ -32,8 +39,9 @@ export default function Home() {
       <section
         className="flex flex-row justify-evenly" >
         <textarea
-         className="resize font-mono"
-         placeholder="free form text area" ></textarea>
+          ref={textArea}
+          className="resize font-mono"
+          placeholder="free form text area" ></textarea>
       </section>
 
       {/* config */}
