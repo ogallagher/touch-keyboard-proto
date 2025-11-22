@@ -87,7 +87,7 @@ export const frthenKeyboard = new KeyboardDefinition([
     },
     {
       label: new KeyLabel({
-        center: 'l\nn',
+        center: 'l n',
         left: 'an',
         right: 'in',
         down: 'ng',
@@ -114,6 +114,7 @@ export const frthenKeyboard = new KeyboardDefinition([
       }),
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('s')],
+        [new AbstractTouchGesture(TouchGestureType.TOUCH_HOLD), new KeyStroke("'", 's')],
         [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.LEFT), new KeyStroke('z')],
         [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.RIGHT), new KeyStroke('c')],
         [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.UP), new KeyStroke('s', 'h')]
