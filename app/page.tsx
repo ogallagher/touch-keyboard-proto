@@ -17,20 +17,39 @@ export default function Home() {
   ))
   const canvas = useRef(null as unknown as HTMLCanvasElement)
   const textArea = useRef(null as unknown as HTMLTextAreaElement)
+  const [windowInnerHeight, setWindowInnerHeight] = useState(null as unknown as number)
 
   useEffect(
     () => {
+      textArea.current.selectionStart = 0
+      textArea.current.selectionEnd = 0
       textArea.current.focus()
-    }
+    },
+    []
+  )
+
+  useEffect(
+    () => {
+      const onResize = () => setWindowInnerHeight(window.innerHeight)
+      window.addEventListener('resize', onResize)
+
+      onResize()
+
+      return () => window.removeEventListener('resize', onResize)
+    },
+    []
   )
   
   return (
     <div 
-      className="min-h-screen flex flex-col justify-start gap-2">
+      className={[
+        "flex flex-col justify-start gap-2",
+        `h-[${windowInnerHeight}px]`
+      ].join(' ')}>
       {/* overlay graphics canvas */}
       <canvas
         ref={canvas}
-        className="fixed z-10 w-full h-full pointer-events-none" />
+        className="fixed w-full h-full pointer-events-none touch-none" />
 
       {/* header */}
       <Header />
@@ -41,7 +60,8 @@ export default function Home() {
         <textarea
           ref={textArea}
           className="resize font-mono"
-          placeholder="free form text area" ></textarea>
+          placeholder="free form text area"
+          readOnly={true} ></textarea>
       </section>
 
       {/* config */}

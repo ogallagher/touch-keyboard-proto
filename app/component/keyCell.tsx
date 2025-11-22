@@ -25,40 +25,46 @@ export default function KeyCell(
   )
 
   // draw gesture
-  useEffect(() => {
-    if (canvas.current && gesture) {
-      // logger.info('use canvas')
-      const space = new CanvasSpace(canvas.current)
-      space.background = 'transparent'
-      const form = space.getForm()
+  useEffect(
+    () => {
+      let space: CanvasSpace|undefined
+      if (canvas.current && gesture) {
+        // logger.info('use canvas')
+        space = new CanvasSpace(canvas.current)
+        space.background = 'transparent'
+        const form = space.getForm()
 
-      // animation
-      space.add((_time, _ftime) => {
-        space.clear('transparent')
+        // animation
+        space.add((_time, _ftime) => {
+          space!.clear('transparent')
 
-        if (gesture.points.length > 1) {
-          form
-          .strokeOnly('#fffa', getGestureSegmentLength() * 0.05, 'round', 'round')
-          .line(gesture.points)
-        }
+          if (gesture.points.length > 1) {
+            form
+            .strokeOnly('#fffa', getGestureSegmentLength() * 0.05, 'round', 'round')
+            .line(gesture.points)
+          }
 
-        for (let p of gesture.points) {
-          form
-          .fillOnly('#09fa')
-          .circle(Circle.fromCenter(
-            p,
-            getGestureSegmentLength() * 0.1
-          ))
-        }
+          for (let p of gesture.points) {
+            form
+            .fillOnly('#09fa')
+            .circle(Circle.fromCenter(
+              p,
+              getGestureSegmentLength() * 0.1
+            ))
+          }
 
-        if (gesture.complete) {
-          space.stop()
-        }
-      })
+          if (gesture.complete) {
+            space!.stop()
+          }
+        })
 
-      space.play()
-    }
-  }, [gesture])
+        space.play()
+      }
+
+      return () => { space?.removeAll() }
+    }, 
+    [gesture]
+  )
 
   function onGesture(gesture: TouchGesture) {
     const keystroke = map.getKeystroke(gesture)
