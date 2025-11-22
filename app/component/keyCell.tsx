@@ -6,6 +6,7 @@ import { PageCanvasCtx } from "@context/pageCanvasCtx"
 import { CanvasSpace, Circle } from "pts"
 import KeyMap from "@lib/keyMap"
 import { TextAreaEditCtx } from "@context/textAreaCtx"
+import { KeyGridCtx } from "@context/keyGridCtx"
 
 const logger = pino({
   name: 'key-cell'
@@ -19,8 +20,10 @@ export default function KeyCell(
 ) {
   const self = useRef(null as HTMLDivElement|null)
   const [gesture, setGesture] = useState(null as TouchGesture|null)
+  const [isMaj, setIsMaj] = useState(false)
   const canvas = useContext(PageCanvasCtx)
   const textAreaEdit = useContext(TextAreaEditCtx)
+  const keyGridState = useContext(KeyGridCtx)
 
   const getGestureSegmentLength = () => (
     Math.min(self.current!.clientWidth, self.current!.clientHeight) * 0.4
@@ -68,6 +71,17 @@ export default function KeyCell(
     [gesture]
   )
 
+  // listen to modifier keys
+  useEffect(
+    () => {
+      // show majiscule if shift/caps-lock
+      keyGridState.current.minMajListeners.add(setIsMaj)
+
+      return () => { keyGridState.current.minMajListeners.delete(setIsMaj) }
+    },
+    []
+  )
+
   function onGesture(gesture: TouchGesture) {
     const keystroke = map.getKeystroke(gesture)
 
@@ -79,7 +93,7 @@ export default function KeyCell(
       let target = document.activeElement || document
 
       if (target === textAreaEdit.current.target.current) {
-        keystroke.dispatch(textAreaEdit.current)
+        keystroke.dispatch(textAreaEdit.current, keyGridState.current)
       }
     }
   }
@@ -127,21 +141,21 @@ export default function KeyCell(
       }} >
       <div
         className="flex flex-row justify-evenly">
-        <pre>{label.upleft}</pre>
-        <pre>{label.up}</pre>
-        <pre>{label.upright}</pre>
+        <pre>{isMaj ? label.upleft?.toUpperCase() : label.upleft}</pre>
+        <pre>{isMaj ? label.up?.toUpperCase() : label.up}</pre>
+        <pre>{isMaj ? label.upright?.toUpperCase() : label.upright}</pre>
       </div>
       <div
         className="flex flex-row justify-evenly">
-        <pre>{label.left}</pre>
-        <pre>{label.center}</pre>
-        <pre>{label.right}</pre>
+        <pre>{isMaj ? label.left?.toUpperCase() : label.left}</pre>
+        <pre>{isMaj ? label.center?.toUpperCase() : label.center}</pre>
+        <pre>{isMaj ? label.right?.toUpperCase() : label.right}</pre>
       </div>
       <div
         className="flex flex-row justify-evenly">
-        <pre>{label.downleft}</pre>
-        <pre>{label.down}</pre>
-        <pre>{label.downright}</pre>
+        <pre>{isMaj ? label.downleft?.toUpperCase() : label.downleft}</pre>
+        <pre>{isMaj ? label.down?.toUpperCase() : label.down}</pre>
+        <pre>{isMaj ? label.downright?.toUpperCase() : label.downright}</pre>
       </div>
     </div>
   )

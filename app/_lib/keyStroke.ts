@@ -1,3 +1,4 @@
+import { KeyGridState } from "@context/keyGridCtx"
 import { EditTextArea } from "@context/textAreaCtx"
 
 export type TypeChar = string
@@ -35,7 +36,7 @@ export default class KeyStroke {
     return `KS[${this.chars.join('+')}]`
   }
 
-  public dispatch(textAreaEdit: EditTextArea) {
+  public dispatch(textAreaEdit: EditTextArea, keyState: KeyGridState) {
     for (let char of this.chars) {
       switch (char) {
         case MetaChar.LEFT:
@@ -50,11 +51,36 @@ export default class KeyStroke {
           textAreaEdit.deleteChars(1)
           break
 
+        case MetaChar.SHIFT:
+          if (keyState.getModifierKey(MetaChar.SHIFT)) {
+            keyState.releaseModifierKeys(MetaChar.SHIFT)
+          }
+          else {
+            keyState.pressModifierKeys(MetaChar.SHIFT)
+          }
+          keyState.releaseModifierKeys(MetaChar.CAPS_LOCK)
+          break
+        
+        case MetaChar.CAPS_LOCK:
+          if (keyState.getModifierKey(MetaChar.CAPS_LOCK)) {
+            keyState.releaseModifierKeys(MetaChar.CAPS_LOCK)
+          }
+          else {
+            keyState.pressModifierKeys(MetaChar.CAPS_LOCK)
+          }
+          keyState.releaseModifierKeys(MetaChar.SHIFT)
+          break
+
         default:
-          textAreaEdit.typeChars(char)
+          if (keyState.getModifierKey(MetaChar.SHIFT) || keyState.getModifierKey(MetaChar.CAPS_LOCK)) {
+            textAreaEdit.typeChars(char.toUpperCase())
+          }
+          else {
+            textAreaEdit.typeChars(char)
+          }
+          keyState.releaseEphemeralKeys()
           break
       }
-      
     }
   }
 }

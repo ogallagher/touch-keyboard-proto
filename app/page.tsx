@@ -10,6 +10,7 @@ import { PageCanvasCtx } from "@context/pageCanvasCtx"
 import { frthenKeyboard } from "@lib/keyboardDefinitions/eng_frthen"
 import TextArea from "@component/textArea"
 import { EditTextArea, TextAreaEditCtx } from "@context/textAreaCtx"
+import { KeyGridCtx, KeyGridState } from "@context/keyGridCtx"
 
 export default function Home() {
   const [gridDimensions, setGridDimensions] = useState(new GridDimensions(
@@ -17,27 +18,14 @@ export default function Home() {
     frthenKeyboard.keys.length
   ))
   const canvas = useRef(null as unknown as HTMLCanvasElement)
-  // const [windowInnerHeight, setWindowInnerHeight] = useState(null as unknown as number)
   const textAreaEdit = useRef(null as unknown as EditTextArea)
-
-  // useEffect(
-  //   () => {
-  //     const onResize = () => setWindowInnerHeight(window.innerHeight)
-  //     window.addEventListener('resize', onResize)
-
-  //     onResize()
-
-  //     return () => window.removeEventListener('resize', onResize)
-  //   },
-  //   []
-  // )
+  const keyGridState = useRef(new KeyGridState())
   
   return (
     <div 
       className={[
         "flex flex-col justify-start gap-2",
         'h-dvh'
-        // `h-[${windowInnerHeight}px]`
       ].join(' ')}>
       {/* overlay graphics canvas */}
       <canvas
@@ -70,7 +58,9 @@ export default function Home() {
 
       <PageCanvasCtx value={canvas}>
         <TextAreaEditCtx value={textAreaEdit}>
-          <KeyGrid dimensions={gridDimensions} keyboard={frthenKeyboard} />
+          <KeyGridCtx value={keyGridState}>
+            <KeyGrid dimensions={gridDimensions} keyboard={frthenKeyboard} />
+          </KeyGridCtx>
         </TextAreaEditCtx>
       </PageCanvasCtx>
     </div>

@@ -87,7 +87,7 @@ export const frthenKeyboard = new KeyboardDefinition([
     },
     {
       label: new KeyLabel({
-        center: 'l n',
+        center: 'n l',
         left: 'an',
         right: 'in',
         down: 'ng',
