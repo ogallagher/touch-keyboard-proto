@@ -27,7 +27,7 @@ export default function KeyGrid(
         yield (
           <KeyCell 
             key={`${row},${col}`}
-            label={new KeyLabel({ center: '' })}
+            label={new KeyLabel()}
             map={ new KeyMap() } />
         )
       }
@@ -50,7 +50,7 @@ export default function KeyGrid(
   useEffect(
     () => {
       const ignoreScroll = (e: Event) => { e.preventDefault() }
-      const scrollEventTypes = ['scroll', 'touchmove', 'wheel']
+      const scrollEventTypes = ['scroll', 'touchmove', 'wheel', 'drag']
 
       scrollEventTypes.forEach((eventType) => {
         grid.current.addEventListener(

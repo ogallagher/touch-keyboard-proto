@@ -9,14 +9,27 @@ const logger = pino({
 
 const holdDelaySec = 0.75
 
-const enum TouchGestureSegmentType {
+export const enum InnerTouchGestureSegmentType {
   TOUCH = 't',
-  HOLD = 'h',
   CARDINAL_SWIPE = 'cs',
-  DIAGONAL_SWIPE = 'ds',
+  DIAGONAL_SWIPE = 'ds'
+}
+
+export const enum TerminalTouchGestureSegmentType {
+  HOLD = 'h',
   CORNER = 'L',
   RETURN = 'r',
   RETURN_OVER = 'ro'
+}
+
+export const enum TouchGestureSegmentType {
+  TOUCH = InnerTouchGestureSegmentType.TOUCH,
+  CARDINAL_SWIPE = InnerTouchGestureSegmentType.CARDINAL_SWIPE,
+  DIAGONAL_SWIPE = InnerTouchGestureSegmentType.DIAGONAL_SWIPE,
+  HOLD = TerminalTouchGestureSegmentType.HOLD,
+  CORNER = TerminalTouchGestureSegmentType.CORNER,
+  RETURN = TerminalTouchGestureSegmentType.RETURN,
+  RETURN_OVER = TerminalTouchGestureSegmentType.RETURN_OVER
 }
 
 export enum TouchGestureType {
@@ -50,12 +63,12 @@ export function isReturn(d1: Direction, d2: Direction) {
 export const isTouch = (e: TouchEvent|MouseEvent) => e.type.indexOf('touch') !== -1
 
 export class AbstractTouchGesture {
-  protected _type: TouchGestureType
+  protected _type: TouchGestureType|InnerTouchGestureSegmentType|TerminalTouchGestureSegmentType
   protected _direction?: Direction
   protected _cornerDirection?: Direction
 
   constructor(
-    type: TouchGestureType,
+    type: TouchGestureType|InnerTouchGestureSegmentType|TerminalTouchGestureSegmentType,
     direction?: Direction,
     cornerDirection?: Direction
   ) {
@@ -112,29 +125,46 @@ export class AbstractTouchGesture {
 export default class TouchGesture extends AbstractTouchGesture {
   private _complete: boolean
   private onComplete?: (g: TouchGesture) => any
+  private onSegment?: (s: InnerTouchGestureSegmentType, d: Direction) => any
   private _points: Group
   private times: Date[] = []
   private readonly segmentLength: number
   private holdTimeout?: NodeJS.Timeout
 
   constructor(
-    {type, direction, cornerDirection, origin, whenStart, segmentLength, onComplete}: {
-      type: TouchGestureType
+    {type, direction, cornerDirection, origin, whenStart, segmentLength, onComplete, onSegment}: {
+      type: TouchGestureType|InnerTouchGestureSegmentType|TerminalTouchGestureSegmentType
       direction?: Direction
       cornerDirection?: Direction
       origin: IPt
       whenStart: Date
       segmentLength: number
       onComplete?: (g: TouchGesture) => any
+      onSegment?: (s: InnerTouchGestureSegmentType, d: Direction) => any
     }
   ) {
     super(type, direction, cornerDirection)
     this._complete = false
     this.onComplete = onComplete
+    this.onSegment = onSegment
     this._points = new Group(new Pt(origin))
     this.times.push(whenStart)
     this.segmentLength = segmentLength
     this.startHoldTimeout()
+
+    if (type === InnerTouchGestureSegmentType.TOUCH) {
+      this.innerType = type
+    }
+  }
+
+  set innerType(type: InnerTouchGestureSegmentType) {
+    if (this._type !== type) {
+      this._type = type
+
+      if (this.onSegment) {
+        this.onSegment(type, this.direction!)
+      }
+    }
   }
 
   get complete() {
@@ -174,7 +204,7 @@ export default class TouchGesture extends AbstractTouchGesture {
     )
   }
 
-  static create(e: TouchEvent|MouseEvent, segmentLength: number, onComplete?: (g: TouchGesture) => any) {
+  static create(e: TouchEvent|MouseEvent, segmentLength: number, onComplete?: (g: TouchGesture) => any, onSegment?: (s: InnerTouchGestureSegmentType, d: Direction) => any) {
     logger.info(`create gesture on event type=${e.type}`)
 
     return new TouchGesture({ 
@@ -185,7 +215,8 @@ export default class TouchGesture extends AbstractTouchGesture {
       },
       whenStart: new Date(),
       segmentLength,
-      onComplete
+      onComplete,
+      onSegment
     })
   }
 
@@ -230,8 +261,8 @@ export default class TouchGesture extends AbstractTouchGesture {
             // swipe from center
             this._points.push(p)
             this._direction = dir
-            this._type = (
-              isCardinal(dir) ? TouchGestureType.CARDINAL_SWIPE : TouchGestureType.DIAGONAL_SWIPE
+            this.innerType = (
+              isCardinal(dir) ? InnerTouchGestureSegmentType.CARDINAL_SWIPE : InnerTouchGestureSegmentType.DIAGONAL_SWIPE
             )
 
             this.startHoldTimeout()

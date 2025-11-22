@@ -1,5 +1,5 @@
 import KeyLabel from "@lib/keyLabel"
-import TouchGesture from "@lib/touchGesture"
+import TouchGesture, { InnerTouchGestureSegmentType } from "@lib/touchGesture"
 import pino from "pino"
 import { useRef, useContext, useEffect, useState, ModifierKey, Dispatch, SetStateAction } from "react"
 import { PageCanvasCtx } from "@context/pageCanvasCtx"
@@ -7,6 +7,7 @@ import { CanvasSpace, Circle } from "pts"
 import KeyMap from "@lib/keyMap"
 import { TextAreaEditCtx } from "@context/textAreaCtx"
 import { KeyGridCtx, ModifierKeyListener } from "@context/keyGridCtx"
+import { Direction } from "@lib/orientation"
 
 const logger = pino({
   name: 'key-cell'
@@ -22,6 +23,9 @@ export default function KeyCell(
   const [gesture, setGesture] = useState(null as TouchGesture|null)
   const [isShift, setIsShift] = useState(false)
   const [isCapsLock, setIsCapsLock] = useState(false)
+  const [gestureSegment, setGestureSegment] = useState(
+    {} as {segment?: InnerTouchGestureSegmentType, direction?: Direction}
+  )
   const canvas = useContext(PageCanvasCtx)
   const textAreaEdit = useContext(TextAreaEditCtx)
   const keyGridState = useContext(KeyGridCtx)
@@ -106,7 +110,15 @@ export default function KeyCell(
         keystroke.dispatch(textAreaEdit.current, keyGridState.current)
       }
     }
+
+    setGestureSegment({})
   }
+
+  const onGestureSegment = (
+    label.pseudoZoneCardinalSwipeDefined 
+    ? (segment: InnerTouchGestureSegmentType, direction: Direction) => { setGestureSegment({segment, direction}) } 
+    : undefined
+  )
 
   return (
     <div
@@ -120,12 +132,22 @@ export default function KeyCell(
       ].join(' ')}
       onTouchStart={(e) => {
         e.preventDefault()
-        setGesture(TouchGesture.create(e, getGestureSegmentLength(), onGesture))
+        setGesture(TouchGesture.create(
+          e, 
+          getGestureSegmentLength(), 
+          onGesture, 
+          onGestureSegment
+        ))
       }}
       // TODO handle both touch screen and mouse without duplicate events
       // onMouseDown={(e) => {
       //   e.preventDefault()
-      //   setGesture(TouchGesture.create(e, getGestureSegmentLength(), onGesture))
+      //   setGesture(TouchGesture.create(
+      //     e, 
+      //     getGestureSegmentLength(), 
+      //     onGesture, 
+      //     label.pseudoZoneCardinalSwipeDefined ? (s, d) => { setGestureSegment(s); setGestureDirection(d) } : undefined
+      //   ))
       // }}
       onTouchMove={(e) => {
         if (gesture && !gesture.complete) {
@@ -151,21 +173,21 @@ export default function KeyCell(
       }} >
       <div
         className="flex flex-row justify-evenly">
-        <pre>{label.getZone('upleft', label.getPseudo(isShift, isCapsLock))}</pre>
-        <pre>{label.getZone('up', label.getPseudo(isShift, isCapsLock))}</pre>
-        <pre>{label.getZone('upright', label.getPseudo(isShift, isCapsLock))}</pre>
+        <pre>{label.getZone('upleft', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
+        <pre>{label.getZone('up', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
+        <pre>{label.getZone('upright', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
       </div>
       <div
         className="flex flex-row justify-evenly">
-        <pre>{label.getZone('left', label.getPseudo(isShift, isCapsLock))}</pre>
-        <pre>{label.getZone('center', label.getPseudo(isShift, isCapsLock))}</pre>
-        <pre>{label.getZone('right', label.getPseudo(isShift, isCapsLock))}</pre>
+        <pre>{label.getZone('left', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
+        <pre>{label.getZone('center', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
+        <pre>{label.getZone('right', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
       </div>
       <div
         className="flex flex-row justify-evenly">
-        <pre>{label.getZone('downleft', label.getPseudo(isShift, isCapsLock))}</pre>
-        <pre>{label.getZone('down', label.getPseudo(isShift, isCapsLock))}</pre>
-        <pre>{label.getZone('downright', label.getPseudo(isShift, isCapsLock))}</pre>
+        <pre>{label.getZone('downleft', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
+        <pre>{label.getZone('down', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
+        <pre>{label.getZone('downright', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
       </div>
     </div>
   )
