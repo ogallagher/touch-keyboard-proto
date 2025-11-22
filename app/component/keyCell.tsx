@@ -1,10 +1,11 @@
 import KeyLabel from "@lib/keyLabel"
-import TouchGesture, { TouchGestureType } from "@lib/touchGesture"
+import TouchGesture from "@lib/touchGesture"
 import pino from "pino"
 import { useRef, useContext, useEffect, useState } from "react"
 import { PageCanvasCtx } from "@context/pageCanvasCtx"
 import { CanvasSpace, Circle } from "pts"
 import KeyMap from "@lib/keyMap"
+import { TextAreaEditCtx } from "@context/textAreaCtx"
 
 const logger = pino({
   name: 'key-cell'
@@ -19,6 +20,7 @@ export default function KeyCell(
   const self = useRef(null as HTMLDivElement|null)
   const [gesture, setGesture] = useState(null as TouchGesture|null)
   const canvas = useContext(PageCanvasCtx)
+  const textAreaEdit = useContext(TextAreaEditCtx)
 
   const getGestureSegmentLength = () => (
     Math.min(self.current!.clientWidth, self.current!.clientHeight) * 0.4
@@ -75,12 +77,9 @@ export default function KeyCell(
     else {
       logger.info(`keystroke=${keystroke} for gesture=${gesture} points=${gesture.points}`)
       let target = document.activeElement || document
-        
-      if (
-        target instanceof HTMLTextAreaElement || 
-        (target instanceof HTMLInputElement && target.type === 'text')
-      ) {
-        keystroke.dispatch(target)
+
+      if (target === textAreaEdit.current.target.current) {
+        keystroke.dispatch(textAreaEdit.current)
       }
     }
   }

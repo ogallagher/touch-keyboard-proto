@@ -1,3 +1,5 @@
+import { EditTextArea } from "@context/textAreaCtx"
+
 export type TypeChar = string
 
 export enum MetaChar {
@@ -20,6 +22,8 @@ export enum MetaChar {
 
 export type KeyChar = TypeChar|MetaChar
 
+export const cursorChar = '┃' // 0x2503
+
 export default class KeyStroke {
   private chars: KeyChar[] = []
 
@@ -31,9 +35,26 @@ export default class KeyStroke {
     return `KS[${this.chars.join('+')}]`
   }
 
-  public dispatch(target: HTMLTextAreaElement|HTMLInputElement) {
+  public dispatch(textAreaEdit: EditTextArea) {
     for (let char of this.chars) {
-      target.value += char
+      switch (char) {
+        case MetaChar.LEFT:
+          textAreaEdit.moveCursor(-1)
+          break
+        
+        case MetaChar.RIGHT:
+          textAreaEdit.moveCursor(+1)
+          break
+
+        case MetaChar.BACKSPACE:
+          textAreaEdit.deleteChars(1)
+          break
+
+        default:
+          textAreaEdit.typeChars(char)
+          break
+      }
+      
     }
   }
 }

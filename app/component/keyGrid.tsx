@@ -46,20 +46,22 @@ export default function KeyGrid(
     }
   }
 
-  function scrollLock() {
-    ['scroll', 'touchmove', 'wheel'].forEach((eventType) => {
-      grid.current.addEventListener(
-        eventType, 
-        (e) => e.preventDefault()
-      )
-    })
-
-    // document.body.classList.add('overflow-hidden')
-  }
-
+  // lock scroll
   useEffect(
     () => {
-      scrollLock()
+      const ignoreScroll = (e: Event) => { e.preventDefault() }
+      const scrollEventTypes = ['scroll', 'touchmove', 'wheel']
+
+      scrollEventTypes.forEach((eventType) => {
+        grid.current.addEventListener(
+          eventType, 
+          ignoreScroll
+        )
+      })
+
+      // document.body.classList.add('overflow-hidden')
+
+      return () => scrollEventTypes.forEach((eventType) => grid.current?.removeEventListener(eventType, ignoreScroll))
     },
     []
   )

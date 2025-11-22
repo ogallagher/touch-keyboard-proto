@@ -1,6 +1,5 @@
 'use client'
 
-import { websiteBasePath } from "@lib/path"
 import Header from "@component/header"
 import KeyGrid from "@component/keyGrid"
 import GridDimensions from "@lib/gridDimensions"
@@ -9,6 +8,8 @@ import { Orientation } from "@lib/orientation"
 import { useEffect, useRef, useState } from "react"
 import { PageCanvasCtx } from "@context/pageCanvasCtx"
 import { frthenKeyboard } from "@lib/keyboardDefinitions/eng_frthen"
+import TextArea from "@component/textArea"
+import { EditTextArea, TextAreaEditCtx } from "@context/textAreaCtx"
 
 export default function Home() {
   const [gridDimensions, setGridDimensions] = useState(new GridDimensions(
@@ -16,35 +17,27 @@ export default function Home() {
     frthenKeyboard.keys.length
   ))
   const canvas = useRef(null as unknown as HTMLCanvasElement)
-  const textArea = useRef(null as unknown as HTMLTextAreaElement)
-  const [windowInnerHeight, setWindowInnerHeight] = useState(null as unknown as number)
+  // const [windowInnerHeight, setWindowInnerHeight] = useState(null as unknown as number)
+  const textAreaEdit = useRef(null as unknown as EditTextArea)
 
-  useEffect(
-    () => {
-      textArea.current.selectionStart = 0
-      textArea.current.selectionEnd = 0
-      textArea.current.focus()
-    },
-    []
-  )
+  // useEffect(
+  //   () => {
+  //     const onResize = () => setWindowInnerHeight(window.innerHeight)
+  //     window.addEventListener('resize', onResize)
 
-  useEffect(
-    () => {
-      const onResize = () => setWindowInnerHeight(window.innerHeight)
-      window.addEventListener('resize', onResize)
+  //     onResize()
 
-      onResize()
-
-      return () => window.removeEventListener('resize', onResize)
-    },
-    []
-  )
+  //     return () => window.removeEventListener('resize', onResize)
+  //   },
+  //   []
+  // )
   
   return (
     <div 
       className={[
         "flex flex-col justify-start gap-2",
-        `h-[${windowInnerHeight}px]`
+        'h-dvh'
+        // `h-[${windowInnerHeight}px]`
       ].join(' ')}>
       {/* overlay graphics canvas */}
       <canvas
@@ -57,11 +50,7 @@ export default function Home() {
       {/* eval */}
       <section
         className="flex flex-row justify-evenly" >
-        <textarea
-          ref={textArea}
-          className="resize font-mono"
-          placeholder="free form text area"
-          readOnly={true} ></textarea>
+        <TextArea edit={textAreaEdit} />
       </section>
 
       {/* config */}
@@ -80,7 +69,9 @@ export default function Home() {
       </div>
 
       <PageCanvasCtx value={canvas}>
-        <KeyGrid dimensions={gridDimensions} keyboard={frthenKeyboard} />
+        <TextAreaEditCtx value={textAreaEdit}>
+          <KeyGrid dimensions={gridDimensions} keyboard={frthenKeyboard} />
+        </TextAreaEditCtx>
       </PageCanvasCtx>
     </div>
   )
