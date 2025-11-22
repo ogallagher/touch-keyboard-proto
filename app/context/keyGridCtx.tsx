@@ -14,21 +14,39 @@ export class KeyGridState {
   ])
   
   public readonly minMajListeners: Set<ModifierKeyListener> = new Set()
+  public readonly shiftListeners: Set<ModifierKeyListener> = new Set()
+  public readonly capsLockListeners: Set<ModifierKeyListener> = new Set()
 
   private setModifierKeys(mkeys: MetaChar[], value: boolean) {
     let updateMinMaj = false
+    let updateShift = false
+    let updateCapsLock = false
 
     mkeys.forEach(mkey => {
       this._modifierKeys.set(mkey, value)
 
-      if (mkey === MetaChar.SHIFT || mkey === MetaChar.CAPS_LOCK) {
+
+      if (mkey === MetaChar.SHIFT) {
         updateMinMaj = true
+        updateShift = true
+      }
+      else if (mkey === MetaChar.CAPS_LOCK) {
+        updateMinMaj = true
+        updateCapsLock = true
       }
     })
 
     if (updateMinMaj) {
       const isMaj = (this._modifierKeys.get(MetaChar.SHIFT) || this._modifierKeys.get(MetaChar.CAPS_LOCK))!
       this.minMajListeners.forEach(l => l(isMaj))
+    }
+    if (updateShift) {
+      const isShift = this._modifierKeys.get(MetaChar.SHIFT)!
+      this.shiftListeners.forEach(l => l(isShift))
+    }
+    if (updateCapsLock) {
+      const isCapsLock = this._modifierKeys.get(MetaChar.CAPS_LOCK)!
+      this.capsLockListeners.forEach(l => l(isCapsLock))
     }
   }
 

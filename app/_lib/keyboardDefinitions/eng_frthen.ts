@@ -11,7 +11,9 @@ export const frthenKeyboard = new KeyboardDefinition([
     {
       label: new KeyLabel({ 
         center: 'f',
-        down: 'v'
+        down: 'v',
+        center_shift: 'F',
+        down_shift: 'V'
       }),
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('f')],
@@ -23,7 +25,12 @@ export const frthenKeyboard = new KeyboardDefinition([
         center: 'r',
         left: 'y',
         down: 'w',
-        right: 're'
+        right: 're',
+        center_shift: 'R',
+        left_shift: 'Y',
+        down_shift: 'W',
+        right_shift: 'Re',
+        right_capslock: 'RE'
       }),
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('r')],
@@ -40,7 +47,14 @@ export const frthenKeyboard = new KeyboardDefinition([
         left: 'd',
         down: 'th',
         right: 'j',
-        up: 'to'
+        up: 'to',
+        center_shift: 'T',
+        left_shift: 'D',
+        down_shift: 'Th',
+        right_shift: 'J',
+        up_shift: 'To',
+        down_capslock: 'TH',
+        up_capslock: 'TO'
       }),
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('t')],
@@ -60,7 +74,14 @@ export const frthenKeyboard = new KeyboardDefinition([
         center: 'h',
         left: 'hi',
         right: 'ha',
-        up: 'he'
+        up: 'he',
+        center_shift: 'H',
+        left_shift: 'Hi',
+        right_shift: 'Ha',
+        up_shift: 'He',
+        left_capslock: 'HI',
+        right_capslock: 'HA',
+        up_capslock: 'HE'
       }),
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('h')],
@@ -75,7 +96,12 @@ export const frthenKeyboard = new KeyboardDefinition([
         left: 'i',
         down: 'u',
         right: 'a',
-        up: 'o'
+        up: 'o',
+        center_shift: 'E',
+        left_shift: 'I',
+        down_shift: 'U',
+        right_shift: 'A',
+        up_shift: 'O'
       }),
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('e')],
@@ -87,19 +113,27 @@ export const frthenKeyboard = new KeyboardDefinition([
     },
     {
       label: new KeyLabel({
-        center: 'n l',
+        center: 'n',
         left: 'an',
         right: 'in',
         down: 'ng',
-        up: 'nd'
+        up: 'l',
+        center_shift: 'N',
+        left_shift: 'An',
+        right_shift: 'In',
+        down_shift: 'Ng',
+        up_shift: 'L',
+        left_capslock: 'AN',
+        right_capslock: 'IN',
+        down_capslock: 'NG'
       }),
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('n')],
         [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.LEFT), new KeyStroke('a', 'n')],
         [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.DOWN), new KeyStroke('n', 'g')],
         [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.RIGHT), new KeyStroke('i', 'n')],
-        [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.UP), new KeyStroke('n', 'd')],
-        [new AbstractTouchGesture(TouchGestureType.CARDINAL_RETURN_SWIPE, Direction.UP), new KeyStroke('l')]
+        [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.UP), new KeyStroke('l')],
+        [new AbstractTouchGesture(TouchGestureType.CARDINAL_RETURN_SWIPE, Direction.UP), new KeyStroke('n', 'd')]
       ])
     }
   ],
@@ -110,7 +144,12 @@ export const frthenKeyboard = new KeyboardDefinition([
         center: 's',
         left: 'z',
         right: 'c',
-        up: 'sh'
+        up: 'sh',
+        center_shift: 'S',
+        left_shift: 'Z',
+        right_shift: 'C',
+        up_shift: 'Sh',
+        up_capslock: 'SH'
       }),
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('s')],
@@ -126,7 +165,11 @@ export const frthenKeyboard = new KeyboardDefinition([
         down: 'x',
         right: 'q',
         up: 'g',
-        left: '⌫'
+        left: '⌫',
+        center_shift: 'K',
+        down_shift: 'X',
+        right_shift: 'Q',
+        up_shift: 'G'
       }),
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('k')],
@@ -140,7 +183,10 @@ export const frthenKeyboard = new KeyboardDefinition([
       label: new KeyLabel({
         center: 'p',
         left: 'm',
-        up: 'b'
+        up: 'b',
+        center_shift: 'P',
+        left_shift: 'M',
+        up_shift: 'B'
       }),
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('p')],
