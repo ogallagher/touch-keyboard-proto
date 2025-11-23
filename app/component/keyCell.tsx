@@ -1,13 +1,14 @@
 import KeyLabel from "@lib/keyLabel"
 import TouchGesture, { InnerTouchGestureSegmentType } from "@lib/touchGesture"
 import pino from "pino"
-import { useRef, useContext, useEffect, useState, ModifierKey, Dispatch, SetStateAction } from "react"
+import { useRef, useContext, useEffect, useState, Dispatch, SetStateAction } from "react"
 import { PageCanvasCtx } from "@context/pageCanvasCtx"
 import { CanvasSpace, Circle } from "pts"
 import KeyMap from "@lib/keyMap"
 import { TextAreaEditCtx } from "@context/textAreaCtx"
 import { KeyGridCtx, ModifierKeyListener } from "@context/keyGridCtx"
 import { Direction } from "@lib/orientation"
+import { isTouchScreen } from "@lib/platform"
 
 const logger = pino({
   name: 'key-cell'
@@ -19,7 +20,7 @@ export default function KeyCell(
     map: KeyMap
   }
 ) {
-  const self = useRef(null as HTMLDivElement|null)
+  const self = useRef(null as unknown as HTMLDivElement)
   const [gesture, setGesture] = useState(null as TouchGesture|null)
   const [isShift, setIsShift] = useState(false)
   const [isCapsLock, setIsCapsLock] = useState(false)
@@ -96,6 +97,80 @@ export default function KeyCell(
     [label]
   )
 
+  // listen to mouse and touch events
+  useEffect(
+    () => {
+      const start = (e: TouchEvent|MouseEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+        setGesture(TouchGesture.create(
+          e, 
+          getGestureSegmentLength(), 
+          onGesture, 
+          onGestureSegment
+        ))
+      }
+
+      const move = (e: TouchEvent|MouseEvent) => {
+        if (gesture && !gesture.complete) {
+          e.preventDefault()
+          e.stopPropagation()
+          gesture.update(e)
+        }
+      }
+
+      const end = (e: TouchEvent|MouseEvent) => {
+        if (gesture && !gesture.complete) {
+          e.preventDefault()
+          e.stopPropagation()
+          gesture?.update(e)
+        }
+      }
+
+      const setMouseHover = () => {
+        if (gesture && !gesture.complete) {
+          keyGridState.current.mouseHoverKeyCell.current = self.current
+        }
+      }
+      const unsetMouseHover = () => {
+        if (keyGridState.current.mouseHoverKeyCell.current === self.current) {
+          keyGridState.current.mouseHoverKeyCell.current = null
+        }
+      }
+
+      if (isTouchScreen()) {
+        self.current?.addEventListener('touchstart', start)
+        self.current?.addEventListener('touchmove', move)
+        self.current?.addEventListener('touchend', end)
+      }
+      else {
+        self.current?.addEventListener('mousedown', start)
+        self.current?.addEventListener('mousemove', move)
+        self.current?.addEventListener('mouseup', end)
+        self.current?.addEventListener('mouseup', unsetMouseHover)
+        self.current?.addEventListener('mouseleave', setMouseHover)
+        self.current?.addEventListener('mouseenter', unsetMouseHover)
+      }
+
+      return () => {
+        if (isTouchScreen()) {
+          self.current?.removeEventListener('touchstart', start)
+          self.current?.removeEventListener('touchmove', move)
+          self.current?.removeEventListener('touchend', end)
+        }
+        else {
+          self.current?.removeEventListener('mousedown', start)
+          self.current?.removeEventListener('mousemove', move)
+          self.current?.removeEventListener('mouseup', end)
+          self.current?.removeEventListener('mouseup', unsetMouseHover)
+          self.current?.removeEventListener('mouseleave', setMouseHover)
+          self.current?.removeEventListener('mouseenter', unsetMouseHover)
+        }
+      }
+    },
+    [gesture]
+  )
+
   function onGesture(gesture: TouchGesture) {
     const keystroke = map.getKeystroke(gesture)
 
@@ -129,48 +204,7 @@ export default function KeyCell(
         'grow',
         'flex flex-col justify-evenly',
         'rounded-lg'
-      ].join(' ')}
-      onTouchStart={(e) => {
-        e.preventDefault()
-        setGesture(TouchGesture.create(
-          e, 
-          getGestureSegmentLength(), 
-          onGesture, 
-          onGestureSegment
-        ))
-      }}
-      // TODO handle both touch screen and mouse without duplicate events
-      // onMouseDown={(e) => {
-      //   e.preventDefault()
-      //   setGesture(TouchGesture.create(
-      //     e, 
-      //     getGestureSegmentLength(), 
-      //     onGesture, 
-      //     label.pseudoZoneCardinalSwipeDefined ? (s, d) => { setGestureSegment(s); setGestureDirection(d) } : undefined
-      //   ))
-      // }}
-      onTouchMove={(e) => {
-        if (gesture && !gesture.complete) {
-          e.preventDefault()
-          gesture.update(e)
-        }
-      }}
-      // onMouseMove={(e) => {
-      //   if (gesture && !gesture.complete) {
-      //     gesture.update(e)         
-      //   }
-      // }}
-      onTouchEnd={(e) => {
-        e.preventDefault()
-        gesture?.update(e)
-      }}
-      // onMouseUp={(e) => {
-      //   e.preventDefault()
-      //   gesture?.update(e)
-      // }}
-      onTouchCancel={() => {
-        setGesture(null)
-      }} >
+      ].join(' ')} >
       <div
         className="flex flex-row justify-evenly">
         <pre>{label.getZone('upleft', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>

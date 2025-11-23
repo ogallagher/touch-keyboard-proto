@@ -1,5 +1,4 @@
 import { Cardinal, Diagonal, Direction, headingToDirection, isAcute, isCardinal, isPerpendicular, toOpposite } from "@lib/orientation"
-import type { MouseEvent, TouchEvent } from "react"
 import { Group, IPt, Pt } from "pts"
 import pino from "pino"
 

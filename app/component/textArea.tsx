@@ -30,9 +30,10 @@ export default function TextArea(
   return (
     <textarea
       ref={textArea}
-      className="resize font-mono"
-      placeholder="free form text area"
-      readOnly={true} >
+      className="max-sm:field-sizing-content md:resize min-w-xs min-h-8 font-mono"
+      placeholder="composer text area"
+      readOnly={true} 
+      >
     </textarea>
   )
 }

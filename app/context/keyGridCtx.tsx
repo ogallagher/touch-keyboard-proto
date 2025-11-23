@@ -1,5 +1,5 @@
 import { MetaChar } from "@lib/keyStroke"
-import { createContext, RefObject } from "react"
+import { createContext, RefObject, useRef } from "react"
 
 export type ModifierKeyListener = (v: boolean) => void
 
@@ -16,6 +16,8 @@ export class KeyGridState {
   public readonly minMajListeners: Set<ModifierKeyListener> = new Set()
   public readonly shiftListeners: Set<ModifierKeyListener> = new Set()
   public readonly capsLockListeners: Set<ModifierKeyListener> = new Set()
+
+  public mouseHoverKeyCell = useRef(null as HTMLDivElement|null)
 
   private setModifierKeys(mkeys: MetaChar[], value: boolean) {
     let updateMinMaj = false

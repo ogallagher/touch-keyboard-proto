@@ -3,7 +3,9 @@ import KeyCell from "./keyCell"
 import KeyboardDefinition from "@lib/keyboardDefinition"
 import KeyLabel from "@lib/keyLabel"
 import KeyMap from "@lib/keyMap"
-import { useEffect, useRef } from "react"
+import { useContext, useEffect, useRef } from "react"
+import { KeyGridCtx } from "@context/keyGridCtx"
+import { isTouchScreen } from "@lib/platform"
 
 export default function KeyGrid(
   { dimensions, keyboard }: {
@@ -12,6 +14,7 @@ export default function KeyGrid(
   }
 ) {
   const grid = useRef(null as unknown as HTMLDivElement)
+  const keyGridState = useContext(KeyGridCtx)
 
   function* getKeyCells(row: number) {
     for (let col=0; col<dimensions.width; col++) {
@@ -62,6 +65,33 @@ export default function KeyGrid(
       // document.body.classList.add('overflow-hidden')
 
       return () => scrollEventTypes.forEach((eventType) => grid.current?.removeEventListener(eventType, ignoreScroll))
+    },
+    []
+  )
+
+  // mouse events that exit key cells
+  useEffect(
+    () => {
+      if (!isTouchScreen()) {
+        const relay = (e: MouseEvent) => {
+          let _e = new MouseEvent(
+            e.type,
+            {
+              clientX: e.clientX,
+              clientY: e.clientY
+            }
+          )
+          keyGridState.current?.mouseHoverKeyCell.current?.dispatchEvent(_e)
+        }
+
+        window.addEventListener('mousemove', relay)
+        window.addEventListener('mouseup', relay)
+
+        return () => {
+          window.removeEventListener('mousemove', relay)
+          window.removeEventListener('mouseup', relay)
+        }
+      }
     },
     []
   )

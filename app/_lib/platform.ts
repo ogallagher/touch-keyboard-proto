@@ -1,0 +1,1 @@
+export const isTouchScreen = () => window.ontouchstart !== undefined
