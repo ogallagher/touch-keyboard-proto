@@ -1,10 +1,12 @@
 import { Cardinal, Diagonal, Direction } from "@lib/orientation"
-import { InnerTouchGestureSegmentType } from "@lib/touchGesture"
+import { InitGestureSegmentType } from "@lib/touchGesture"
 
 export type Zone = 'center'|'up'|'right'|'down'|'left'|'upright'|'downright'|'downleft'|'upleft'
-export type PseudoCond = 'shift'|'capslock'|InnerTouchGestureSegmentType
+export type PseudoCond = 'shift'|'capslock'|InitGestureSegmentType
 
 export class ZoneKey {
+  static readonly strDelim = '_'
+
   constructor(
     public readonly zone: Zone,
     public readonly pseudo?: PseudoCond,
@@ -15,8 +17,13 @@ export class ZoneKey {
     return (
       [this.zone, this.pseudo, this.direction]
       .filter(v => v)
-      .join('_')
+      .join(ZoneKey.strDelim)
     )
+  }
+
+  static fromString(s: string) {
+    const [zone, pseudo = undefined, direction = undefined] = s.split(this.strDelim)
+    return new ZoneKey(zone as Zone, pseudo as PseudoCond, direction as Direction)
   }
 }
 
@@ -25,8 +32,19 @@ export default class KeyLabel {
 
   constructor(values: [ZoneKey, string][] = []) {
     for (let [key, val] of values) {
-      this.values.set(key.toString(), val)
+      this.set(key, val)
     }
+  }
+
+  entries(): [ZoneKey, string|undefined][] {
+    return (
+      [...this.values.entries()]
+      .map(([zoneStr, label]) => [ZoneKey.fromString(zoneStr), label])
+    )
+  }
+
+  set(zone: ZoneKey, label: string|undefined) {
+    this.values.set(zone.toString(), label)
   }
 
   protected pseudoZoneDefined(
@@ -55,13 +73,13 @@ export default class KeyLabel {
 
   get pseudoZoneCardinalSwipeDefined() {
     return this.pseudoZoneDefined(
-      InnerTouchGestureSegmentType.CARDINAL_SWIPE, 
+      InitGestureSegmentType.CARDINAL_SWIPE, 
       [Cardinal.UP, Cardinal.RIGHT, Cardinal.DOWN, Cardinal.LEFT],
       ['center', 'up', 'right', 'down', 'left']
     )
   }
 
-  getPseudo(shift?: boolean, capslock?: boolean, gestureSegment?: InnerTouchGestureSegmentType): PseudoCond|undefined {
+  getPseudo(shift?: boolean, capslock?: boolean, gestureSegment?: InitGestureSegmentType): PseudoCond|undefined {
     if (shift) return 'shift'
     if (capslock) return 'capslock'
     if (gestureSegment) return gestureSegment

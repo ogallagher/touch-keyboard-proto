@@ -37,7 +37,7 @@ export default function ConfigEvalSection(
       </section>
 
       {/* config mode */}
-      <div
+      <section
         className={[
           'flex-row justify-evenly gap-1 text-2xl',
           mode === ConfigEvalMode.Config ? 'flex' : 'hidden'
@@ -52,7 +52,7 @@ export default function ConfigEvalSection(
           orientation={Orientation.Vertical}
           onDec={() => setGridDimensions(gridDimensions.rowAdd(-1))}
           onInc={() => setGridDimensions(gridDimensions.rowAdd(+1))} />
-      </div>
+      </section>
 
       {/* switch between modes */}
       <button 

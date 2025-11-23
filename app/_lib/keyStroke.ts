@@ -18,7 +18,9 @@ export enum MetaChar {
   UP = '<up>',
   RIGHT = '<right>',
   DOWN = '<down>',
-  LEFT = '<left>'
+  LEFT = '<left>',
+
+  CLOSE_KEYBOARD = '<close-keyb>'
 }
 
 export type KeyChar = TypeChar|MetaChar
@@ -36,7 +38,7 @@ export default class KeyStroke {
     return `KS[${this.chars.join('+')}]`
   }
 
-  public dispatch(textAreaEdit: EditTextArea, keyState: KeyGridState) {
+  public dispatch(textAreaEdit: EditTextArea, keyGridState: KeyGridState) {
     for (let char of this.chars) {
       switch (char) {
         case MetaChar.LEFT:
@@ -52,33 +54,37 @@ export default class KeyStroke {
           break
 
         case MetaChar.SHIFT:
-          if (keyState.getModifierKey(MetaChar.SHIFT)) {
-            keyState.releaseModifierKeys(MetaChar.SHIFT)
+          if (keyGridState.getModifierKey(MetaChar.SHIFT)) {
+            keyGridState.releaseModifierKeys(MetaChar.SHIFT)
           }
           else {
-            keyState.pressModifierKeys(MetaChar.SHIFT)
+            keyGridState.pressModifierKeys(MetaChar.SHIFT)
           }
-          keyState.releaseModifierKeys(MetaChar.CAPS_LOCK)
+          keyGridState.releaseModifierKeys(MetaChar.CAPS_LOCK)
           break
         
         case MetaChar.CAPS_LOCK:
-          if (keyState.getModifierKey(MetaChar.CAPS_LOCK)) {
-            keyState.releaseModifierKeys(MetaChar.CAPS_LOCK)
+          if (keyGridState.getModifierKey(MetaChar.CAPS_LOCK)) {
+            keyGridState.releaseModifierKeys(MetaChar.CAPS_LOCK)
           }
           else {
-            keyState.pressModifierKeys(MetaChar.CAPS_LOCK)
+            keyGridState.pressModifierKeys(MetaChar.CAPS_LOCK)
           }
-          keyState.releaseModifierKeys(MetaChar.SHIFT)
+          keyGridState.releaseModifierKeys(MetaChar.SHIFT)
+          break
+
+        case MetaChar.CLOSE_KEYBOARD:
+          keyGridState.deactivateKeyGrid.current()
           break
 
         default:
-          if (keyState.getModifierKey(MetaChar.SHIFT) || keyState.getModifierKey(MetaChar.CAPS_LOCK)) {
+          if (keyGridState.getModifierKey(MetaChar.SHIFT) || keyGridState.getModifierKey(MetaChar.CAPS_LOCK)) {
             textAreaEdit.typeChars(char.toUpperCase())
           }
           else {
             textAreaEdit.typeChars(char)
           }
-          keyState.releaseEphemeralKeys()
+          keyGridState.releaseEphemeralKeys()
           break
       }
     }

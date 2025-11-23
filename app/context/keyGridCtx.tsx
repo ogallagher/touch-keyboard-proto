@@ -1,9 +1,13 @@
+import KeyboardDefinition from "@lib/keyboardDefinition"
 import { MetaChar } from "@lib/keyStroke"
 import { createContext, RefObject, useRef } from "react"
 
 export type ModifierKeyListener = (v: boolean) => void
 
 export class KeyGridState {
+  public readonly addKeyGrid = useRef(null as unknown as (keyboard: KeyboardDefinition, onDeactivate?: () => void) => void)
+  public readonly deactivateKeyGrid = useRef(null as unknown as () => void)
+
   private readonly _modifierKeys: Map<MetaChar, boolean> = new Map([
     [MetaChar.SHIFT, false],
     [MetaChar.CAPS_LOCK, false],

@@ -1,14 +1,38 @@
 import { AbstractTouchGesture, TouchGestureType, typeWithoutHold, typeWithoutOverReturn } from "@lib/touchGesture"
 import KeyStroke from "@lib/keyStroke"
+import { ChildKeyboardDefinition } from "./keyboardDefinition"
 
 export default class KeyMap {
   private readonly gestures: Map<string, AbstractTouchGesture> = new Map()
   private readonly gestureToKeystroke: Map<string, KeyStroke> = new Map()
+  private readonly gestureToKeyboard: Map<string, ChildKeyboardDefinition> = new Map()
 
-  constructor(v: [AbstractTouchGesture, KeyStroke][] = []) {
-    for (let [gesture, keystroke] of v) {
-      this.gestures.set(gesture.id, gesture)
-      this.gestureToKeystroke.set(gesture.id, keystroke)
+  constructor(v: [AbstractTouchGesture, KeyStroke|ChildKeyboardDefinition][] = []) {
+    for (let [gesture, keys] of v) {
+      this.set(gesture, keys)
+    }
+  }
+
+  entries() {
+    const keystrokes: [AbstractTouchGesture, KeyStroke|ChildKeyboardDefinition][] = (
+      [...this.gestureToKeystroke.entries()]
+      .map(([gid, keystroke]) => [this.gestures.get(gid)!, keystroke])
+    )
+    const keyboards: [AbstractTouchGesture, KeyStroke|ChildKeyboardDefinition][] = (
+      [...this.gestureToKeyboard.entries()]
+      .map(([gid, keyboard]) => [this.gestures.get(gid)!, keyboard])
+    )
+
+    return keystrokes.concat(keyboards)
+  }
+
+  set(gesture: AbstractTouchGesture, keys: KeyStroke|ChildKeyboardDefinition) {
+    this.gestures.set(gesture.id, gesture)
+    if (keys instanceof KeyStroke) {
+      this.gestureToKeystroke.set(gesture.id, keys)
+    }
+    else {
+      this.gestureToKeyboard.set(gesture.id, keys)
     }
   }
 
@@ -39,6 +63,10 @@ export default class KeyMap {
     }
 
     return keystroke
+  }
+
+  getKeyboard(gesture: AbstractTouchGesture) {
+    return this.gestureToKeyboard.get(gesture.id)
   }
 
   getAbstractGesture(gesture: AbstractTouchGesture, useHoldFallback: boolean = true, useOverReturnFallback: boolean = true) {

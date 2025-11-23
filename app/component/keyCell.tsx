@@ -1,7 +1,7 @@
 import KeyLabel from "@lib/keyLabel"
-import TouchGesture, { InnerTouchGestureSegmentType } from "@lib/touchGesture"
+import TouchGesture, { InitGestureSegmentType } from "@lib/touchGesture"
 import pino from "pino"
-import { useRef, useContext, useEffect, useState, Dispatch, SetStateAction } from "react"
+import { useRef, useContext, useEffect, useState, Dispatch, SetStateAction, RefObject } from "react"
 import { PageCanvasCtx } from "@context/pageCanvasCtx"
 import { CanvasSpace, Circle } from "pts"
 import KeyMap from "@lib/keyMap"
@@ -9,15 +9,17 @@ import { TextAreaEditCtx } from "@context/textAreaCtx"
 import { KeyGridCtx, ModifierKeyListener } from "@context/keyGridCtx"
 import { Direction } from "@lib/orientation"
 import { isTouchScreen } from "@lib/platform"
+import { KeyboardPersistance, KeyboardSize } from "@lib/keyboardDefinition"
 
 const logger = pino({
   name: 'key-cell'
 })
 
 export default function KeyCell(
-  { label, map }: {
-    label: KeyLabel,
+  { label, map, activateKeyGrid }: {
+    label: KeyLabel
     map: KeyMap
+    activateKeyGrid: RefObject<() => void>
   }
 ) {
   const self = useRef(null as unknown as HTMLDivElement)
@@ -25,7 +27,7 @@ export default function KeyCell(
   const [isShift, setIsShift] = useState(false)
   const [isCapsLock, setIsCapsLock] = useState(false)
   const [gestureSegment, setGestureSegment] = useState(
-    {} as {segment?: InnerTouchGestureSegmentType, direction?: Direction}
+    {} as {segment?: InitGestureSegmentType, direction?: Direction}
   )
   const canvas = useContext(PageCanvasCtx)
   const textAreaEdit = useContext(TextAreaEditCtx)
@@ -175,15 +177,30 @@ export default function KeyCell(
   function onGesture(gesture: TouchGesture) {
     const keystroke = map.getKeystroke(gesture)
 
-    if (!keystroke) {
-      logger.info(`no keystroke for gesture=${gesture}`)
-    }
-    else {
-      logger.info(`keystroke=${keystroke} for gesture=${gesture} points=${gesture.points}`)
+    if (keystroke) {
+      logger.info(`keystroke=${keystroke} for gesture=${gesture}`)
       let target = document.activeElement || document
 
       if (target === textAreaEdit.current.target.current) {
         keystroke.dispatch(textAreaEdit.current, keyGridState.current)
+      }
+    }
+    else {
+      const childKeyboard = map.getKeyboard(gesture)
+      if (childKeyboard) {
+        logger.info(`keyboard=${childKeyboard.keyboard.name} for gesture=${gesture}`)
+
+        switch (childKeyboard.size) {
+          case KeyboardSize.Fill:
+            keyGridState.current.addKeyGrid.current(childKeyboard.keyboard, activateKeyGrid.current)
+            break
+
+          case KeyboardSize.Embed:
+            break
+        }
+      }
+      else {
+        logger.info(`no keystroke for gesture=${gesture}`)
       }
     }
 
@@ -192,7 +209,7 @@ export default function KeyCell(
 
   const onGestureSegment = (
     label.pseudoZoneCardinalSwipeDefined 
-    ? (segment: InnerTouchGestureSegmentType, direction: Direction) => { setGestureSegment({segment, direction}) } 
+    ? (segment: InitGestureSegmentType, direction: Direction) => { setGestureSegment({segment, direction}) } 
     : undefined
   )
 
