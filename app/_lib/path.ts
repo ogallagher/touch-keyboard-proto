@@ -3,7 +3,7 @@ export const websiteBasePath = process.env.BASEPATH || '/touch-keyboard'
 
 export const githubUrl = 'https://github.com/ogallagher/touch-keyboard-proto'
 export const siblingServerUrl = {
-  BEEPIT: '/beep-it',
+  BEEPIT: '/',
   WORDSEARCH: '/wordsearch',
   QUIZCARD: '/quizcard-generator'
 }
