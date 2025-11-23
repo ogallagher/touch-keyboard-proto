@@ -1,4 +1,4 @@
-import { Gear, Play } from "react-bootstrap-icons"
+import { Gear, Play, Trash } from "react-bootstrap-icons"
 import TextArea from "@component/textArea"
 import IncDec from "./incDec"
 import GridDimensions from "@lib/gridDimensions"
@@ -25,6 +25,15 @@ export default function ConfigEvalSection(
           mode === ConfigEvalMode.Eval ? 'flex' : 'hidden' 
         ].join(' ')} >
         <TextArea edit={textAreaEdit} visible={mode === ConfigEvalMode.Eval} />
+
+        <button
+          className="cursor-pointer"
+          onClick={() => {
+            textAreaEdit.current.reset()
+          }}
+          title='clear composer text area' >
+          <Trash />
+        </button>
       </section>
 
       {/* config mode */}

@@ -11,11 +11,9 @@ export default function TextArea(
   const textArea = useRef(null as unknown as HTMLTextAreaElement)
   const cursorPos = useRef(0)
 
-  // init value with custom cursor
   // define editor
   useEffect(
     () => {
-      textArea.current.value = cursorChar
       edit.current = new EditTextArea(textArea, cursorPos)
     },
     []

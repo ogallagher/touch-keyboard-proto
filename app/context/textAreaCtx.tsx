@@ -5,7 +5,9 @@ export class EditTextArea {
   constructor(
     public readonly target: RefObject<HTMLTextAreaElement>,
     public readonly cursor: RefObject<number>
-  ) {}
+  ) {
+    this.reset()
+  }
 
   moveCursor(delta: number) {
     if (delta === 0) return
@@ -52,6 +54,12 @@ export class EditTextArea {
     )
 
     this.cursor.current -= count
+  }
+
+  reset() {
+    this.target.current.value = cursorChar
+    this.cursor.current = 0
+    this.target.current.focus()
   }
 }
 
