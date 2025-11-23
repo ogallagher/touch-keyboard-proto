@@ -3,14 +3,12 @@
 import Header from "@component/header"
 import KeyGrid from "@component/keyGrid"
 import GridDimensions from "@lib/gridDimensions"
-import IncDec from "@component/incDec"
-import { Orientation } from "@lib/orientation"
-import { useEffect, useRef, useState } from "react"
+import { useRef, useState } from "react"
 import { PageCanvasCtx } from "@context/pageCanvasCtx"
 import { frthenKeyboard } from "@lib/keyboardDefinitions/eng_frthen"
-import TextArea from "@component/textArea"
 import { EditTextArea, TextAreaEditCtx } from "@context/textAreaCtx"
 import { KeyGridCtx, KeyGridState } from "@context/keyGridCtx"
+import ConfigEvalSection from "@component/configEvalSection"
 
 export default function Home() {
   const [gridDimensions, setGridDimensions] = useState(new GridDimensions(
@@ -35,26 +33,9 @@ export default function Home() {
       {/* header */}
       <Header />
 
-      {/* eval */}
-      <section
-        className="flex flex-row justify-evenly" >
-        <TextArea edit={textAreaEdit} />
-      </section>
-
-      {/* config */}
-      <div
-        className="flex flex-row justify-evenly gap-1 text-2xl">
-        {/* config grid dimensions.width */}
-        <IncDec
-          orientation={Orientation.Horizontal} 
-          onDec={() => setGridDimensions(gridDimensions.colAdd(-1))}
-          onInc={() => setGridDimensions(gridDimensions.colAdd(+1))} />
-        {/* config grid dimensions.height */}
-        <IncDec 
-          orientation={Orientation.Vertical}
-          onDec={() => setGridDimensions(gridDimensions.rowAdd(-1))}
-          onInc={() => setGridDimensions(gridDimensions.rowAdd(+1))} />
-      </div>
+      <ConfigEvalSection
+        gridDimensions={gridDimensions} setGridDimensions={setGridDimensions}
+        textAreaEdit={textAreaEdit} />
 
       <PageCanvasCtx value={canvas}>
         <TextAreaEditCtx value={textAreaEdit}>

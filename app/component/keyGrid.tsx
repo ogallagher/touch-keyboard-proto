@@ -1,7 +1,7 @@
 import GridDimensions from "@lib/gridDimensions"
 import KeyCell from "./keyCell"
 import KeyboardDefinition from "@lib/keyboardDefinition"
-import KeyLabel from "@lib/keyLabel"
+import KeyLabel, { ZoneKey } from "@lib/keyLabel"
 import KeyMap from "@lib/keyMap"
 import { useContext, useEffect, useRef } from "react"
 import { KeyGridCtx } from "@context/keyGridCtx"
@@ -30,7 +30,7 @@ export default function KeyGrid(
         yield (
           <KeyCell 
             key={`${row},${col}`}
-            label={new KeyLabel()}
+            label={new KeyLabel([[new ZoneKey('center'), ' ']])}
             map={ new KeyMap() } />
         )
       }
