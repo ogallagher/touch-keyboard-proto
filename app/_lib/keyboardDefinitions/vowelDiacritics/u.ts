@@ -54,5 +54,13 @@ export const uDia = new KeyboardDefinition('uDia', [
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('ũ')],
       ])
     },
+    {
+      label: new KeyLabel([
+        [new ZoneKey('center'), 'u'], // plain
+      ]),
+      map: new KeyMap([
+        [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('u')],
+      ])
+    },
   ]
 ])

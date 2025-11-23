@@ -53,6 +53,14 @@ export const yDia = new KeyboardDefinition('yDia', [
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('ỹ')],
       ])
-    }
+    },
+    {
+      label: new KeyLabel([
+        [new ZoneKey('center'), 'y'], // plain
+      ]),
+      map: new KeyMap([
+        [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('y')],
+      ])
+    },
   ]
 ])

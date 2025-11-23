@@ -21,6 +21,14 @@ export const nDia = new KeyboardDefinition('nDia', [
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('ň')],
       ])
-    }
+    },
+    {
+      label: new KeyLabel([
+        [new ZoneKey('center'), 'n'], // plain
+      ]),
+      map: new KeyMap([
+        [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('n')],
+      ])
+    },
   ]
 ])

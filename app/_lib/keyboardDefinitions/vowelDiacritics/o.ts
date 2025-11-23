@@ -54,5 +54,13 @@ export const oDia = new KeyboardDefinition('oDia', [
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('õ')],
       ])
     },
+    {
+      label: new KeyLabel([
+        [new ZoneKey('center'), 'o'], // plain
+      ]),
+      map: new KeyMap([
+        [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('o')],
+      ])
+    },
   ]
 ])

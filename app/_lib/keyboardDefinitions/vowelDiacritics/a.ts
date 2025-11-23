@@ -61,6 +61,14 @@ export const aDia = new KeyboardDefinition('aDia', [
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('ã')],
       ])
-    }
+    },
+    {
+      label: new KeyLabel([
+        [new ZoneKey('center'), 'a'], // plain
+      ]),
+      map: new KeyMap([
+        [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('a')],
+      ])
+    },
   ]
 ])

@@ -54,5 +54,13 @@ export const iDia = new KeyboardDefinition('iDia', [
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('ĩ')],
       ])
     },
+    {
+      label: new KeyLabel([
+        [new ZoneKey('center'), 'i'], // plain
+      ]),
+      map: new KeyMap([
+        [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('i')],
+      ])
+    },
   ]
 ])

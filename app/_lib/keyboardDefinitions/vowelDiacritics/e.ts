@@ -46,5 +46,13 @@ export const eDia = new KeyboardDefinition('eDia', [
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('ē')],
       ])
     },
+    {
+      label: new KeyLabel([
+        [new ZoneKey('center'), 'e'], // plain
+      ]),
+      map: new KeyMap([
+        [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('e')],
+      ])
+    },
   ]
 ])
