@@ -1,5 +1,6 @@
 import KeyLabel from "@lib/keyLabel"
 import KeyMap from "@lib/keyMap"
+import GridDimensions from "./gridDimensions"
 
 export enum KeyboardPersistance {
   /**
@@ -29,8 +30,16 @@ export type KeyDefinition = {label: KeyLabel, map: KeyMap}
 export default class KeyboardDefinition {
   constructor(
     public readonly name: string,
-    public readonly keys: KeyDefinition[][]
+    protected readonly keys: KeyDefinition[][]
   ) {}
+
+  getKey(row: number, col: number) {
+    return this.keys[row][col]
+  }
+
+  get dimensions() {
+    return new GridDimensions(this.keys[0].length, this.keys.length)
+  }
 }
 
 export class ChildKeyboardDefinition {
@@ -49,7 +58,7 @@ export class ChildKeyboardDefinition {
     this.size = size
     
     for (let ko of keyOverrides) {
-      const key = this.keyboard.keys[ko.row][ko.col]
+      const key = this.keyboard.getKey(ko.row, ko.col)
 
       if (ko.key.label) {
         for (let [zone, label] of ko.key.label.entries()) {

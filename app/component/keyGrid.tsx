@@ -8,10 +8,10 @@ import { KeyGridCtx } from "@context/keyGridCtx"
 import { isTouchScreen } from "@lib/platform"
 
 export default function KeyGrid(
-  { dimensions, keyboard, onDeactivate }: {
+  { dimensions, keyboard, onClose }: {
     dimensions: GridDimensions
     keyboard: KeyboardDefinition
-    onDeactivate?: () => void
+    onClose?: () => void
   }
 ) {
   const grid = useRef(null as unknown as HTMLDivElement)
@@ -62,7 +62,7 @@ export default function KeyGrid(
     const unlockScroll = lockScroll()
     const disableMouseEvents = enableMouseEvents()
 
-    return () => { 
+    return (closeKeyboard: boolean = false) => { 
       setActive(false)
       unlockScroll()
 
@@ -70,8 +70,8 @@ export default function KeyGrid(
         disableMouseEvents()
       }
 
-      if (onDeactivate) {
-        onDeactivate()
+      if (closeKeyboard && onClose) {
+        onClose()
       }
     }
   })
@@ -80,9 +80,10 @@ export default function KeyGrid(
     for (let col=0; col<dimensions.width; col++) {
       let label: KeyLabel
       let map: KeyMap
-      if (row < keyboard.keys.length && col < keyboard.keys[row].length) {
-        label = keyboard.keys[row][col].label
-        map = keyboard.keys[row][col].map
+      const dim = keyboard.dimensions
+      if (row < dim.height && col < dim.width) {
+        label = keyboard.getKey(row, col).label
+        map = keyboard.getKey(row, col).map
       }
       else {
         label = new KeyLabel([[new ZoneKey('center'), ' ']])

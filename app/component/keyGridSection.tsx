@@ -16,15 +16,15 @@ export default function KeyGridSection(
   // define addGrid
   useEffect(
     () => {
-      keyGridState.current.addKeyGrid.current = (keyboard: KeyboardDefinition, onDeactivate?: () => void) => {
-        const gridDimensions = new GridDimensions(keyboard.keys[0].length, keyboard.keys.length)
+      keyGridState.current.addKeyGrid.current = (keyboard: KeyboardDefinition, onClose?: () => void) => {
+        const gridDimensions = keyboard.dimensions
         setGridDimensions(gridDimensions)
         
         children.set(
           keyboard.name, 
           <KeyGrid 
             key={`${children.size}-@${new Date().getTime()}`} 
-            dimensions={gridDimensions} keyboard={keyboard} onDeactivate={onDeactivate} />
+            dimensions={gridDimensions} keyboard={keyboard} onClose={onClose} />
         )
         setChildren(children)
       }
@@ -44,7 +44,7 @@ export default function KeyGridSection(
   
   return (
     <KeyGridCtx value={keyGridState}>
-      <div className="relative grow" >
+      <div className='relative grow' >
         {[...children.values()]}
       </div>
     </KeyGridCtx>

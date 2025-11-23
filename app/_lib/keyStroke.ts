@@ -74,7 +74,7 @@ export default class KeyStroke {
           break
 
         case MetaChar.CLOSE_KEYBOARD:
-          keyGridState.deactivateKeyGrid.current()
+          keyGridState.deactivateKeyGrid.current(true)
           break
 
         default:

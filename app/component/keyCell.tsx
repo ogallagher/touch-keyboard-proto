@@ -1,7 +1,7 @@
 import KeyLabel from "@lib/keyLabel"
 import TouchGesture, { InitGestureSegmentType } from "@lib/touchGesture"
 import pino from "pino"
-import { useRef, useContext, useEffect, useState, Dispatch, SetStateAction, RefObject } from "react"
+import { useRef, useContext, useEffect, useState, Dispatch, SetStateAction, RefObject, JSX } from "react"
 import { PageCanvasCtx } from "@context/pageCanvasCtx"
 import { CanvasSpace, Circle } from "pts"
 import KeyMap from "@lib/keyMap"
@@ -10,6 +10,8 @@ import { KeyGridCtx, ModifierKeyListener } from "@context/keyGridCtx"
 import { Direction } from "@lib/orientation"
 import { isTouchScreen } from "@lib/platform"
 import { KeyboardPersistance, KeyboardSize } from "@lib/keyboardDefinition"
+import KeyGrid from "./keyGrid"
+import GridDimensions from "@lib/gridDimensions"
 
 const logger = pino({
   name: 'key-cell'
@@ -29,6 +31,7 @@ export default function KeyCell(
   const [gestureSegment, setGestureSegment] = useState(
     {} as {segment?: InitGestureSegmentType, direction?: Direction}
   )
+  const [embedGrid, setEmbedGrid] = useState(null as JSX.Element|null)
   const canvas = useContext(PageCanvasCtx)
   const textAreaEdit = useContext(TextAreaEditCtx)
   const keyGridState = useContext(KeyGridCtx)
@@ -196,6 +199,14 @@ export default function KeyCell(
             break
 
           case KeyboardSize.Embed:
+            if (!embedGrid) {
+              setEmbedGrid(
+                <KeyGrid
+                  dimensions={childKeyboard.keyboard.dimensions}
+                  keyboard={childKeyboard.keyboard}
+                  onClose={() => setEmbedGrid(null)} />
+              )
+            }
             break
         }
       }
@@ -214,32 +225,45 @@ export default function KeyCell(
   )
 
   return (
-    <div
-      ref={self}
-      className={[
-        'dark:bg-zinc-900 dark:hover:bg-zinc-800 bg-zinc-100 hover:bg-zinc-200',
-        'select-none',
-        'grow',
-        'flex flex-col justify-evenly',
-        'rounded-lg'
-      ].join(' ')} >
-      <div
-        className="flex flex-row justify-evenly">
-        <pre>{label.getZone('upleft', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
-        <pre>{label.getZone('up', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
-        <pre>{label.getZone('upright', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
-      </div>
-      <div
-        className="flex flex-row justify-evenly">
-        <pre>{label.getZone('left', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
-        <pre>{label.getZone('center', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
-        <pre>{label.getZone('right', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
-      </div>
-      <div
-        className="flex flex-row justify-evenly">
-        <pre>{label.getZone('downleft', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
-        <pre>{label.getZone('down', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
-        <pre>{label.getZone('downright', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
+    // embed grid
+    <div className='relative grow' >
+      <div 
+        className={[
+          'top-0 left-0 right-0 bottom-0',
+          'absolute'
+        ].join(' ')} >
+        {/* key cell */}
+        <div
+          ref={self}
+          className={[
+            'dark:bg-zinc-900 dark:hover:bg-zinc-800 bg-zinc-100 hover:bg-zinc-200',
+            'select-none',
+            'grow h-full',
+            'flex-col justify-evenly',
+            'rounded-lg',
+            embedGrid ? 'hidden' : 'flex'
+          ].join(' ')} >
+          <div
+            className="flex flex-row justify-evenly">
+            <pre>{label.getZone('upleft', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
+            <pre>{label.getZone('up', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
+            <pre>{label.getZone('upright', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
+          </div>
+          <div
+            className="flex flex-row justify-evenly">
+            <pre>{label.getZone('left', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
+            <pre>{label.getZone('center', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
+            <pre>{label.getZone('right', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
+          </div>
+          <div
+            className="flex flex-row justify-evenly">
+            <pre>{label.getZone('downleft', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
+            <pre>{label.getZone('down', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
+            <pre>{label.getZone('downright', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
+          </div>
+        </div>
+        {/* embed grid */}
+        { embedGrid ? embedGrid : undefined }
       </div>
     </div>
   )
