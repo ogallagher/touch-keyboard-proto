@@ -1,5 +1,9 @@
 import { KeyGridState } from "@context/keyGridCtx"
 import { EditTextArea } from "@context/textAreaCtx"
+import { KeyboardPersistance } from "./keyboardDefinition"
+import pino from "pino"
+
+const logger = pino({ name: 'key-stroke' })
 
 export type TypeChar = string
 
@@ -39,6 +43,8 @@ export default class KeyStroke {
   }
 
   public dispatch(textAreaEdit: EditTextArea, keyGridState: KeyGridState) {
+    let closedKeyboard = false
+
     for (let char of this.chars) {
       switch (char) {
         case MetaChar.LEFT:
@@ -75,6 +81,7 @@ export default class KeyStroke {
 
         case MetaChar.CLOSE_KEYBOARD:
           keyGridState.deactivateKeyGrid.current(true)
+          closedKeyboard = true
           break
 
         default:
@@ -84,9 +91,17 @@ export default class KeyStroke {
           else {
             textAreaEdit.typeChars(char)
           }
+
           keyGridState.releaseEphemeralKeys()
+
+          if (keyGridState.gridPersistance.current === KeyboardPersistance.Brief) {
+            keyGridState.deactivateKeyGrid.current(true)
+            closedKeyboard = true
+          }
           break
       }
     }
+
+    return { closedKeyboard }
   }
 }

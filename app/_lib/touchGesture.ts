@@ -234,7 +234,7 @@ export default class TouchGesture extends AbstractTouchGesture {
     return this.segmentLength * 1.5
   }
 
-  private clearHoldTimeout() {
+  protected clearHoldTimeout() {
     clearTimeout(this.holdTimeout)
   }
 
@@ -245,6 +245,11 @@ export default class TouchGesture extends AbstractTouchGesture {
       () => this.addHoldSegment(), 
       delaySec * 1000
     )
+  }
+
+  public cancel() {
+    this.clearHoldTimeout()
+    this._complete = true
   }
 
   static create(e: TouchEvent|MouseEvent, segmentLength: number, map: KeyMap, onComplete?: (g: TouchGesture) => any, onSegment?: (s: InitGestureSegmentType, d: Direction) => any) {

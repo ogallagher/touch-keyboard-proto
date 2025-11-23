@@ -9,9 +9,8 @@ import { TextAreaEditCtx } from "@context/textAreaCtx"
 import { KeyGridCtx, ModifierKeyListener } from "@context/keyGridCtx"
 import { Direction } from "@lib/orientation"
 import { isTouchScreen } from "@lib/platform"
-import { KeyboardPersistance, KeyboardSize } from "@lib/keyboardDefinition"
+import { KeyboardSize } from "@lib/keyboardDefinition"
 import KeyGrid from "./keyGrid"
-import GridDimensions from "@lib/gridDimensions"
 
 const logger = pino({
   name: 'key-cell'
@@ -185,7 +184,10 @@ export default function KeyCell(
       let target = document.activeElement || document
 
       if (target === textAreaEdit.current.target.current) {
-        keystroke.dispatch(textAreaEdit.current, keyGridState.current)
+        const { closedKeyboard } = keystroke.dispatch(textAreaEdit.current, keyGridState.current)
+        if (closedKeyboard) {
+          gesture.cancel()
+        }
       }
     }
     else {
@@ -204,7 +206,8 @@ export default function KeyCell(
                 <KeyGrid
                   dimensions={childKeyboard.keyboard.dimensions}
                   keyboard={childKeyboard.keyboard}
-                  onClose={() => setEmbedGrid(null)} />
+                  onClose={() => setEmbedGrid(null)}
+                  persistance={childKeyboard.persistance} />
               )
             }
             break

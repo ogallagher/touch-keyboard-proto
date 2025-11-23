@@ -1,6 +1,6 @@
 import GridDimensions from "@lib/gridDimensions"
 import KeyCell from "./keyCell"
-import KeyboardDefinition from "@lib/keyboardDefinition"
+import KeyboardDefinition, { KeyboardPersistance } from "@lib/keyboardDefinition"
 import KeyLabel, { ZoneKey } from "@lib/keyLabel"
 import KeyMap from "@lib/keyMap"
 import { useContext, useEffect, useRef, useState } from "react"
@@ -8,9 +8,10 @@ import { KeyGridCtx } from "@context/keyGridCtx"
 import { isTouchScreen } from "@lib/platform"
 
 export default function KeyGrid(
-  { dimensions, keyboard, onClose }: {
+  { dimensions, keyboard, persistance = KeyboardPersistance.Indefinite, onClose }: {
     dimensions: GridDimensions
     keyboard: KeyboardDefinition
+    persistance?: KeyboardPersistance
     onClose?: () => void
   }
 ) {
@@ -62,7 +63,7 @@ export default function KeyGrid(
     const unlockScroll = lockScroll()
     const disableMouseEvents = enableMouseEvents()
 
-    return (closeKeyboard: boolean = false) => { 
+    return (closeKeyboard: boolean) => { 
       setActive(false)
       unlockScroll()
 
@@ -118,8 +119,9 @@ export default function KeyGrid(
       const deactivate = activate.current()
 
       keyGridState.current.deactivateKeyGrid.current = deactivate
+      keyGridState.current.gridPersistance.current = persistance
 
-      return deactivate
+      return () => deactivate(false)
     },
     []
   )

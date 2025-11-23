@@ -1,4 +1,4 @@
-import KeyboardDefinition from "@lib/keyboardDefinition"
+import KeyboardDefinition, { KeyboardPersistance } from "@lib/keyboardDefinition"
 import { MetaChar } from "@lib/keyStroke"
 import { createContext, RefObject, useRef } from "react"
 
@@ -7,6 +7,7 @@ export type ModifierKeyListener = (v: boolean) => void
 export class KeyGridState {
   public readonly addKeyGrid = useRef(null as unknown as (keyboard: KeyboardDefinition, onClose?: () => void) => void)
   public readonly deactivateKeyGrid = useRef(null as unknown as (closeKeyboard: boolean) => void)
+  public readonly gridPersistance = useRef(KeyboardPersistance.Indefinite)
 
   private readonly _modifierKeys: Map<MetaChar, boolean> = new Map([
     [MetaChar.SHIFT, false],

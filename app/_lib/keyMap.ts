@@ -36,12 +36,17 @@ export default class KeyMap {
     }
   }
 
-  getKeystroke(gesture: AbstractTouchGesture, useHoldFallback: boolean = true, useOverReturnFallback: boolean = true) {
-    let keystroke = this.gestureToKeystroke.get(gesture.id)
+  private getKeys(
+    returnType: typeof KeyStroke|typeof ChildKeyboardDefinition, 
+    gesture: AbstractTouchGesture, 
+    useHoldFallback: boolean, useOverReturnFallback: boolean
+  ) {
+    let map = returnType === KeyStroke ? this.gestureToKeystroke : this.gestureToKeyboard
+    let keys = map.get(gesture.id)
 
-    if (!keystroke) {
+    if (!keys) {
       if (useHoldFallback && gesture.isHold) {
-        keystroke = this.gestureToKeystroke.get(
+        keys = map.get(
           new AbstractTouchGesture(
             typeWithoutHold(gesture.type as TouchGestureType), 
             gesture.direction, 
@@ -51,7 +56,7 @@ export default class KeyMap {
         )
       }
       else if (useOverReturnFallback && gesture.isOverReturn) {
-        keystroke = this.gestureToKeystroke.get(
+        keys = map.get(
           new AbstractTouchGesture(
             typeWithoutOverReturn(gesture.type as TouchGestureType), 
             gesture.direction, 
@@ -62,11 +67,15 @@ export default class KeyMap {
       }
     }
 
-    return keystroke
+    return keys
   }
 
-  getKeyboard(gesture: AbstractTouchGesture) {
-    return this.gestureToKeyboard.get(gesture.id)
+  getKeystroke(gesture: AbstractTouchGesture, useHoldFallback: boolean = true, useOverReturnFallback: boolean = true) {
+    return this.getKeys(KeyStroke, gesture, useHoldFallback, useOverReturnFallback) as KeyStroke|undefined
+  }
+
+  getKeyboard(gesture: AbstractTouchGesture, useHoldFallback: boolean = true, useOverReturnFallback: boolean = true) {
+    return this.getKeys(ChildKeyboardDefinition, gesture, useHoldFallback, useOverReturnFallback) as ChildKeyboardDefinition|undefined
   }
 
   getAbstractGesture(gesture: AbstractTouchGesture, useHoldFallback: boolean = true, useOverReturnFallback: boolean = true) {
