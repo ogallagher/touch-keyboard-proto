@@ -9,8 +9,9 @@ import { TextAreaEditCtx } from "@context/textAreaCtx"
 import { KeyGridCtx, ModifierKeyListener } from "@context/keyGridCtx"
 import { Direction } from "@lib/orientation"
 import { isTouchScreen } from "@lib/platform"
-import { KeyboardSize } from "@lib/keyboardDefinition"
+import { ChildKeyboardDefinition, KeyboardSize } from "@lib/keyboardDefinition"
 import KeyGrid from "./keyGrid"
+import KeyStroke from "@lib/keyStroke"
 
 const logger = pino({
   name: 'key-cell'
@@ -177,45 +178,44 @@ export default function KeyCell(
   )
 
   function onGesture(gesture: TouchGesture) {
-    const keystroke = map.getKeystroke(gesture)
+    const keys = map.getKeys(gesture, true, true)
 
-    if (keystroke) {
-      logger.info(`keystroke=${keystroke} for gesture=${gesture}`)
+    if (keys instanceof KeyStroke) {
+      logger.info(`keystroke=${keys} for gesture=${gesture}`)
       let target = document.activeElement || document
 
       if (target === textAreaEdit.current.target.current) {
-        const { closedKeyboard } = keystroke.dispatch(textAreaEdit.current, keyGridState.current)
+        const { closedKeyboard } = keys.dispatch(textAreaEdit.current, keyGridState.current)
         if (closedKeyboard) {
           gesture.cancel()
         }
       }
     }
-    else {
-      const childKeyboard = map.getKeyboard(gesture)
-      if (childKeyboard) {
-        logger.info(`keyboard=${childKeyboard.keyboard.name} for gesture=${gesture}`)
+    else if (keys instanceof ChildKeyboardDefinition) {
+      if (keys) {
+        logger.info(`keyboard=${keys.keyboard.name} for gesture=${gesture}`)
 
-        switch (childKeyboard.size) {
+        switch (keys.size) {
           case KeyboardSize.Fill:
-            keyGridState.current.addKeyGrid.current(childKeyboard.keyboard, activateKeyGrid.current)
+            keyGridState.current.addKeyGrid.current(keys.keyboard, activateKeyGrid.current)
             break
 
           case KeyboardSize.Embed:
             if (!embedGrid) {
               setEmbedGrid(
                 <KeyGrid
-                  dimensions={childKeyboard.keyboard.dimensions}
-                  keyboard={childKeyboard.keyboard}
+                  dimensions={keys.keyboard.dimensions}
+                  keyboard={keys.keyboard}
                   onClose={() => setEmbedGrid(null)}
-                  persistance={childKeyboard.persistance} />
+                  persistance={keys.persistance} />
               )
             }
             break
         }
       }
-      else {
-        logger.info(`no keystroke for gesture=${gesture}`)
-      }
+    }
+    else {
+      logger.info(`no mapping for gesture=${gesture}`)
     }
 
     setGestureSegment({})

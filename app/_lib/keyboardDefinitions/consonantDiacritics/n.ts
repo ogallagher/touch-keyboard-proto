@@ -1,0 +1,26 @@
+import KeyboardDefinition from "@lib/keyboardDefinition";
+import KeyLabel, { ZoneKey } from "@lib/keyLabel";
+import KeyMap from "@lib/keyMap";
+import KeyStroke from "@lib/keyStroke";
+import { AbstractTouchGesture, TouchGestureType } from "@lib/touchGesture";
+
+export const nDia = new KeyboardDefinition('nDia', [
+  [
+    {
+      label: new KeyLabel([
+        [new ZoneKey('center'), 'ñ'], // tilde
+      ]),
+      map: new KeyMap([
+        [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('ñ')],
+      ])
+    },
+    {
+      label: new KeyLabel([
+        [new ZoneKey('center'), 'ň'], // caron
+      ]),
+      map: new KeyMap([
+        [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('ň')],
+      ])
+    }
+  ]
+])

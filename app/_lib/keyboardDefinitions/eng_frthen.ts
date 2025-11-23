@@ -5,6 +5,13 @@ import KeyStroke, { MetaChar } from "@lib/keyStroke"
 import { Cardinal, Direction } from "@lib/orientation"
 import { AbstractTouchGesture, InitGestureSegmentType, TouchGestureType } from "@lib/touchGesture"
 import { digits1key } from "./digits1key"
+import { eDia } from "./vowelDiacritics/e"
+import { aDia } from "./vowelDiacritics/a"
+import { uDia } from "./vowelDiacritics/u"
+import { iDia } from "./vowelDiacritics/i"
+import { oDia } from "./vowelDiacritics/o"
+import { nDia } from "./consonantDiacritics/n"
+import { yDia } from "./pseudovowelDiacritics/y"
 
 // row 1 = f r t
 const row1: KeyDefinition[] = [
@@ -57,7 +64,14 @@ const row1: KeyDefinition[] = [
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.DOWN), new KeyStroke('w')],
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.RIGHT), new KeyStroke('r', 'e')],
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.RIGHT, undefined, false), new KeyStroke("'", 'r', 'e')],
-      [new AbstractTouchGesture(TouchGestureType.CARDINAL_RETURN_SWIPE, Direction.RIGHT), new KeyStroke('e', 'r')]
+      [new AbstractTouchGesture(TouchGestureType.CARDINAL_RETURN_SWIPE, Direction.RIGHT), new KeyStroke('e', 'r')],
+
+      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.LEFT), new ChildKeyboardDefinition(yDia,
+        {
+          persistance: KeyboardPersistance.Brief,
+          size: KeyboardSize.Embed
+        }
+      )],
     ])
   },
   {
@@ -127,7 +141,38 @@ const row2: KeyDefinition[] = [
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.LEFT), new KeyStroke('i')],
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.DOWN), new KeyStroke('u')],
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.RIGHT), new KeyStroke('a')],
-      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.UP), new KeyStroke('o')]
+      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.UP), new KeyStroke('o')],
+
+      [new AbstractTouchGesture(TouchGestureType.TOUCH_HOLD), new ChildKeyboardDefinition(eDia,
+        {
+          persistance: KeyboardPersistance.Brief,
+          size: KeyboardSize.Embed
+        }
+      )],
+      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.RIGHT), new ChildKeyboardDefinition(aDia,
+        {
+          persistance: KeyboardPersistance.Brief,
+          size: KeyboardSize.Embed
+        }
+      )],
+      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.DOWN), new ChildKeyboardDefinition(uDia,
+        {
+          persistance: KeyboardPersistance.Brief,
+          size: KeyboardSize.Embed
+        }
+      )],
+      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.LEFT), new ChildKeyboardDefinition(iDia,
+        {
+          persistance: KeyboardPersistance.Brief,
+          size: KeyboardSize.Embed
+        }
+      )],
+      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.UP), new ChildKeyboardDefinition(oDia,
+        {
+          persistance: KeyboardPersistance.Brief,
+          size: KeyboardSize.Embed
+        }
+      )],
     ])
   },
   {
@@ -153,7 +198,14 @@ const row2: KeyDefinition[] = [
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.DOWN), new KeyStroke('n', 'g')],
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.RIGHT), new KeyStroke('i', 'n')],
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.UP), new KeyStroke('l')],
-      [new AbstractTouchGesture(TouchGestureType.CARDINAL_RETURN_SWIPE, Direction.UP), new KeyStroke('n', 'd')]
+      [new AbstractTouchGesture(TouchGestureType.CARDINAL_RETURN_SWIPE, Direction.UP), new KeyStroke('n', 'd')],
+
+      [new AbstractTouchGesture(TouchGestureType.TOUCH_HOLD), new ChildKeyboardDefinition(nDia,
+        {
+          persistance: KeyboardPersistance.Brief,
+          size: KeyboardSize.Embed
+        }
+      )],
     ])
   }
 ]
@@ -266,7 +318,7 @@ const row4: KeyDefinition[] = [
     ]),
     map: new KeyMap([
       [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('.')],
-      [new AbstractTouchGesture(TouchGestureType.TOUCH_HOLD), new KeyStroke('...')],
+      [new AbstractTouchGesture(TouchGestureType.TOUCH_HOLD, undefined, undefined, false), new KeyStroke('...')],
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.LEFT), new KeyStroke('?')],
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.RIGHT), new KeyStroke(',')],
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.RIGHT), new KeyStroke(';')],

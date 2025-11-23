@@ -36,46 +36,44 @@ export default class KeyMap {
     }
   }
 
-  private getKeys(
-    returnType: typeof KeyStroke|typeof ChildKeyboardDefinition, 
+  getKeys(
     gesture: AbstractTouchGesture, 
-    useHoldFallback: boolean, useOverReturnFallback: boolean
+    useHoldFallback: boolean, 
+    useOverReturnFallback: boolean
   ) {
-    let map = returnType === KeyStroke ? this.gestureToKeystroke : this.gestureToKeyboard
-    let keys = map.get(gesture.id)
+    const maps = [this.gestureToKeystroke, this.gestureToKeyboard]
+    let keys: KeyStroke|ChildKeyboardDefinition|undefined
 
-    if (!keys) {
-      if (useHoldFallback && gesture.isHold) {
-        keys = map.get(
-          new AbstractTouchGesture(
-            typeWithoutHold(gesture.type as TouchGestureType), 
-            gesture.direction, 
-            gesture.cornerDirection,
-            gesture.chainOnHold
-          ).id
+    function* gestures() {
+      yield gesture
+
+      if (useHoldFallback) {
+        yield new AbstractTouchGesture(
+          typeWithoutHold(gesture.type as TouchGestureType), 
+          gesture.direction, 
+          gesture.cornerDirection,
+          gesture.chainOnHold
         )
       }
-      else if (useOverReturnFallback && gesture.isOverReturn) {
-        keys = map.get(
-          new AbstractTouchGesture(
-            typeWithoutOverReturn(gesture.type as TouchGestureType), 
-            gesture.direction, 
-            gesture.cornerDirection,
-            gesture.chainOnHold
-          ).id
+
+      if (useOverReturnFallback) {
+        yield new AbstractTouchGesture(
+          typeWithoutOverReturn(gesture.type as TouchGestureType), 
+          gesture.direction, 
+          gesture.cornerDirection,
+          gesture.chainOnHold
         )
       }
     }
 
+    for (let _gesture of gestures()) {
+      for (let map of maps) {
+        keys = map.get(_gesture.id)
+        if (keys) return keys
+      }
+    }
+
     return keys
-  }
-
-  getKeystroke(gesture: AbstractTouchGesture, useHoldFallback: boolean = true, useOverReturnFallback: boolean = true) {
-    return this.getKeys(KeyStroke, gesture, useHoldFallback, useOverReturnFallback) as KeyStroke|undefined
-  }
-
-  getKeyboard(gesture: AbstractTouchGesture, useHoldFallback: boolean = true, useOverReturnFallback: boolean = true) {
-    return this.getKeys(ChildKeyboardDefinition, gesture, useHoldFallback, useOverReturnFallback) as ChildKeyboardDefinition|undefined
   }
 
   getAbstractGesture(gesture: AbstractTouchGesture, useHoldFallback: boolean = true, useOverReturnFallback: boolean = true) {
