@@ -1,4 +1,4 @@
-import { AbstractTouchGesture, TerminalTouchGestureSegmentType, TouchGestureType, typeWithoutHold } from "@lib/touchGesture"
+import { AbstractTouchGesture, TerminalTouchGestureSegmentType, TouchGestureType, typeWithoutHold, typeWithoutOverReturn } from "@lib/touchGesture"
 import KeyStroke from "@lib/keyStroke"
 
 export default class KeyMap {
@@ -20,8 +20,10 @@ export default class KeyMap {
           new AbstractTouchGesture(typeWithoutHold(gesture.type as TouchGestureType), gesture.direction, gesture.cornerDirection).id
         )
       }
-      else if (useOverReturnFallback) {
-        
+      else if (useOverReturnFallback && gesture.isOverReturn) {
+        keystroke = this.gestureToKeystroke.get(
+          new AbstractTouchGesture(typeWithoutOverReturn(gesture.type as TouchGestureType), gesture.direction, gesture.cornerDirection).id
+        )
       }
     }
 

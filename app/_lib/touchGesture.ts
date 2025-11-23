@@ -43,7 +43,7 @@ export enum TouchGestureType {
   CARDINAL_RETURN_SWIPE = `${TouchGestureSegmentType.CARDINAL_SWIPE}-${TouchGestureSegmentType.RETURN}`,
   DIAGONAL_RETURN_SWIPE = `${TouchGestureSegmentType.DIAGONAL_SWIPE}-${TouchGestureSegmentType.RETURN}`,
   CARDINAL_RETURN_OVER_SWIPE = `${TouchGestureSegmentType.CARDINAL_SWIPE}-${TouchGestureSegmentType.RETURN_OVER}`,
-  DIAGONAL_RETURN_OVER_SWIPE = `${TouchGestureSegmentType.CARDINAL_SWIPE}-${TouchGestureSegmentType.RETURN_OVER}`
+  DIAGONAL_RETURN_OVER_SWIPE = `${TouchGestureSegmentType.DIAGONAL_SWIPE}-${TouchGestureSegmentType.RETURN_OVER}`
 }
 
 export function isCorner(d1: Direction, d2: Direction) {
@@ -69,6 +69,17 @@ export function typeWithoutHold(t: TouchGestureType) {
       return TouchGestureType.CARDINAL_SWIPE
     case TouchGestureType.DIAGONAL_SWIPE_HOLD:
       return TouchGestureType.DIAGONAL_SWIPE
+    default:
+      return t
+  }
+}
+
+export function typeWithoutOverReturn(t: TouchGestureType) {
+  switch (t) {
+    case TouchGestureType.CARDINAL_RETURN_OVER_SWIPE:
+      return TouchGestureType.CARDINAL_RETURN_SWIPE
+    case TouchGestureType.DIAGONAL_RETURN_OVER_SWIPE:
+      return TouchGestureType.DIAGONAL_RETURN_SWIPE
     default:
       return t
   }
@@ -129,6 +140,10 @@ export class AbstractTouchGesture {
 
   get isHold() {
     return this._type.endsWith(TerminalTouchGestureSegmentType.HOLD)
+  }
+
+  get isOverReturn() {
+    return this._type.endsWith(TerminalTouchGestureSegmentType.RETURN_OVER)
   }
 
   toString() {
