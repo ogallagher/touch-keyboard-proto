@@ -6,7 +6,7 @@ const logger = pino({
   name: 'touch-gesture'
 })
 
-const holdDelaySec = 0.75
+const holdDelaySec = 0.5
 
 export const enum InnerTouchGestureSegmentType {
   TOUCH = 't',
@@ -61,6 +61,19 @@ export function isReturn(d1: Direction, d2: Direction) {
 
 export const isTouch = (e: TouchEvent|MouseEvent) => e.type.indexOf('touch') !== -1
 
+export function typeWithoutHold(t: TouchGestureType) {
+  switch (t) {
+    case TouchGestureType.TOUCH_HOLD:
+      return TouchGestureType.TOUCH
+    case TouchGestureType.CARDINAL_SWIPE_HOLD:
+      return TouchGestureType.CARDINAL_SWIPE
+    case TouchGestureType.DIAGONAL_SWIPE_HOLD:
+      return TouchGestureType.DIAGONAL_SWIPE
+    default:
+      return t
+  }
+}
+
 export class AbstractTouchGesture {
   protected _type: TouchGestureType|InnerTouchGestureSegmentType|TerminalTouchGestureSegmentType
   protected _direction?: Direction
@@ -112,6 +125,10 @@ export class AbstractTouchGesture {
         )
       )
     )
+  }
+
+  get isHold() {
+    return this._type.endsWith(TerminalTouchGestureSegmentType.HOLD)
   }
 
   toString() {

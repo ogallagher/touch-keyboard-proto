@@ -1,4 +1,4 @@
-import { AbstractTouchGesture } from "@lib/touchGesture"
+import { AbstractTouchGesture, TerminalTouchGestureSegmentType, TouchGestureType, typeWithoutHold } from "@lib/touchGesture"
 import KeyStroke from "@lib/keyStroke"
 
 export default class KeyMap {
@@ -11,7 +11,20 @@ export default class KeyMap {
     }
   }
 
-  getKeystroke(gesture: AbstractTouchGesture) {
-    return this.gestureToKeystroke.get(gesture.id)
+  getKeystroke(gesture: AbstractTouchGesture, useHoldFallback: boolean = true, useOverReturnFallback: boolean = true) {
+    let keystroke = this.gestureToKeystroke.get(gesture.id)
+
+    if (!keystroke) {
+      if (useHoldFallback && gesture.isHold) {
+        keystroke = this.gestureToKeystroke.get(
+          new AbstractTouchGesture(typeWithoutHold(gesture.type as TouchGestureType), gesture.direction, gesture.cornerDirection).id
+        )
+      }
+      else if (useOverReturnFallback) {
+        
+      }
+    }
+
+    return keystroke
   }
 }
