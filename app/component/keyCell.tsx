@@ -105,7 +105,8 @@ export default function KeyCell(
         e.stopPropagation()
         setGesture(TouchGesture.create(
           e, 
-          getGestureSegmentLength(), 
+          getGestureSegmentLength(),
+          map,
           onGesture, 
           onGestureSegment
         ))

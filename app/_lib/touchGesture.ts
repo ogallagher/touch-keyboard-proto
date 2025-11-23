@@ -1,12 +1,13 @@
 import { Cardinal, Diagonal, Direction, headingToDirection, isAcute, isCardinal, isPerpendicular, toOpposite } from "@lib/orientation"
 import { Group, IPt, Pt } from "pts"
 import pino from "pino"
+import KeyMap from "@lib/keyMap"
 
 const logger = pino({
   name: 'touch-gesture'
 })
 
-const holdDelaySec = 0.5
+export const holdDelaySec = 0.5
 
 export const enum InnerTouchGestureSegmentType {
   TOUCH = 't',
@@ -89,15 +90,18 @@ export class AbstractTouchGesture {
   protected _type: TouchGestureType|InnerTouchGestureSegmentType|TerminalTouchGestureSegmentType
   protected _direction?: Direction
   protected _cornerDirection?: Direction
+  private readonly _chainOnHold: boolean|null
 
   constructor(
     type: TouchGestureType|InnerTouchGestureSegmentType|TerminalTouchGestureSegmentType,
     direction?: Direction,
-    cornerDirection?: Direction
+    cornerDirection?: Direction,
+    chainOnHold: boolean|null = true
   ) {
     this._type = type
     this._direction = direction
     this._cornerDirection = cornerDirection
+    this._chainOnHold = chainOnHold
   }
 
   get type() { 
@@ -110,6 +114,10 @@ export class AbstractTouchGesture {
 
   get cornerDirection() {
     return this._cornerDirection
+  }
+
+  get chainOnHold() {
+    return this._chainOnHold
   }
 
   equals(other: AbstractTouchGesture) {
@@ -160,27 +168,30 @@ export default class TouchGesture extends AbstractTouchGesture {
   private _points: Group
   private times: Date[] = []
   private readonly segmentLength: number
+  private readonly map: KeyMap
   private holdTimeout?: NodeJS.Timeout
 
   constructor(
-    {type, direction, cornerDirection, origin, whenStart, segmentLength, onComplete, onSegment}: {
+    {type, direction, cornerDirection, origin, whenStart, segmentLength, map, onComplete, onSegment}: {
       type: TouchGestureType|InnerTouchGestureSegmentType|TerminalTouchGestureSegmentType
       direction?: Direction
       cornerDirection?: Direction
       origin: IPt
       whenStart: Date
       segmentLength: number
+      map: KeyMap
       onComplete?: (g: TouchGesture) => any
       onSegment?: (s: InnerTouchGestureSegmentType, d: Direction) => any
     }
   ) {
-    super(type, direction, cornerDirection)
+    super(type, direction, cornerDirection, null)
     this._complete = false
     this.onComplete = onComplete
     this.onSegment = onSegment
     this._points = new Group(new Pt(origin))
     this.times.push(whenStart)
     this.segmentLength = segmentLength
+    this.map = map
     this.startHoldTimeout()
 
     if (type === InnerTouchGestureSegmentType.TOUCH) {
@@ -226,16 +237,16 @@ export default class TouchGesture extends AbstractTouchGesture {
     clearTimeout(this.holdTimeout)
   }
 
-  private startHoldTimeout() {
+  public startHoldTimeout(delaySec = holdDelaySec) {
     this.clearHoldTimeout()
 
     this.holdTimeout = setTimeout(
       () => this.addHoldSegment(), 
-      holdDelaySec * 1000
+      delaySec * 1000
     )
   }
 
-  static create(e: TouchEvent|MouseEvent, segmentLength: number, onComplete?: (g: TouchGesture) => any, onSegment?: (s: InnerTouchGestureSegmentType, d: Direction) => any) {
+  static create(e: TouchEvent|MouseEvent, segmentLength: number, map: KeyMap, onComplete?: (g: TouchGesture) => any, onSegment?: (s: InnerTouchGestureSegmentType, d: Direction) => any) {
     logger.info(`create gesture on event type=${e.type}`)
 
     return new TouchGesture({ 
@@ -246,6 +257,7 @@ export default class TouchGesture extends AbstractTouchGesture {
       },
       whenStart: new Date(),
       segmentLength,
+      map,
       onComplete,
       onSegment
     })
@@ -253,20 +265,31 @@ export default class TouchGesture extends AbstractTouchGesture {
 
   addHoldSegment() {
     if (!this.complete) {
-      switch (this._type) {
-        case TouchGestureType.TOUCH:
-          this._type = TouchGestureType.TOUCH_HOLD
-          break
-        case TouchGestureType.CARDINAL_SWIPE:
-          this._type = TouchGestureType.CARDINAL_SWIPE_HOLD
-          break
-        case TouchGestureType.DIAGONAL_SWIPE:
-          this._type = TouchGestureType.DIAGONAL_SWIPE_HOLD
-          break
-        default:
-          logger.warn(`skip unsupported gesture segment ${TouchGestureSegmentType.HOLD} after ${this._type}`)
+      if (!this.isHold) {
+        switch (this._type) {
+          case TouchGestureType.TOUCH:
+            this._type = TouchGestureType.TOUCH_HOLD
+            break
+          case TouchGestureType.CARDINAL_SWIPE:
+            this._type = TouchGestureType.CARDINAL_SWIPE_HOLD
+            break
+          case TouchGestureType.DIAGONAL_SWIPE:
+            this._type = TouchGestureType.DIAGONAL_SWIPE_HOLD
+            break
+          default:
+            logger.warn(`skip unsupported gesture segment ${TouchGestureSegmentType.HOLD} after ${this._type}`)
+        }
       }
-      this.complete = true
+
+      if (this.map.getAbstractGesture(this)!.chainOnHold) {
+        if (this.onComplete) {
+          this.onComplete(this)
+        }
+        this.startHoldTimeout(holdDelaySec * 0.3)
+      }
+      else {
+        this.complete = true
+      }
     }
   }
 
