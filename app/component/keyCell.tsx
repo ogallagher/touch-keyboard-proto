@@ -8,12 +8,15 @@ import { TextAreaEditCtx } from "@context/textAreaCtx"
 import { KeyGridCtx, ModifierKeyListener } from "@context/keyGridCtx"
 import { Direction } from "@lib/orientation"
 import { isTouchScreen } from "@lib/platform"
-import { ChildKeyboardDefinition, KeyboardSize } from "@lib/keyboardDefinition"
+import { KeyboardInstance, KeyboardSize, KeyIndex } from "@lib/keyboardDefinition"
 import KeyGrid from "./keyGrid"
 import KeyStroke from "@lib/keyStroke"
+import { ConfigCtx } from "@context/configCtx"
+import { ConfigEvalMode } from "@lib/control"
 
 export default function KeyCell(
-  { label, map, activateKeyGrid }: {
+  { index, label, map, activateKeyGrid }: {
+    index: KeyIndex
     label: KeyLabel
     map: KeyMap
     activateKeyGrid: RefObject<() => void>
@@ -30,6 +33,7 @@ export default function KeyCell(
   const canvas = useContext(PageCanvasCtx)
   const textAreaEdit = useContext(TextAreaEditCtx)
   const keyGridState = useContext(KeyGridCtx)
+  const configCtx = useContext(ConfigCtx)
 
   const getGestureSegmentLength = () => (
     Math.min(self.current!.clientWidth, self.current!.clientHeight) * 0.4
@@ -43,19 +47,20 @@ export default function KeyCell(
       const target = document.activeElement || document
 
       if (target === textAreaEdit.current.target.current) {
+        // dispatch to eval composer
         const { closedKeyboard } = keys.dispatch(textAreaEdit.current, keyGridState.current)
         if (closedKeyboard) {
           gesture.cancel()
         }
       }
     }
-    else if (keys instanceof ChildKeyboardDefinition) {
+    else if (keys instanceof KeyboardInstance) {
       if (keys) {
         console.info(`keyboard=${keys.keyboard.name} for gesture=${gesture}`)
 
         switch (keys.size) {
           case KeyboardSize.Fill:
-            keyGridState.current.addKeyGrid.current(keys.keyboard, activateKeyGrid.current)
+            keyGridState.current.addKeyGrid.current(keys, activateKeyGrid.current)
             break
 
           case KeyboardSize.Embed:
@@ -63,7 +68,7 @@ export default function KeyCell(
               setEmbedGrid(
                 <KeyGrid
                   dimensions={keys.keyboard.dimensions}
-                  keyboard={keys.keyboard}
+                  keyboard={keys}
                   onClose={() => setEmbedGrid(null)}
                   persistance={keys.persistance} />
               )
@@ -74,6 +79,11 @@ export default function KeyCell(
     }
     else {
       console.info(`no mapping for gesture=${gesture}`)
+    }
+
+    if (configCtx.mode === ConfigEvalMode.Config) {
+      // load in config
+      configCtx.loadKey(index, gesture, keys)
     }
 
     setGestureSegment({})
@@ -223,7 +233,6 @@ export default function KeyCell(
   )
 
   return (
-    // embed grid
     <div className='relative grow' >
       <div 
         className={[
@@ -260,6 +269,7 @@ export default function KeyCell(
             <pre>{label.getZone('downright', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
           </div>
         </div>
+
         {/* embed grid */}
         { embedGrid ? embedGrid : undefined }
       </div>

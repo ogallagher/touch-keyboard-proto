@@ -1,9 +1,10 @@
 import { KeyGridCtx, KeyGridState } from "@context/keyGridCtx"
 import KeyGrid from "@component/keyGrid"
-import { Dispatch, JSX, SetStateAction, useEffect, useRef, useState } from "react"
+import { Dispatch, JSX, SetStateAction, useContext, useEffect, useRef, useState } from "react"
 import GridDimensions from "@lib/gridDimensions"
 import { frthenKeyboard } from "@lib/keyboardDefinitions/eng_frthen"
-import KeyboardDefinition from "@lib/keyboardDefinition"
+import { KeyboardInstance, KeyboardPersistance, KeyboardSize } from "@lib/keyboardDefinition"
+import { ConfigCtx } from "@context/configCtx"
 
 export default function KeyGridSection(
   { setGridDimensions }: {
@@ -12,21 +13,24 @@ export default function KeyGridSection(
 ) {
   const [children, setChildren] = useState(new Map() as Map<string, JSX.Element>)
   const keyGridState = useRef(new KeyGridState())
+  const configCtx = useContext(ConfigCtx)
 
   // define addGrid
   useEffect(
     () => {
-      keyGridState.current.addKeyGrid.current = (keyboard: KeyboardDefinition, onClose?: () => void) => {
-        const gridDimensions = keyboard.dimensions
+      keyGridState.current.addKeyGrid.current = (keyboard: KeyboardInstance, onClose?: () => void) => {
+        const gridDimensions = keyboard.keyboard.dimensions
         setGridDimensions(gridDimensions)
         
         children.set(
-          keyboard.name, 
+          keyboard.keyboard.name, 
           <KeyGrid 
             key={`${children.size}-@${new Date().getTime()}`} 
             dimensions={gridDimensions} keyboard={keyboard} onClose={onClose} />
         )
         setChildren(children)
+
+        configCtx.loadKeyboard(keyboard)
       }
     },
     [ children ]
@@ -36,7 +40,10 @@ export default function KeyGridSection(
   useEffect(
     () => {
       if (children.size === 0) {
-        keyGridState.current.addKeyGrid.current(frthenKeyboard)
+        keyGridState.current.addKeyGrid.current(new KeyboardInstance(
+          frthenKeyboard,
+          { persistance: KeyboardPersistance.Indefinite, size: KeyboardSize.Fill }
+        ))
       }
     },
     [ children ]

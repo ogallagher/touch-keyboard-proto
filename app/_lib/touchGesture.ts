@@ -124,6 +124,10 @@ export class AbstractTouchGesture {
     )
   }
 
+  clone() {
+    return new AbstractTouchGesture(this._type, this._direction, this._cornerDirection, this._chainOnHold)
+  }
+
   get id(): string {
     return (
       `type=${this._type}`

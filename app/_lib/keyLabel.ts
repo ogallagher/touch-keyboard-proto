@@ -28,7 +28,7 @@ export class ZoneKey {
 }
 
 export default class KeyLabel {
-  protected readonly values: Map<string, string|undefined> = new Map()
+  protected readonly values: Map<string, string> = new Map()
 
   constructor(values: [ZoneKey, string][] = []) {
     for (const [key, val] of values) {
@@ -36,15 +36,24 @@ export default class KeyLabel {
     }
   }
 
-  entries(): [ZoneKey, string|undefined][] {
+  entries(): [ZoneKey, string][] {
     return (
       [...this.values.entries()]
-      .map(([zoneStr, label]) => [ZoneKey.fromString(zoneStr), label])
+      .map(([zoneStr, label]) => [ZoneKey.fromString(zoneStr), label!])
     )
   }
 
+  clone() {
+    return new KeyLabel(this.entries())
+  }
+
   set(zone: ZoneKey, label: string|undefined) {
-    this.values.set(zone.toString(), label)
+    if (label === undefined) {
+      this.values.delete(zone.toString())
+    }
+    else {
+      this.values.set(zone.toString(), label)
+    }
   }
 
   protected pseudoZoneDefined(

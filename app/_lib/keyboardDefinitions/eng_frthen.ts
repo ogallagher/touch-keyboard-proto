@@ -1,4 +1,4 @@
-import KeyboardDefinition, { ChildKeyboardDefinition, KeyboardPersistance, KeyboardSize, KeyDefinition } from "@lib/keyboardDefinition"
+import KeyboardDefinition, { KeyboardInstance, KeyboardPersistance, KeyboardSize, KeyDefinition } from "@lib/keyboardDefinition"
 import KeyLabel, { ZoneKey } from "@lib/keyLabel"
 import KeyMap from "@lib/keyMap"
 import KeyStroke, { MetaChar } from "@lib/keyStroke"
@@ -28,7 +28,7 @@ const row1: KeyDefinition[] = [
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.DOWN), new KeyStroke('v')],
       [
         new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.RIGHT, undefined, false), 
-        new ChildKeyboardDefinition(digits1key, { 
+        new KeyboardInstance(digits1key, { 
           persistance: KeyboardPersistance.Indefinite,
           size: KeyboardSize.Embed,
           keyOverrides: [
@@ -66,7 +66,7 @@ const row1: KeyDefinition[] = [
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.RIGHT, undefined, false), new KeyStroke("'", 'r', 'e')],
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_RETURN_SWIPE, Direction.RIGHT), new KeyStroke('e', 'r')],
 
-      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.LEFT), new ChildKeyboardDefinition(yDia,
+      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.LEFT), new KeyboardInstance(yDia,
         {
           persistance: KeyboardPersistance.Brief,
           size: KeyboardSize.Embed
@@ -143,31 +143,31 @@ const row2: KeyDefinition[] = [
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.RIGHT), new KeyStroke('a')],
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.UP), new KeyStroke('o')],
 
-      [new AbstractTouchGesture(TouchGestureType.TOUCH_HOLD), new ChildKeyboardDefinition(eDia,
+      [new AbstractTouchGesture(TouchGestureType.TOUCH_HOLD), new KeyboardInstance(eDia,
         {
           persistance: KeyboardPersistance.Brief,
           size: KeyboardSize.Embed
         }
       )],
-      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.RIGHT), new ChildKeyboardDefinition(aDia,
+      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.RIGHT), new KeyboardInstance(aDia,
         {
           persistance: KeyboardPersistance.Brief,
           size: KeyboardSize.Embed
         }
       )],
-      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.DOWN), new ChildKeyboardDefinition(uDia,
+      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.DOWN), new KeyboardInstance(uDia,
         {
           persistance: KeyboardPersistance.Brief,
           size: KeyboardSize.Embed
         }
       )],
-      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.LEFT), new ChildKeyboardDefinition(iDia,
+      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.LEFT), new KeyboardInstance(iDia,
         {
           persistance: KeyboardPersistance.Brief,
           size: KeyboardSize.Embed
         }
       )],
-      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.UP), new ChildKeyboardDefinition(oDia,
+      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.UP), new KeyboardInstance(oDia,
         {
           persistance: KeyboardPersistance.Brief,
           size: KeyboardSize.Embed
@@ -200,7 +200,7 @@ const row2: KeyDefinition[] = [
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.UP), new KeyStroke('l')],
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_RETURN_SWIPE, Direction.UP), new KeyStroke('n', 'd')],
 
-      [new AbstractTouchGesture(TouchGestureType.TOUCH_HOLD), new ChildKeyboardDefinition(nDia,
+      [new AbstractTouchGesture(TouchGestureType.TOUCH_HOLD), new KeyboardInstance(nDia,
         {
           persistance: KeyboardPersistance.Brief,
           size: KeyboardSize.Embed

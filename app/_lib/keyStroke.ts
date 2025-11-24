@@ -31,15 +31,15 @@ export const cursorChar = '┃' // 0x2503
 export default class KeyStroke {
   private chars: KeyChar[] = []
 
-  public constructor(...chars: KeyChar[]) {
+  constructor(...chars: KeyChar[]) {
     this.chars = this.chars.concat(chars)
   }
 
-  public toString() {
+  toString() {
     return `KS[${this.chars.join('+')}]`
   }
 
-  public dispatch(textAreaEdit: EditTextArea, keyGridState: KeyGridState) {
+  dispatch(textAreaEdit: EditTextArea, keyGridState: KeyGridState) {
     let closedKeyboard = false
 
     for (const char of this.chars) {
@@ -100,5 +100,9 @@ export default class KeyStroke {
     }
 
     return { closedKeyboard }
+  }
+
+  clone() {
+    return new KeyStroke(...this.chars)
   }
 }

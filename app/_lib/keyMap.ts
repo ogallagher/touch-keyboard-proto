@@ -1,24 +1,24 @@
 import { AbstractTouchGesture, TouchGestureType, typeWithoutHold, typeWithoutOverReturn } from "@lib/touchGesture"
 import KeyStroke from "@lib/keyStroke"
-import { ChildKeyboardDefinition } from "./keyboardDefinition"
+import { KeyboardInstance } from "./keyboardDefinition"
 
 export default class KeyMap {
   private readonly gestures: Map<string, AbstractTouchGesture> = new Map()
   private readonly gestureToKeystroke: Map<string, KeyStroke> = new Map()
-  private readonly gestureToKeyboard: Map<string, ChildKeyboardDefinition> = new Map()
+  private readonly gestureToKeyboard: Map<string, KeyboardInstance> = new Map()
 
-  constructor(v: [AbstractTouchGesture, KeyStroke|ChildKeyboardDefinition][] = []) {
+  constructor(v: [AbstractTouchGesture, KeyStroke|KeyboardInstance][] = []) {
     for (const [gesture, keys] of v) {
       this.set(gesture, keys)
     }
   }
 
   entries() {
-    const keystrokes: [AbstractTouchGesture, KeyStroke|ChildKeyboardDefinition][] = (
+    const keystrokes: [AbstractTouchGesture, KeyStroke|KeyboardInstance][] = (
       [...this.gestureToKeystroke.entries()]
       .map(([gid, keystroke]) => [this.gestures.get(gid)!, keystroke])
     )
-    const keyboards: [AbstractTouchGesture, KeyStroke|ChildKeyboardDefinition][] = (
+    const keyboards: [AbstractTouchGesture, KeyStroke|KeyboardInstance][] = (
       [...this.gestureToKeyboard.entries()]
       .map(([gid, keyboard]) => [this.gestures.get(gid)!, keyboard])
     )
@@ -26,7 +26,13 @@ export default class KeyMap {
     return keystrokes.concat(keyboards)
   }
 
-  set(gesture: AbstractTouchGesture, keys: KeyStroke|ChildKeyboardDefinition) {
+  clone() {
+    return new KeyMap(this.entries().map(([gesture, keys]) => {
+      return [gesture.clone(), keys.clone()]
+    }))
+  }
+
+  set(gesture: AbstractTouchGesture, keys: KeyStroke|KeyboardInstance) {
     this.gestures.set(gesture.id, gesture)
     if (keys instanceof KeyStroke) {
       this.gestureToKeystroke.set(gesture.id, keys)
@@ -42,7 +48,7 @@ export default class KeyMap {
     useOverReturnFallback: boolean
   ) {
     const maps = [this.gestureToKeystroke, this.gestureToKeyboard]
-    let keys: KeyStroke|ChildKeyboardDefinition|undefined
+    let keys: KeyStroke|KeyboardInstance|undefined
 
     function* gestures() {
       yield gesture

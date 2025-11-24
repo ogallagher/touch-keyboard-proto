@@ -7,11 +7,14 @@ import { PageCanvasCtx } from "@context/pageCanvasCtx"
 import { EditTextArea, TextAreaEditCtx } from "@context/textAreaCtx"
 import ConfigEvalSection from "@component/configEvalSection"
 import KeyGridSection from "@component/keyGridSection"
+import { ConfigEvalMode } from "@lib/control"
+import { ConfigCtx, ConfigureKeyBoard } from "@context/configCtx"
 
 export default function Home() {
   const [gridDimensions, setGridDimensions] = useState(new GridDimensions(1, 1))
   const canvas = useRef(null as unknown as HTMLCanvasElement)
   const textAreaEdit = useRef(null as unknown as EditTextArea)
+  const config = useRef(new ConfigureKeyBoard())
   
   return (
     <div 
@@ -27,15 +30,18 @@ export default function Home() {
       {/* header */}
       <Header />
 
-      <ConfigEvalSection
-        gridDimensions={gridDimensions} setGridDimensions={setGridDimensions}
-        textAreaEdit={textAreaEdit} />
+      <ConfigCtx 
+        value={config.current} >
+        <ConfigEvalSection
+          gridDimensions={gridDimensions} setGridDimensions={setGridDimensions}
+          textAreaEdit={textAreaEdit} />
 
-      <PageCanvasCtx value={canvas}>
-        <TextAreaEditCtx value={textAreaEdit}>
-          <KeyGridSection setGridDimensions={setGridDimensions} />
-        </TextAreaEditCtx>
-      </PageCanvasCtx>
+        <PageCanvasCtx value={canvas}>
+          <TextAreaEditCtx value={textAreaEdit}>
+            <KeyGridSection setGridDimensions={setGridDimensions} />
+          </TextAreaEditCtx>
+        </PageCanvasCtx>
+      </ConfigCtx>
     </div>
   )
 }

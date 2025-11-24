@@ -1,6 +1,6 @@
 import GridDimensions from "@lib/gridDimensions"
 import KeyCell from "./keyCell"
-import KeyboardDefinition, { KeyboardPersistance } from "@lib/keyboardDefinition"
+import { KeyboardInstance, KeyboardPersistance } from "@lib/keyboardDefinition"
 import KeyLabel, { ZoneKey } from "@lib/keyLabel"
 import KeyMap from "@lib/keyMap"
 import { useContext, useEffect, useRef, useState } from "react"
@@ -10,7 +10,7 @@ import { isTouchScreen } from "@lib/platform"
 export default function KeyGrid(
   { dimensions, keyboard, persistance = KeyboardPersistance.Indefinite, onClose }: {
     dimensions: GridDimensions
-    keyboard: KeyboardDefinition
+    keyboard: KeyboardInstance
     persistance?: KeyboardPersistance
     onClose?: () => void
   }
@@ -81,10 +81,9 @@ export default function KeyGrid(
     for (let col=0; col<dimensions.width; col++) {
       let label: KeyLabel
       let map: KeyMap
-      const dim = keyboard.dimensions
-      if (row < dim.height && col < dim.width) {
-        label = keyboard.getKey(row, col).label
-        map = keyboard.getKey(row, col).map
+      if (row < dimensions.height && col < dimensions.width) {
+        label = keyboard.keyboard.getKey(row, col).label
+        map = keyboard.keyboard.getKey(row, col).map
       }
       else {
         label = new KeyLabel([[new ZoneKey('center'), ' ']])
@@ -94,6 +93,7 @@ export default function KeyGrid(
       yield (
         <KeyCell 
           key={`${row},${col}`}
+          index={{ row, col }}
           label={label}
           map={map}
           activateKeyGrid={activate} />

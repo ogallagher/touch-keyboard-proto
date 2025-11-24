@@ -24,14 +24,33 @@ export enum KeyboardSize {
   Fill = 'fill'
 }
 
-export type KeyAttributes = {label?: KeyLabel, map?: KeyMap}
-export type KeyDefinition = {label: KeyLabel, map: KeyMap}
+export interface KeyIndex { row: number, col: number }
+export interface KeyAttributes {label?: KeyLabel, map?: KeyMap}
+export interface KeyDefinition extends KeyAttributes {label: KeyLabel, map: KeyMap}
+export type KeyOverride = KeyIndex & {
+  key: KeyAttributes
+} 
 
 export default class KeyboardDefinition {
+  protected _name: string
   constructor(
-    public readonly name: string,
-    protected readonly keys: KeyDefinition[][]
-  ) {}
+    name: string,
+    protected readonly keys: KeyDefinition[][],
+    public readonly lockEdit: boolean = true
+  ) {
+    this._name = name
+  }
+
+  get name() {
+    return this._name
+  }
+
+  set name(name: string) {
+    if (this.lockEdit) {
+      throw new Error(`keyboard name=${name} is locked for editing; create an editable clone first`)
+    }
+    this._name = name
+  }
 
   getKey(row: number, col: number) {
     return this.keys[row][col]
@@ -40,35 +59,62 @@ export default class KeyboardDefinition {
   get dimensions() {
     return new GridDimensions(this.keys[0].length, this.keys.length)
   }
+
+  clone(name: string = this._name, lockEdit: boolean = false) {
+    return new KeyboardDefinition(
+      name,
+      this.keys.map((row) => {
+        return row.map((key) => {
+          return { 
+            label: key.label.clone(), 
+            map: key.map.clone()
+          }
+        })
+      }),
+      lockEdit
+    )
+  }
 }
 
-export class ChildKeyboardDefinition {
+export class KeyboardInstance {
+  public readonly keyboard: KeyboardDefinition
   public readonly persistance: KeyboardPersistance
   public readonly size: KeyboardSize
 
   constructor(
-    public readonly keyboard: KeyboardDefinition,
-    { persistance, size, keyOverrides = [] }: { 
+    keyboard: KeyboardDefinition,
+    { persistance, size, name, keyOverrides = [] }: { 
       persistance: KeyboardPersistance
       size: KeyboardSize
-      keyOverrides?: { row: number, col: number, key: KeyAttributes }[]
+      name?: string
+      keyOverrides?: KeyOverride[]
     }
   ) {
+    this.keyboard = keyboard.clone(name, false)
     this.persistance = persistance
     this.size = size
     
-    for (const ko of keyOverrides) {
-      const key = this.keyboard.getKey(ko.row, ko.col)
+    keyOverrides.forEach(this.saveKey, this)
+  }
 
-      if (ko.key.label) {
-        for (const [zone, label] of ko.key.label.entries()) {
-          key.label.set(zone, label)
-        }
+  clone() {
+    return new KeyboardInstance(
+      this.keyboard,
+      this
+    )
+  }
+
+  saveKey(ko: KeyOverride) {
+    const key = this.keyboard.getKey(ko.row, ko.col)
+
+    if (ko.key.label) {
+      for (const [zone, label] of ko.key.label.entries()) {
+        key.label.set(zone, label)
       }
-      if (ko.key.map) {
-        for (const [gesture, keys] of ko.key.map.entries()) {
-          key.map.set(gesture, keys)
-        }
+    }
+    if (ko.key.map) {
+      for (const [gesture, keys] of ko.key.map.entries()) {
+        key.map.set(gesture, keys)
       }
     }
   }
