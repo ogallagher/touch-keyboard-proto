@@ -9,6 +9,7 @@ export const yDia = new KeyboardDefinition('yDia', [
     {
       label: new KeyLabel([
         [new ZoneKey('center'), 'ý'], // accent
+        [new ZoneKey('center', 'shift'), 'Ý'],
       ]),
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('ý')],
@@ -17,6 +18,7 @@ export const yDia = new KeyboardDefinition('yDia', [
     {
       label: new KeyLabel([
         [new ZoneKey('center'), 'ỳ'], // grave
+        [new ZoneKey('center', 'shift'), 'Ỳ'],
       ]),
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('ỳ')],
@@ -25,6 +27,7 @@ export const yDia = new KeyboardDefinition('yDia', [
     {
       label: new KeyLabel([
         [new ZoneKey('center'), 'ÿ'], // dieresis
+        [new ZoneKey('center', 'shift'), 'Ÿ'],
       ]),
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('ÿ')],
@@ -33,6 +36,7 @@ export const yDia = new KeyboardDefinition('yDia', [
     {
       label: new KeyLabel([
         [new ZoneKey('center'), 'ŷ'], // circumflex
+        [new ZoneKey('center', 'shift'), 'Ŷ'],
       ]),
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('ŷ')],
@@ -41,6 +45,7 @@ export const yDia = new KeyboardDefinition('yDia', [
     {
       label: new KeyLabel([
         [new ZoneKey('center'), 'ȳ'], // macron
+        [new ZoneKey('center', 'shift'), 'Ȳ'],
       ]),
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('ȳ')],
@@ -49,6 +54,7 @@ export const yDia = new KeyboardDefinition('yDia', [
     {
       label: new KeyLabel([
         [new ZoneKey('center'), 'ỹ'], // tilde
+        [new ZoneKey('center', 'shift'), 'Ỹ'],
       ]),
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('ỹ')],
@@ -57,6 +63,7 @@ export const yDia = new KeyboardDefinition('yDia', [
     {
       label: new KeyLabel([
         [new ZoneKey('center'), 'y'], // plain
+        [new ZoneKey('center', 'shift'), 'Y'],
       ]),
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('y')],

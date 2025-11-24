@@ -9,6 +9,7 @@ export const oDia = new KeyboardDefinition('oDia', [
     {
       label: new KeyLabel([
         [new ZoneKey('center'), 'ó'], // accent
+        [new ZoneKey('center', 'shift'), 'Ó'],
       ]),
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('ó')],
@@ -17,6 +18,7 @@ export const oDia = new KeyboardDefinition('oDia', [
     {
       label: new KeyLabel([
         [new ZoneKey('center'), 'ò'], // grave
+        [new ZoneKey('center', 'shift'), 'Ò'],
       ]),
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('ò')],
@@ -25,6 +27,7 @@ export const oDia = new KeyboardDefinition('oDia', [
     {
       label: new KeyLabel([
         [new ZoneKey('center'), 'ö'], // dieresis
+        [new ZoneKey('center', 'shift'), 'Ö'],
       ]),
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('ö')],
@@ -33,6 +36,7 @@ export const oDia = new KeyboardDefinition('oDia', [
     {
       label: new KeyLabel([
         [new ZoneKey('center'), 'ô'], // circumflex
+        [new ZoneKey('center', 'shift'), 'Ô'],
       ]),
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('ô')],
@@ -41,6 +45,7 @@ export const oDia = new KeyboardDefinition('oDia', [
     {
       label: new KeyLabel([
         [new ZoneKey('center'), 'ō'], // macron
+        [new ZoneKey('center', 'shift'), 'Ō'],
       ]),
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('ō')],
@@ -49,6 +54,7 @@ export const oDia = new KeyboardDefinition('oDia', [
     {
       label: new KeyLabel([
         [new ZoneKey('center'), 'õ'], // tilde
+        [new ZoneKey('center', 'shift'), 'Õ'],
       ]),
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('õ')],
@@ -57,6 +63,7 @@ export const oDia = new KeyboardDefinition('oDia', [
     {
       label: new KeyLabel([
         [new ZoneKey('center'), 'o'], // plain
+        [new ZoneKey('center', 'shift'), 'O'],
       ]),
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('o')],

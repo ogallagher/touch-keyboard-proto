@@ -9,6 +9,7 @@ export const nDia = new KeyboardDefinition('nDia', [
     {
       label: new KeyLabel([
         [new ZoneKey('center'), 'ñ'], // tilde
+        [new ZoneKey('center', 'shift'), 'Ñ'],
       ]),
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('ñ')],
@@ -17,6 +18,7 @@ export const nDia = new KeyboardDefinition('nDia', [
     {
       label: new KeyLabel([
         [new ZoneKey('center'), 'ň'], // caron
+        [new ZoneKey('center', 'shift'), 'Ň'],
       ]),
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('ň')],
@@ -25,6 +27,7 @@ export const nDia = new KeyboardDefinition('nDia', [
     {
       label: new KeyLabel([
         [new ZoneKey('center'), 'n'], // plain
+        [new ZoneKey('center', 'shift'), 'N'],
       ]),
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('n')],

@@ -9,6 +9,7 @@ export const aDia = new KeyboardDefinition('aDia', [
     {
       label: new KeyLabel([
         [new ZoneKey('center'), 'á'], // accent
+        [new ZoneKey('center', 'shift'), 'Á'],
       ]),
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('á')],
@@ -17,6 +18,7 @@ export const aDia = new KeyboardDefinition('aDia', [
     {
       label: new KeyLabel([
         [new ZoneKey('center'), 'à'], // grave
+        [new ZoneKey('center', 'shift'), 'À'],
       ]),
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('à')],
@@ -25,6 +27,7 @@ export const aDia = new KeyboardDefinition('aDia', [
     {
       label: new KeyLabel([
         [new ZoneKey('center'), 'ä'], // dieresis
+        [new ZoneKey('center', 'shift'), 'Ä'],
       ]),
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('ä')],
@@ -33,6 +36,7 @@ export const aDia = new KeyboardDefinition('aDia', [
     {
       label: new KeyLabel([
         [new ZoneKey('center'), 'â'], // circumflex
+        [new ZoneKey('center', 'shift'), 'Â'],
       ]),
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('â')],
@@ -41,6 +45,7 @@ export const aDia = new KeyboardDefinition('aDia', [
     {
       label: new KeyLabel([
         [new ZoneKey('center'), 'ā'], // macron
+        [new ZoneKey('center', 'shift'), 'Ā'],
       ]),
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('ā')],
@@ -49,6 +54,7 @@ export const aDia = new KeyboardDefinition('aDia', [
     {
       label: new KeyLabel([
         [new ZoneKey('center'), 'å'], // ring
+        [new ZoneKey('center', 'shift'), 'Å'],
       ]),
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('å')],
@@ -57,6 +63,7 @@ export const aDia = new KeyboardDefinition('aDia', [
     {
       label: new KeyLabel([
         [new ZoneKey('center'), 'ã'], // tilde
+        [new ZoneKey('center', 'shift'), 'Ã'],
       ]),
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('ã')],
@@ -65,6 +72,7 @@ export const aDia = new KeyboardDefinition('aDia', [
     {
       label: new KeyLabel([
         [new ZoneKey('center'), 'a'], // plain
+        [new ZoneKey('center', 'shift'), 'A'],
       ]),
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('a')],
