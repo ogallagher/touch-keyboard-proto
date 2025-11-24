@@ -1,6 +1,5 @@
 import KeyLabel from "@lib/keyLabel"
 import TouchGesture, { InitGestureSegmentType } from "@lib/touchGesture"
-import pino from "pino"
 import { useRef, useContext, useEffect, useState, Dispatch, SetStateAction, RefObject, JSX } from "react"
 import { PageCanvasCtx } from "@context/pageCanvasCtx"
 import { CanvasSpace, Circle } from "pts"
@@ -12,10 +11,6 @@ import { isTouchScreen } from "@lib/platform"
 import { ChildKeyboardDefinition, KeyboardSize } from "@lib/keyboardDefinition"
 import KeyGrid from "./keyGrid"
 import KeyStroke from "@lib/keyStroke"
-
-const logger = pino({
-  name: 'key-cell'
-})
 
 export default function KeyCell(
   { label, map, activateKeyGrid }: {
@@ -40,12 +35,62 @@ export default function KeyCell(
     Math.min(self.current!.clientWidth, self.current!.clientHeight) * 0.4
   )
 
+  function onGesture(gesture: TouchGesture) {
+    const keys = map.getKeys(gesture, true, true)
+
+    if (keys instanceof KeyStroke) {
+      console.info(`keystroke=${keys} for gesture=${gesture}`)
+      const target = document.activeElement || document
+
+      if (target === textAreaEdit.current.target.current) {
+        const { closedKeyboard } = keys.dispatch(textAreaEdit.current, keyGridState.current)
+        if (closedKeyboard) {
+          gesture.cancel()
+        }
+      }
+    }
+    else if (keys instanceof ChildKeyboardDefinition) {
+      if (keys) {
+        console.info(`keyboard=${keys.keyboard.name} for gesture=${gesture}`)
+
+        switch (keys.size) {
+          case KeyboardSize.Fill:
+            keyGridState.current.addKeyGrid.current(keys.keyboard, activateKeyGrid.current)
+            break
+
+          case KeyboardSize.Embed:
+            if (!embedGrid) {
+              setEmbedGrid(
+                <KeyGrid
+                  dimensions={keys.keyboard.dimensions}
+                  keyboard={keys.keyboard}
+                  onClose={() => setEmbedGrid(null)}
+                  persistance={keys.persistance} />
+              )
+            }
+            break
+        }
+      }
+    }
+    else {
+      console.info(`no mapping for gesture=${gesture}`)
+    }
+
+    setGestureSegment({})
+  }
+
+  const onGestureSegment = (
+    label.pseudoZoneCardinalSwipeDefined 
+    ? (segment: InitGestureSegmentType, direction: Direction) => { setGestureSegment({segment, direction}) } 
+    : undefined
+  )
+
   // draw gesture
   useEffect(
     () => {
       let space: CanvasSpace|undefined
       if (canvas.current && gesture) {
-        // logger.info('use canvas')
+        // console.info('use canvas')
         space = new CanvasSpace(canvas.current)
         space.background = 'transparent'
         const form = space.getForm()
@@ -60,7 +105,7 @@ export default function KeyCell(
             .line(gesture.points)
           }
 
-          for (let p of gesture.points) {
+          for (const p of gesture.points) {
             form
             .fillOnly('#09fa')
             .circle(Circle.fromCenter(
@@ -175,56 +220,6 @@ export default function KeyCell(
       }
     },
     [gesture]
-  )
-
-  function onGesture(gesture: TouchGesture) {
-    const keys = map.getKeys(gesture, true, true)
-
-    if (keys instanceof KeyStroke) {
-      logger.info(`keystroke=${keys} for gesture=${gesture}`)
-      let target = document.activeElement || document
-
-      if (target === textAreaEdit.current.target.current) {
-        const { closedKeyboard } = keys.dispatch(textAreaEdit.current, keyGridState.current)
-        if (closedKeyboard) {
-          gesture.cancel()
-        }
-      }
-    }
-    else if (keys instanceof ChildKeyboardDefinition) {
-      if (keys) {
-        logger.info(`keyboard=${keys.keyboard.name} for gesture=${gesture}`)
-
-        switch (keys.size) {
-          case KeyboardSize.Fill:
-            keyGridState.current.addKeyGrid.current(keys.keyboard, activateKeyGrid.current)
-            break
-
-          case KeyboardSize.Embed:
-            if (!embedGrid) {
-              setEmbedGrid(
-                <KeyGrid
-                  dimensions={keys.keyboard.dimensions}
-                  keyboard={keys.keyboard}
-                  onClose={() => setEmbedGrid(null)}
-                  persistance={keys.persistance} />
-              )
-            }
-            break
-        }
-      }
-    }
-    else {
-      logger.info(`no mapping for gesture=${gesture}`)
-    }
-
-    setGestureSegment({})
-  }
-
-  const onGestureSegment = (
-    label.pseudoZoneCardinalSwipeDefined 
-    ? (segment: InitGestureSegmentType, direction: Direction) => { setGestureSegment({segment, direction}) } 
-    : undefined
   )
 
   return (

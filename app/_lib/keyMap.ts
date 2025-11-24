@@ -8,7 +8,7 @@ export default class KeyMap {
   private readonly gestureToKeyboard: Map<string, ChildKeyboardDefinition> = new Map()
 
   constructor(v: [AbstractTouchGesture, KeyStroke|ChildKeyboardDefinition][] = []) {
-    for (let [gesture, keys] of v) {
+    for (const [gesture, keys] of v) {
       this.set(gesture, keys)
     }
   }
@@ -66,8 +66,8 @@ export default class KeyMap {
       }
     }
 
-    for (let _gesture of gestures()) {
-      for (let map of maps) {
+    for (const _gesture of gestures()) {
+      for (const map of maps) {
         keys = map.get(_gesture.id)
         if (keys) return keys
       }

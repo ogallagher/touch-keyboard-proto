@@ -1,9 +1,6 @@
 import { KeyGridState } from "@context/keyGridCtx"
 import { EditTextArea } from "@context/textAreaCtx"
 import { KeyboardPersistance } from "./keyboardDefinition"
-import pino from "pino"
-
-const logger = pino({ name: 'key-stroke' })
 
 export type TypeChar = string
 
@@ -45,7 +42,7 @@ export default class KeyStroke {
   public dispatch(textAreaEdit: EditTextArea, keyGridState: KeyGridState) {
     let closedKeyboard = false
 
-    for (let char of this.chars) {
+    for (const char of this.chars) {
       switch (char) {
         case MetaChar.LEFT:
           textAreaEdit.moveCursor(-1)

@@ -1,11 +1,6 @@
 import { Cardinal, Diagonal, Direction, headingToDirection, isAcute, isCardinal, isPerpendicular, toOpposite } from "@lib/orientation"
 import { Group, IPt, Pt } from "pts"
-import pino from "pino"
 import KeyMap from "@lib/keyMap"
-
-const logger = pino({
-  name: 'touch-gesture'
-})
 
 export const holdDelaySec = 0.5
 
@@ -164,8 +159,8 @@ export class AbstractTouchGesture {
 
 export default class TouchGesture extends AbstractTouchGesture {
   private _complete: boolean
-  private onComplete?: (g: TouchGesture) => any
-  private onSegment?: (s: InitGestureSegmentType, d: Direction) => any
+  private onComplete?: (g: TouchGesture) => void
+  private onSegment?: (s: InitGestureSegmentType, d: Direction) => void
   private _points: Group
   private times: Date[] = []
   private readonly segmentLength: number
@@ -181,8 +176,8 @@ export default class TouchGesture extends AbstractTouchGesture {
       whenStart: Date
       segmentLength: number
       map: KeyMap
-      onComplete?: (g: TouchGesture) => any
-      onSegment?: (s: InitGestureSegmentType, d: Direction) => any
+      onComplete?: (g: TouchGesture) => void
+      onSegment?: (s: InitGestureSegmentType, d: Direction) => void
     }
   ) {
     super(type, direction, cornerDirection, null)
@@ -252,8 +247,8 @@ export default class TouchGesture extends AbstractTouchGesture {
     this._complete = true
   }
 
-  static create(e: TouchEvent|MouseEvent, segmentLength: number, map: KeyMap, onComplete?: (g: TouchGesture) => any, onSegment?: (s: InitGestureSegmentType, d: Direction) => any) {
-    logger.info(`create gesture on event type=${e.type}`)
+  static create(e: TouchEvent|MouseEvent, segmentLength: number, map: KeyMap, onComplete?: (g: TouchGesture) => void, onSegment?: (s: InitGestureSegmentType, d: Direction) => void) {
+    console.info(`create gesture on event type=${e.type}`)
 
     return new TouchGesture({ 
       type: TouchGestureType.TOUCH,
@@ -283,7 +278,7 @@ export default class TouchGesture extends AbstractTouchGesture {
             this._type = TouchGestureType.DIAGONAL_SWIPE_HOLD
             break
           default:
-            logger.warn(`skip unsupported gesture segment ${TouchGestureSegmentType.HOLD} after ${this._type}`)
+            console.warn(`skip unsupported gesture segment ${TouchGestureSegmentType.HOLD} after ${this._type}`)
         }
       }
 
@@ -332,7 +327,7 @@ export default class TouchGesture extends AbstractTouchGesture {
             (this._type === TouchGestureType.CARDINAL_SWIPE || this._type === TouchGestureType.DIAGONAL_SWIPE)
             && this._direction !== dir
           ) {
-            // logger.info(`[${this._points.join(' ')}]: ${this._direction} -L-> ${dir}`)
+            // console.info(`[${this._points.join(' ')}]: ${this._direction} -L-> ${dir}`)
             if (isReturn(this._direction!, dir)) {
               // return
               this._points.push(p)
@@ -359,7 +354,7 @@ export default class TouchGesture extends AbstractTouchGesture {
               this.clearHoldTimeout()
             }
             else {
-              logger.warn(`ignore unsupported segment direction=${dir} after ${this}`)
+              console.warn(`ignore unsupported segment direction=${dir} after ${this}`)
             }
           }
           // over return
@@ -392,7 +387,7 @@ export default class TouchGesture extends AbstractTouchGesture {
         break
 
       default:
-        logger.warn(`skip update touch event type=${e.type}`)
+        console.warn(`skip update touch event type=${e.type}`)
     }
   }
 }

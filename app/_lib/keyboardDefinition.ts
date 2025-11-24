@@ -57,16 +57,16 @@ export class ChildKeyboardDefinition {
     this.persistance = persistance
     this.size = size
     
-    for (let ko of keyOverrides) {
+    for (const ko of keyOverrides) {
       const key = this.keyboard.getKey(ko.row, ko.col)
 
       if (ko.key.label) {
-        for (let [zone, label] of ko.key.label.entries()) {
+        for (const [zone, label] of ko.key.label.entries()) {
           key.label.set(zone, label)
         }
       }
       if (ko.key.map) {
-        for (let [gesture, keys] of ko.key.map.entries()) {
+        for (const [gesture, keys] of ko.key.map.entries()) {
           key.map.set(gesture, keys)
         }
       }

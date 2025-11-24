@@ -1,9 +1,8 @@
 import { RefObject, useEffect, useRef } from "react"
-import { cursorChar } from "@lib/keyStroke"
 import { EditTextArea } from "@context/textAreaCtx"
 
 export default function TextArea(
-  { edit, visible }: {
+  { edit: editRef, visible }: {
     edit: RefObject<EditTextArea>
     visible: boolean
   }
@@ -14,7 +13,7 @@ export default function TextArea(
   // define editor
   useEffect(
     () => {
-      edit.current = new EditTextArea(textArea, cursorPos)
+      editRef.current = new EditTextArea(textArea, cursorPos)
     },
     []
   )

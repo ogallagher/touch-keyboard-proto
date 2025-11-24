@@ -31,7 +31,7 @@ export default class KeyLabel {
   protected readonly values: Map<string, string|undefined> = new Map()
 
   constructor(values: [ZoneKey, string][] = []) {
-    for (let [key, val] of values) {
+    for (const [key, val] of values) {
       this.set(key, val)
     }
   }
@@ -54,8 +54,8 @@ export default class KeyLabel {
   ) {
     let res: string|undefined = undefined
 
-    for (let dir of directions) {
-      for (let zone of zones) {
+    for (const dir of directions) {
+      for (const zone of zones) {
         res ||= this.values.get(new ZoneKey(zone, pseudo, dir).toString())
       }
     }

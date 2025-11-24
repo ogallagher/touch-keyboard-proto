@@ -38,7 +38,7 @@ export default function KeyGrid(
   const enableMouseEvents = () => {
     if (!isTouchScreen()) {
       const relay = (e: MouseEvent) => {
-        let _e = new MouseEvent(
+        const _e = new MouseEvent(
           e.type,
           {
             clientX: e.clientX,

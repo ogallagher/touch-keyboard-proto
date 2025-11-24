@@ -79,7 +79,7 @@ export function headingToDirection(heading: number): Direction {
 
 export function directionToUnitVector(d: Direction|Cardinal|Diagonal): Pt {
   let heading: number
-  let v = new Pt({x: 1, y: 0})
+  const v = new Pt({x: 1, y: 0})
 
   switch (d) {
     case Direction.UP:
