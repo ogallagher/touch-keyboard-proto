@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="80mm"
+   height="80mm"
+   viewBox="0 0 80 80"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.2 (ebf0e940, 2025-05-08)"
+   sodipodi:docname="ds-r.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="1.8"
+     inkscape:cx="150.83333"
+     inkscape:cy="131.66667"
+     inkscape:window-width="1224"
+     inkscape:window-height="935"
+     inkscape:window-x="771"
+     inkscape:window-y="68"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer2" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="background">
+    <rect
+       style="fill:#4e4e4e;fill-opacity:1;stroke:none;stroke-width:1;stroke-dasharray:none;stroke-opacity:1"
+       id="rect2"
+       width="80"
+       height="80"
+       x="0"
+       y="0" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer3"
+     inkscape:label="edges">
+    <path
+       id="path2"
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-dasharray:none"
+       d="m 18.558533,61.610993 c 12.343589,12.343677 32.356595,12.343677 44.700184,0 12.343677,-12.343589 12.343677,-32.356594 0,-44.700183 L 63.23273,16.884824 40.671363,39.44577"
+       sodipodi:nodetypes="ccscc" />
+  </g>
+  <g
+     inkscape:label="nodes"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="rotate(-90,52.25,27.75)">
+    <circle
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-dasharray:none;stroke-opacity:1"
+       id="path2-6"
+       cx="40"
+       cy="15.5"
+       inkscape:label="touch"
+       r="8" />
+    <circle
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-dasharray:none;stroke-opacity:1"
+       id="path2-6-8"
+       cx="62.276085"
+       cy="37.776085"
+       inkscape:label="touch"
+       r="8" />
+    <circle
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-dasharray:none;stroke-opacity:1"
+       id="path2-6-8-8"
+       cx="17.723915"
+       cy="-6.7760839"
+       inkscape:label="touch"
+       r="8" />
+  </g>
+</svg>
