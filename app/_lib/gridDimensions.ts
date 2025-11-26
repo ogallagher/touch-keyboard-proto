@@ -27,4 +27,8 @@ export default class GridDimensions {
     }
     return new GridDimensions(this.width, height)
   }
+
+  toString() {
+    return `${this.width}x${this.height}`
+  }
 }

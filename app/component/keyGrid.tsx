@@ -6,18 +6,36 @@ import KeyMap from "@lib/keyMap"
 import { useContext, useEffect, useRef, useState } from "react"
 import { KeyGridCtx } from "@context/keyGridCtx"
 import { isTouchScreen } from "@lib/platform"
+import { ConfigCtx, configListenerName } from "@context/configCtx"
 
 export default function KeyGrid(
-  { dimensions, keyboard, persistance = KeyboardPersistance.Indefinite, onClose }: {
-    dimensions: GridDimensions
+  { keyboard, persistance = KeyboardPersistance.Indefinite, onClose, configurable }: {
     keyboard: KeyboardInstance
     persistance?: KeyboardPersistance
     onClose?: () => void
+    configurable: boolean
   }
 ) {
   const grid = useRef(null as unknown as HTMLDivElement)
   const [active, setActive] = useState(true)
   const keyGridState = useContext(KeyGridCtx)
+  const configCtx = useContext(ConfigCtx)
+  const [dimensions, setDimensions] = useState(keyboard.keyboard.dimensions as GridDimensions|undefined)
+
+  // read subsequent keyboard config updates
+  useEffect(
+    () => {
+      if (configurable) {
+        const name = configListenerName(KeyGrid.name)
+        configCtx.addSaveListener(name, GridDimensions.name, () => {
+          setDimensions(configCtx.keyboardInstance?.keyboard.dimensions)
+        })
+        
+        return () => configCtx.deleteSaveListener(name, GridDimensions.name)  
+      }
+    },
+    [ configurable ]
+  )
 
   const lockScroll = () => {
     const ignoreScroll = (e: Event) => { e.preventDefault() }
@@ -78,17 +96,12 @@ export default function KeyGrid(
   })
 
   function* getKeyCells(row: number) {
-    for (let col=0; col<dimensions.width; col++) {
-      let label: KeyLabel
-      let map: KeyMap
-      if (row < dimensions.height && col < dimensions.width) {
-        label = keyboard.keyboard.getKey(row, col).label
-        map = keyboard.keyboard.getKey(row, col).map
-      }
-      else {
-        label = new KeyLabel([[new ZoneKey('center'), ' ']])
-        map = new KeyMap()
-      }
+    const w = dimensions?.width || 0
+    const h = dimensions?.height || 0
+
+    for (let col=0; col < w; col++) {
+      let label: KeyLabel = keyboard.keyboard.getKey(row, col)?.label || new KeyLabel()
+      let map: KeyMap = keyboard.keyboard.getKey(row, col)?.map || new KeyMap()
 
       yield (
         <KeyCell 
@@ -102,7 +115,7 @@ export default function KeyGrid(
   }
 
   function* getKeyRows() {
-    for (let row=0; row<dimensions.height; row++) {
+    for (let row=0; row < (dimensions?.height || 0); row++) {
       yield (
         <div
           key={row}

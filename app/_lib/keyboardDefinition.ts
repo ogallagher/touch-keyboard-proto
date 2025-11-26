@@ -35,7 +35,7 @@ export default class KeyboardDefinition {
   protected _name: string
   constructor(
     name: string,
-    protected readonly keys: KeyDefinition[][],
+    protected keys: KeyDefinition[][],
     public readonly lockEdit: boolean = true
   ) {
     this._name = name
@@ -47,17 +47,35 @@ export default class KeyboardDefinition {
 
   set name(name: string) {
     if (this.lockEdit) {
-      throw new Error(`keyboard name=${name} is locked for editing; create an editable clone first`)
+      throw new Error(`keyboard name=${this._name} is locked for editing; create an editable clone first`)
     }
     this._name = name
   }
 
-  getKey(row: number, col: number) {
-    return this.keys[row][col]
+  getKey(row: number, col: number): KeyDefinition|undefined {
+    return (this.keys[row] || [])[col]
   }
 
   get dimensions() {
     return new GridDimensions(this.keys[0].length, this.keys.length)
+  }
+
+  set dimensions(dimensions: GridDimensions) {
+    if (this.lockEdit) {
+      throw new Error(`keyboard name=${this._name} is locked for editing; create an editable clone first`)
+    }
+
+    // create adjusted keys grid with empty keys in new cells
+    const keys = new Array(dimensions.height)
+    for (let r = 0; r < dimensions.height; r++) {
+      keys[r] = this.keys[r]?.slice(0, dimensions.width) || new Array(dimensions.width)
+
+      for (let c = 0; c < dimensions.width; c++) {
+        keys[r][c] = keys[r][c] || { label: new KeyLabel(), map: new KeyMap() }
+      }
+    }
+
+    this.keys = keys
   }
 
   clone(name: string = this._name, lockEdit: boolean = false) {
@@ -104,16 +122,22 @@ export class KeyboardInstance {
     )
   }
 
-  saveKey(ko: KeyOverride) {
-    const key = this.keyboard.getKey(ko.row, ko.col)
+  saveKey(keyOverride: KeyOverride) {
+    const key = this.keyboard.getKey(keyOverride.row, keyOverride.col)
+    if (key === undefined) {
+      throw new Error(
+        `failed to override key at invalid location=${keyOverride.col},${keyOverride.row} `
+        + `within grid dimensions=${this.keyboard.dimensions}`
+      )
+    }
 
-    if (ko.key.label) {
-      for (const [zone, label] of ko.key.label.entries()) {
+    if (keyOverride.key.label) {
+      for (const [zone, label] of keyOverride.key.label.entries()) {
         key.label.set(zone, label)
       }
     }
-    if (ko.key.map) {
-      for (const [gesture, keys] of ko.key.map.entries()) {
+    if (keyOverride.key.map) {
+      for (const [gesture, keys] of keyOverride.key.map.entries()) {
         key.map.set(gesture, keys)
       }
     }

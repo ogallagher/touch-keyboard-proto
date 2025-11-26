@@ -46,34 +46,48 @@ export default function KeyCell(
       console.info(`keystroke=${keys} for gesture=${gesture}`)
       const target = document.activeElement || document
 
-      if (target === textAreaEdit.current.target.current) {
-        // dispatch to eval composer
-        const { closedKeyboard } = keys.dispatch(textAreaEdit.current, keyGridState.current)
-        if (closedKeyboard) {
-          gesture.cancel()
-        }
+      // dispatch to eval composer
+      const { closedKeyboard } = keys.dispatch(
+        target === textAreaEdit.current.target.current ? textAreaEdit.current : undefined, 
+        keyGridState.current
+      )
+      if (closedKeyboard) {
+        gesture.cancel()
       }
     }
     else if (keys instanceof KeyboardInstance) {
       if (keys) {
         console.info(`keyboard=${keys.keyboard.name} for gesture=${gesture}`)
 
-        switch (keys.size) {
-          case KeyboardSize.Fill:
-            keyGridState.current.addKeyGrid.current(keys, activateKeyGrid.current)
-            break
-
-          case KeyboardSize.Embed:
-            if (!embedGrid) {
-              setEmbedGrid(
-                <KeyGrid
-                  dimensions={keys.keyboard.dimensions}
-                  keyboard={keys}
-                  onClose={() => setEmbedGrid(null)}
-                  persistance={keys.persistance} />
+        if (configCtx.mode === ConfigEvalMode.Eval) {
+          switch (keys.size) {
+            case KeyboardSize.Fill:
+              keyGridState.current.addKeyGrid(
+                keys, 
+                false, 
+                activateKeyGrid.current
               )
-            }
-            break
+              break
+
+            case KeyboardSize.Embed:
+              if (!embedGrid) {
+                setEmbedGrid(
+                  <KeyGrid
+                    keyboard={keys}
+                    onClose={() => setEmbedGrid(null)}
+                    persistance={keys.persistance}
+                    // don't enable configure of a child keyboard until context switch is explicitly requested by user
+                    configurable={false} />
+                )
+              }
+              break
+          }
+        }
+        else {
+          console.info(
+            `suppress auto launch of child key grid ${keys.keyboard.name} `
+            + `while in config mode`
+          )
         }
       }
     }

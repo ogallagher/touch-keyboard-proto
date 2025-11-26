@@ -1,10 +1,17 @@
 import { ConfigEvalMode } from "@lib/control"
+import GridDimensions from "@lib/gridDimensions"
 import { KeyboardInstance, KeyIndex } from "@lib/keyboardDefinition"
 import KeyStroke from "@lib/keyStroke"
 import TouchGesture from "@lib/touchGesture"
 import { createContext } from "react"
 
+export type ClassName = string
 export type LoadListener = () => void
+export type SaveListener = () => void
+
+export function configListenerName(className: string) {
+  return `${className}${new Date().toISOString()}`
+}
 
 export class ConfigureKeyBoard {
   public mode = ConfigEvalMode.Eval
@@ -13,6 +20,7 @@ export class ConfigureKeyBoard {
   private _gesture?: TouchGesture
   private _keystroke?: KeyStroke|KeyboardInstance
   private readonly loadListeners: Map<string, LoadListener> = new Map()
+  private readonly saveListeners: Map<ClassName, Map<string, SaveListener>> = new Map()
 
   get keyboardInstance() { return this._keyboardInstance }
 
@@ -32,24 +40,41 @@ export class ConfigureKeyBoard {
     }
   }
 
+  addLoadListener(name: string, listener: LoadListener) {
+    this.loadListeners.set(name, listener)
+  }
+
+  deleteLoadListener(name: string) {
+    this.loadListeners.delete(name)
+  }
+
+  addSaveListener(name: string, attributeType: ClassName, listener: SaveListener) {
+    const attrListeners = this.saveListeners.get(attributeType) || new Map()
+    attrListeners.set(name, listener)
+    this.saveListeners.set(attributeType, attrListeners)
+  }
+
+  deleteSaveListener(name: string, attributeTye: ClassName) {
+    this.saveListeners.get(attributeTye)?.delete(name)
+  }
+
   loadKeyboard(keyboardInstance: KeyboardInstance) {
     this._keyboardInstance = keyboardInstance
-    this.loadListeners.forEach(l => l())
+    this.loadListeners.values().forEach(l => l())
   }
 
   loadKey(index: KeyIndex, gesture: TouchGesture, keystroke?: KeyStroke|KeyboardInstance) {
     this._keyIndex = index
     this._gesture = gesture
     this._keystroke = keystroke
-    this.loadListeners.forEach(l => l())
+    this.loadListeners.values().forEach(l => l())
   }
 
-  addLoadListener(name: string, listener: LoadListener) {
-    this.loadListeners.set(name, listener)
-  }
-
-  save() {
-    // TODO call saveListeners?
+  setGridDimensions(gridDimensions: GridDimensions) {
+    if (this._keyboardInstance) {
+      this._keyboardInstance.keyboard.dimensions = gridDimensions
+      this.saveListeners.get(GridDimensions.name)?.values().forEach(l => l())
+    }
   }
 }
 

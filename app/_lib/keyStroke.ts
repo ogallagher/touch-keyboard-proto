@@ -39,21 +39,21 @@ export default class KeyStroke {
     return `KS[${this.chars.join('+')}]`
   }
 
-  dispatch(textAreaEdit: EditTextArea, keyGridState: KeyGridState) {
+  dispatch(textAreaEdit: EditTextArea|undefined, keyGridState: KeyGridState) {
     let closedKeyboard = false
 
     for (const char of this.chars) {
       switch (char) {
         case MetaChar.LEFT:
-          textAreaEdit.moveCursor(-1)
+          textAreaEdit?.moveCursor(-1)
           break
         
         case MetaChar.RIGHT:
-          textAreaEdit.moveCursor(+1)
+          textAreaEdit?.moveCursor(+1)
           break
 
         case MetaChar.BACKSPACE:
-          textAreaEdit.deleteChars(1)
+          textAreaEdit?.deleteChars(1)
           break
 
         case MetaChar.SHIFT:
@@ -83,10 +83,10 @@ export default class KeyStroke {
 
         default:
           if (keyGridState.getModifierKey(MetaChar.SHIFT) || keyGridState.getModifierKey(MetaChar.CAPS_LOCK)) {
-            textAreaEdit.typeChars(char.toUpperCase())
+            textAreaEdit?.typeChars(char.toUpperCase())
           }
           else {
-            textAreaEdit.typeChars(char)
+            textAreaEdit?.typeChars(char)
           }
 
           keyGridState.releaseEphemeralKeys()

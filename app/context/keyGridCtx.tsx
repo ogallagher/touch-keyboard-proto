@@ -2,12 +2,12 @@ import { KeyboardInstance, KeyboardPersistance } from "@lib/keyboardDefinition"
 import { MetaChar } from "@lib/keyStroke"
 import { createContext, RefObject } from "react"
 
+export type AddKeyGrid = (keyboard: KeyboardInstance, configurable: boolean, onClose?: () => void) => void
 export type ModifierKeyListener = (v: boolean) => void
 
 export class KeyGridState {
-  public readonly addKeyGrid: RefObject<(keyboard: KeyboardInstance, onClose?: () => void) => void> = {
-    current: null as unknown as (keyboard: KeyboardInstance, onClose?: () => void) => void
-  }
+  public addKeyGrid = null as unknown as AddKeyGrid
+
   public readonly deactivateKeyGrid: RefObject<(closeKeyboard: boolean) => void> = {
     current: null as unknown as (closeKeyboard: boolean) => void
   }
