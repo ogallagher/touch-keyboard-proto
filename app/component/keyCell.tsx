@@ -1,4 +1,4 @@
-import KeyLabel from "@lib/keyLabel"
+import KeyLabel, { Zone } from "@lib/keyLabel"
 import TouchGesture, { InitGestureSegmentType } from "@lib/touchGesture"
 import { useRef, useContext, useEffect, useState, Dispatch, SetStateAction, RefObject, JSX } from "react"
 import { PageCanvasCtx } from "@context/pageCanvasCtx"
@@ -13,6 +13,7 @@ import KeyGrid from "./keyGrid"
 import KeyStroke from "@lib/keyStroke"
 import { ConfigCtx } from "@context/configCtx"
 import { ConfigEvalMode } from "@lib/control"
+import KeyZoneLabel from "./keyZoneLabel"
 
 export default function KeyCell(
   { index, label, map, activateKeyGrid }: {
@@ -260,28 +261,15 @@ export default function KeyCell(
             'dark:bg-zinc-900 dark:hover:bg-zinc-800 bg-zinc-100 hover:bg-zinc-200',
             'select-none',
             'grow h-full',
-            'flex-col justify-evenly',
+            'grid grid-cols-3',
             'rounded-lg',
             embedGrid ? 'hidden' : 'flex'
           ].join(' ')} >
-          <div
-            className="flex flex-row justify-evenly">
-            <pre>{label.getZone('upleft', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
-            <pre>{label.getZone('up', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
-            <pre>{label.getZone('upright', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
-          </div>
-          <div
-            className="flex flex-row justify-evenly">
-            <pre>{label.getZone('left', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
-            <pre>{label.getZone('center', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
-            <pre>{label.getZone('right', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
-          </div>
-          <div
-            className="flex flex-row justify-evenly">
-            <pre>{label.getZone('downleft', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
-            <pre>{label.getZone('down', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
-            <pre>{label.getZone('downright', label.getPseudo(isShift, isCapsLock, gestureSegment.segment), gestureSegment.direction)}</pre>
-          </div>
+          {(['upleft', 'up', 'upright', 'left', 'center', 'right', 'downleft', 'down', 'downright'] as Zone[]).map(
+            (zone) => (
+              <KeyZoneLabel zone={zone} label={label} isShift={isShift} isCapsLock={isCapsLock} gestureSegment={gestureSegment} />
+            )
+          )}
         </div>
 
         {/* embed grid */}

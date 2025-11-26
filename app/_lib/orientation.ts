@@ -77,11 +77,10 @@ export function headingToDirection(heading: number): Direction {
   }
 }
 
-export function directionToUnitVector(d: Direction|Cardinal|Diagonal): Pt {
-  let heading: number
-  const v = new Pt({x: 1, y: 0})
+export function directionToHeading(direction: Direction|Cardinal|Diagonal, rightBase = 0): number {
+  let heading = 0
 
-  switch (d) {
+  switch (direction) {
     case Direction.UP:
       heading = -Math.PI / 2
       break
@@ -109,10 +108,28 @@ export function directionToUnitVector(d: Direction|Cardinal|Diagonal): Pt {
       break
 
     default:
-      throw new Error(`cannot determine unit fector of unknown direction=${d}`)
+      throw new Error(`cannot determine unit fector of unknown direction=${direction}`)
   }
 
-  return v.toAngle(heading, 1)
+  heading += rightBase
+
+  while (heading < 0) {
+    heading += 2*Math.PI
+  }
+  while (heading > 2*Math.PI) {
+    heading -= 2*Math.PI
+  }
+
+  return heading
+}
+
+export function radianToDegree(r: number) {
+  return Math.round(180 * r / Math.PI)
+}
+
+export function directionToUnitVector(d: Direction|Cardinal|Diagonal): Pt {
+  const v = new Pt({x: 1, y: 0})
+  return v.toAngle(directionToHeading(d), 1)
 }
 
 export function toOpposite(d: Direction|Cardinal|Diagonal) {
@@ -152,5 +169,28 @@ export function isAcute(d1: Diagonal, d2: Direction) {
       return d2 === Direction.RIGHT || d2 === Direction.UP
     case Diagonal.UPLEFT:
       return d2 === Direction.DOWN || d2 === Direction.RIGHT
+  }
+}
+
+export function directionToArrowChar(direction?: Direction): string {
+  switch (direction) {
+    case Direction.LEFT:
+      return '⇐'
+    case Direction.UP:
+      return '⇑'
+    case Direction.RIGHT:
+      return '⇒'
+    case Direction.DOWN:
+      return '⇓'
+    case Direction.UPLEFT:
+      return '⇖'
+    case Direction.UPRIGHT:
+      return '⇗'
+    case Direction.DOWNRIGHT:
+      return '⇘'
+    case Direction.DOWNLEFT:
+      return '⇙'
+    default:
+      return '⇄'
   }
 }

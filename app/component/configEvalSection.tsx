@@ -50,7 +50,6 @@ export default function ConfigEvalSection(
           mode === ConfigEvalMode.Config ? 'flex' : 'hidden'
         ].join(' ')} >
         
-        
         <ConfigKeyCell />
 
         <ConfigKeyGrid />

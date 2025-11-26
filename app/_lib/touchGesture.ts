@@ -3,6 +3,7 @@ import { Group, IPt, Pt } from "pts"
 import KeyMap from "@lib/keyMap"
 
 export const holdDelaySec = 0.5
+export const gestureTypeSegmentDelim = '-'
 
 export const enum InitGestureSegmentType {
   TOUCH = 't',
@@ -29,17 +30,46 @@ export const enum TouchGestureSegmentType {
 
 export enum TouchGestureType {
   TOUCH = TouchGestureSegmentType.TOUCH,
-  TOUCH_HOLD = `${TouchGestureSegmentType.TOUCH}-${TouchGestureSegmentType.HOLD}`,
+  TOUCH_HOLD = `${TouchGestureSegmentType.TOUCH}${gestureTypeSegmentDelim}${TouchGestureSegmentType.HOLD}`,
   CARDINAL_SWIPE = TouchGestureSegmentType.CARDINAL_SWIPE,
-  CARDINAL_SWIPE_HOLD = `${TouchGestureSegmentType.CARDINAL_SWIPE}-${TouchGestureSegmentType.HOLD}`,
+  CARDINAL_SWIPE_HOLD = `${TouchGestureSegmentType.CARDINAL_SWIPE}${gestureTypeSegmentDelim}${TouchGestureSegmentType.HOLD}`,
   DIAGONAL_SWIPE = TouchGestureSegmentType.DIAGONAL_SWIPE,
-  DIAGONAL_SWIPE_HOLD = `${TouchGestureSegmentType.DIAGONAL_SWIPE}-${TouchGestureSegmentType.HOLD}`,
-  CARDINAL_CORNER_SWIPE = `${TouchGestureSegmentType.CARDINAL_SWIPE}-${TouchGestureSegmentType.CORNER}`,
-  DIAGONAL_CORNER_SWIPE = `${TouchGestureSegmentType.DIAGONAL_SWIPE}-${TouchGestureSegmentType.CORNER}`,
-  CARDINAL_RETURN_SWIPE = `${TouchGestureSegmentType.CARDINAL_SWIPE}-${TouchGestureSegmentType.RETURN}`,
-  DIAGONAL_RETURN_SWIPE = `${TouchGestureSegmentType.DIAGONAL_SWIPE}-${TouchGestureSegmentType.RETURN}`,
-  CARDINAL_RETURN_OVER_SWIPE = `${TouchGestureSegmentType.CARDINAL_SWIPE}-${TouchGestureSegmentType.RETURN_OVER}`,
-  DIAGONAL_RETURN_OVER_SWIPE = `${TouchGestureSegmentType.DIAGONAL_SWIPE}-${TouchGestureSegmentType.RETURN_OVER}`
+  DIAGONAL_SWIPE_HOLD = `${TouchGestureSegmentType.DIAGONAL_SWIPE}${gestureTypeSegmentDelim}${TouchGestureSegmentType.HOLD}`,
+  CARDINAL_CORNER_SWIPE = `${TouchGestureSegmentType.CARDINAL_SWIPE}${gestureTypeSegmentDelim}${TouchGestureSegmentType.CORNER}`,
+  DIAGONAL_CORNER_SWIPE = `${TouchGestureSegmentType.DIAGONAL_SWIPE}${gestureTypeSegmentDelim}${TouchGestureSegmentType.CORNER}`,
+  CARDINAL_RETURN_SWIPE = `${TouchGestureSegmentType.CARDINAL_SWIPE}${gestureTypeSegmentDelim}${TouchGestureSegmentType.RETURN}`,
+  DIAGONAL_RETURN_SWIPE = `${TouchGestureSegmentType.DIAGONAL_SWIPE}${gestureTypeSegmentDelim}${TouchGestureSegmentType.RETURN}`,
+  CARDINAL_RETURN_OVER_SWIPE = `${TouchGestureSegmentType.CARDINAL_SWIPE}${gestureTypeSegmentDelim}${TouchGestureSegmentType.RETURN_OVER}`,
+  DIAGONAL_RETURN_OVER_SWIPE = `${TouchGestureSegmentType.DIAGONAL_SWIPE}${gestureTypeSegmentDelim}${TouchGestureSegmentType.RETURN_OVER}`
+}
+
+export function gestureSegmentTypeToPhrase(s: TouchGestureSegmentType) {
+  switch (s) {
+    case TouchGestureSegmentType.TOUCH:
+      return 'touch'
+    case TouchGestureSegmentType.CARDINAL_SWIPE:
+      return 'cardinal swipe'
+    case TouchGestureSegmentType.DIAGONAL_SWIPE:
+      return 'diagonal swipe'
+    case TouchGestureSegmentType.HOLD:
+      return 'hold'
+    case TouchGestureSegmentType.CORNER:
+      return 'corner'
+    case TouchGestureSegmentType.RETURN:
+      return 'return'
+    case TouchGestureSegmentType.RETURN_OVER:
+      return 'return over'
+    default:
+      return '?'
+  }
+}
+
+export function gestureTypeToPhrase(t: TouchGestureType) {
+  return (
+    (t.split(gestureTypeSegmentDelim) as TouchGestureSegmentType[])
+    .map(gestureSegmentTypeToPhrase)
+    .join(' ')
+  )
 }
 
 export function isCorner(d1: Direction, d2: Direction) {
