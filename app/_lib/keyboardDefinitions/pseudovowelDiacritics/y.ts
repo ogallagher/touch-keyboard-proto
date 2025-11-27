@@ -1,4 +1,5 @@
 import KeyboardDefinition from "@lib/keyboardDefinition";
+import { KeyDefinition } from "@lib/keyDefinition";
 import KeyLabel, { ZoneKey } from "@lib/keyLabel";
 import KeyMap from "@lib/keyMap";
 import KeyStroke from "@lib/keyStroke";
@@ -6,7 +7,7 @@ import { AbstractTouchGesture, TouchGestureType } from "@lib/touchGesture";
 
 export const yDia = new KeyboardDefinition('yDia', [
   [
-    {
+    new KeyDefinition({
       label: new KeyLabel([
         [new ZoneKey('center'), 'ý'], // accent
         [new ZoneKey('center', 'shift'), 'Ý'],
@@ -14,8 +15,8 @@ export const yDia = new KeyboardDefinition('yDia', [
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('ý')],
       ])
-    },
-    {
+    }),
+    new KeyDefinition({
       label: new KeyLabel([
         [new ZoneKey('center'), 'ỳ'], // grave
         [new ZoneKey('center', 'shift'), 'Ỳ'],
@@ -23,8 +24,8 @@ export const yDia = new KeyboardDefinition('yDia', [
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('ỳ')],
       ])
-    },
-    {
+    }),
+    new KeyDefinition({
       label: new KeyLabel([
         [new ZoneKey('center'), 'ÿ'], // dieresis
         [new ZoneKey('center', 'shift'), 'Ÿ'],
@@ -32,8 +33,8 @@ export const yDia = new KeyboardDefinition('yDia', [
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('ÿ')],
       ])
-    },
-    {
+    }),
+    new KeyDefinition({
       label: new KeyLabel([
         [new ZoneKey('center'), 'ŷ'], // circumflex
         [new ZoneKey('center', 'shift'), 'Ŷ'],
@@ -41,8 +42,8 @@ export const yDia = new KeyboardDefinition('yDia', [
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('ŷ')],
       ])
-    },
-    {
+    }),
+    new KeyDefinition({
       label: new KeyLabel([
         [new ZoneKey('center'), 'ȳ'], // macron
         [new ZoneKey('center', 'shift'), 'Ȳ'],
@@ -50,8 +51,8 @@ export const yDia = new KeyboardDefinition('yDia', [
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('ȳ')],
       ])
-    },
-    {
+    }),
+    new KeyDefinition({
       label: new KeyLabel([
         [new ZoneKey('center'), 'ỹ'], // tilde
         [new ZoneKey('center', 'shift'), 'Ỹ'],
@@ -59,8 +60,8 @@ export const yDia = new KeyboardDefinition('yDia', [
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('ỹ')],
       ])
-    },
-    {
+    }),
+    new KeyDefinition({
       label: new KeyLabel([
         [new ZoneKey('center'), 'y'], // plain
         [new ZoneKey('center', 'shift'), 'Y'],
@@ -68,6 +69,6 @@ export const yDia = new KeyboardDefinition('yDia', [
       map: new KeyMap([
         [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('y')],
       ])
-    },
+    }),
   ]
 ])

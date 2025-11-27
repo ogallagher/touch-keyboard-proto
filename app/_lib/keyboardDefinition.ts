@@ -1,6 +1,7 @@
 import KeyLabel from "@lib/keyLabel"
 import KeyMap from "@lib/keyMap"
-import GridDimensions from "./gridDimensions"
+import GridDimensions from "@lib/gridDimensions"
+import { KeyAttributes, KeyDefinition } from "@lib/keyDefinition"
 
 export enum KeyboardPersistance {
   /**
@@ -25,8 +26,6 @@ export enum KeyboardSize {
 }
 
 export interface KeyIndex { row: number, col: number }
-export interface KeyAttributes {label?: KeyLabel, map?: KeyMap}
-export interface KeyDefinition extends KeyAttributes {label: KeyLabel, map: KeyMap}
 export type KeyOverride = KeyIndex & {
   key: KeyAttributes
 } 
@@ -56,6 +55,13 @@ export default class KeyboardDefinition {
     return (this.keys[row] || [])[col]
   }
 
+  setKey(index: KeyIndex, key: KeyDefinition) {
+    const dim = this.dimensions
+    if (index.row < dim.height && index.col < dim.width) {
+      this.keys[index.row][index.col] = key
+    }
+  }
+
   get dimensions() {
     return new GridDimensions(this.keys[0].length, this.keys.length)
   }
@@ -83,10 +89,10 @@ export default class KeyboardDefinition {
       name,
       this.keys.map((row) => {
         return row.map((key) => {
-          return { 
+          return new KeyDefinition({ 
             label: key.label.clone(), 
             map: key.map.clone()
-          }
+          })
         })
       }),
       lockEdit

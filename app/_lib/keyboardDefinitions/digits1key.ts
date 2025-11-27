@@ -1,4 +1,5 @@
 import KeyboardDefinition from "@lib/keyboardDefinition"
+import { KeyDefinition } from "@lib/keyDefinition"
 import KeyLabel, { ZoneKey } from "@lib/keyLabel"
 import KeyMap from "@lib/keyMap"
 import KeyStroke from "@lib/keyStroke"
@@ -7,7 +8,7 @@ import { AbstractTouchGesture, InitGestureSegmentType, TouchGestureType } from "
 
 export const digits1key = new KeyboardDefinition('digits1key', [
   [
-    {
+    new KeyDefinition({
       label: new KeyLabel([
         [new ZoneKey('center'), '0 5'],
         [new ZoneKey('center', InitGestureSegmentType.TOUCH), '5'],
@@ -48,6 +49,6 @@ export const digits1key = new KeyboardDefinition('digits1key', [
         [new AbstractTouchGesture(TouchGestureType.DIAGONAL_RETURN_SWIPE, Direction.DOWNRIGHT), new KeyStroke('/')],
         [new AbstractTouchGesture(TouchGestureType.CARDINAL_RETURN_OVER_SWIPE, Direction.RIGHT), new KeyStroke('=')],
       ])
-    }
+    })
   ]
 ])

@@ -1,4 +1,5 @@
-import KeyboardDefinition, { KeyboardInstance, KeyboardPersistance, KeyboardSize, KeyDefinition } from "@lib/keyboardDefinition"
+import KeyboardDefinition, { KeyboardInstance, KeyboardPersistance, KeyboardSize } from "@lib/keyboardDefinition"
+import { KeyDefinition } from "@lib/keyDefinition"
 import KeyLabel, { ZoneKey } from "@lib/keyLabel"
 import KeyMap from "@lib/keyMap"
 import KeyStroke, { MetaChar } from "@lib/keyStroke"
@@ -15,7 +16,7 @@ import { yDia } from "./pseudovowelDiacritics/y"
 
 // row 1 = f r t
 const row1: KeyDefinition[] = [
-  {
+  new KeyDefinition({
     label: new KeyLabel([
       [new ZoneKey('center'), 'f'],
       [new ZoneKey('down'), 'v'],
@@ -44,8 +45,8 @@ const row1: KeyDefinition[] = [
         })
       ]
     ])
-  },
-  {
+  }),
+  new KeyDefinition({
     label: new KeyLabel([
       [new ZoneKey('center'), 'r'],
       [new ZoneKey('left'), 'y'],
@@ -73,8 +74,8 @@ const row1: KeyDefinition[] = [
         }
       )],
     ])
-  },
-  {
+  }),
+  new KeyDefinition({
     label: new KeyLabel([
       [new ZoneKey('center'), 't'],
       [new ZoneKey('left'), 'd'],
@@ -98,11 +99,11 @@ const row1: KeyDefinition[] = [
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.RIGHT), new KeyStroke('j')],
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.UP), new KeyStroke('t', 'o')]
     ])
-  }
+  })
 ]
 // row 2 = h e n
 const row2: KeyDefinition[] = [ 
-  {
+  new KeyDefinition({
     label: new KeyLabel([
       [new ZoneKey('center'), 'h'],
       [new ZoneKey('left'), 'hi'],
@@ -122,8 +123,8 @@ const row2: KeyDefinition[] = [
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.RIGHT), new KeyStroke('h', 'a')],
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.UP), new KeyStroke('h', 'e')]
     ])
-  },
-  {
+  }),
+  new KeyDefinition({
     label: new KeyLabel([
       [new ZoneKey('center'), 'e'],
       [new ZoneKey('left'), 'i'],
@@ -174,8 +175,8 @@ const row2: KeyDefinition[] = [
         }
       )],
     ])
-  },
-  {
+  }),
+  new KeyDefinition({
     label: new KeyLabel([
       [new ZoneKey('center'), 'n'],
       [new ZoneKey('left'), 'an'],
@@ -207,11 +208,11 @@ const row2: KeyDefinition[] = [
         }
       )],
     ])
-  }
+  })
 ]
 // row 3 = s k p
 const row3: KeyDefinition[] = [
-  {
+  new KeyDefinition({
     label: new KeyLabel([
       [new ZoneKey('center'), 's'],
       [new ZoneKey('left'), 'z'],
@@ -230,8 +231,8 @@ const row3: KeyDefinition[] = [
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.RIGHT), new KeyStroke('c')],
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.UP), new KeyStroke('s', 'h')]
     ])
-  },
-  {
+  }),
+  new KeyDefinition({
     label: new KeyLabel([
       [new ZoneKey('center'), 'k'],
       [new ZoneKey('down'), 'x'],
@@ -250,8 +251,8 @@ const row3: KeyDefinition[] = [
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.UP), new KeyStroke('g')],
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.LEFT), new KeyStroke(MetaChar.BACKSPACE)]
     ])
-  },
-  {
+  }),
+  new KeyDefinition({
     label: new KeyLabel([
       [new ZoneKey('center'), 'p'],
       [new ZoneKey('left'), 'm'],
@@ -265,11 +266,11 @@ const row3: KeyDefinition[] = [
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.LEFT), new KeyStroke('m')],
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.UP), new KeyStroke('b')]
     ])
-  }
+  })
 ]
 // row 4 = ' <space> .
 const row4: KeyDefinition[] = [
-  {
+  new KeyDefinition({
     label: new KeyLabel([
       [new ZoneKey('center'), "'"],
       [new ZoneKey('left'), '('],
@@ -291,8 +292,8 @@ const row4: KeyDefinition[] = [
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.DOWN), new KeyStroke(MetaChar.SHIFT)],
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.DOWN, undefined, false), new KeyStroke(MetaChar.CAPS_LOCK)],
     ])
-  },
-  {
+  }),
+  new KeyDefinition({
     label: new KeyLabel([
       [new ZoneKey('center'), '[ ]'],
       [new ZoneKey('down'), '↩'],
@@ -307,8 +308,8 @@ const row4: KeyDefinition[] = [
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.LEFT), new KeyStroke(MetaChar.LEFT)],
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.UP), new KeyStroke('\t')]
     ])
-  },
-  {
+  }),
+  new KeyDefinition({
     label: new KeyLabel([
       [new ZoneKey('center'), '.'],
       [new ZoneKey('left'), '?'],
@@ -325,7 +326,7 @@ const row4: KeyDefinition[] = [
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.UP), new KeyStroke('!')],
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.DOWN), new KeyStroke(':')]
     ])
-  }
+  })
 ]
 
 export const frthenKeyboard = new KeyboardDefinition('frthen', [row1, row2, row3, row4])
