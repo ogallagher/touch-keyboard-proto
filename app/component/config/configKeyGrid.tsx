@@ -6,12 +6,14 @@ import { Grid3x3 } from "react-bootstrap-icons"
 
 export default function ConfigKeyGrid() {
   const configCtx = useContext(ConfigCtx)
-  const [gridDimensions, setGridDimensions] = useState(configCtx.keyboardInstance?.keyboard.dimensions)
-  const [keyboardName, setKeyboardName] = useState(configCtx.keyboardInstance?.keyboard.name)
+  const [gridDimensions, setGridDimensions] = useState(configCtx?.keyboardInstance?.keyboard.dimensions)
+  const [keyboardName, setKeyboardName] = useState(configCtx?.keyboardInstance?.keyboard.name)
 
   // init on new config context
   useEffect(
     () => {
+      if (!configCtx) return
+
       const name = configListenerName(ConfigKeyGrid.name)
       configCtx.addLoadListener(name, () => {
         setGridDimensions(configCtx.keyboardInstance?.keyboard.dimensions)
@@ -20,33 +22,39 @@ export default function ConfigKeyGrid() {
 
       return () => configCtx.deleteLoadListener(name)
     },
-    []
+    [ configCtx ]
   )
 
   // write to config context
   useEffect(
     () => {
+      if (!configCtx) return
+
       if (configCtx.keyboardInstance && keyboardName) {
         configCtx.keyboardInstance.keyboard.name = keyboardName
       }
     },
-    [ keyboardName ]
+    [ configCtx, keyboardName ]
   )
 
   useEffect(
     () => {
+      if (!configCtx) return
+
       if (configCtx.keyboardInstance && gridDimensions) {
         configCtx.setGridDimensions(gridDimensions)
       }
     },
-    [ gridDimensions ]
+    [ configCtx, gridDimensions ]
   )
   
   return (
     <div
       className='flex flex-1/3 flex-col justify-evenly gap-1' >
       {/* grid dimensions */}
-      <div className='flex flex-row justify-center gap-2 text-2xl'>
+      <div 
+        className='flex flex-row justify-center gap-2 text-2xl'
+        title='Keyboard grid dimensions' >
         <div className='flex flex-col justify-center'>
           <Grid3x3 className='text-4xl' />
         </div>

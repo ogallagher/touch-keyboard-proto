@@ -17,9 +17,10 @@ import KeyZoneLabel from "./keyZoneLabel"
 import { KeyDefinition } from "@lib/keyDefinition"
 
 export default function KeyCell(
-  { index, activateKeyGrid }: {
+  { index, activateKeyGrid, keyboard }: {
     index: KeyIndex
     activateKeyGrid: RefObject<() => void>
+    keyboard: KeyboardInstance
   }
 ) {
   const self = useRef(null as unknown as HTMLDivElement)
@@ -35,81 +36,88 @@ export default function KeyCell(
   const keyGridState = useContext(KeyGridCtx)
   const configCtx = useContext(ConfigCtx)
   const [label, setLabel] = useState(
-    configCtx.keyboardInstance?.keyboard.getKey(index.row, index.col)?.label 
+    keyboard?.keyboard.getKey(index.row, index.col)?.label 
     || new KeyLabel()
   )
   const [map, setMap] = useState(
-    configCtx.keyboardInstance?.keyboard.getKey(index.row, index.col)?.map 
+    keyboard?.keyboard.getKey(index.row, index.col)?.map 
     || new KeyMap()
   )
+  const onGesture = useRef(undefined as undefined|((g: TouchGesture) => void))
 
   const getGestureSegmentLength = () => (
     Math.min(self.current!.clientWidth, self.current!.clientHeight) * 0.4
   )
+  
+  // define onGesture
+  useEffect(
+    () => {
+      onGesture.current = !(configCtx && keyGridState) ? undefined : (gesture: TouchGesture) => {
+        const keys = map.getKeys(gesture, true, true)
 
-  function onGesture(gesture: TouchGesture) {
-    const keys = map.getKeys(gesture, true, true)
+        if (keys instanceof KeyStroke) {
+          console.info(`keystroke=${keys} for gesture=${gesture}`)
+          const target = document.activeElement || document
 
-    if (keys instanceof KeyStroke) {
-      console.info(`keystroke=${keys} for gesture=${gesture}`)
-      const target = document.activeElement || document
+          // dispatch to eval composer
+          const { closedKeyboard } = keys.dispatch(
+            target === textAreaEdit.current.target.current ? textAreaEdit.current : undefined, 
+            keyGridState
+          )
+          if (closedKeyboard) {
+            gesture.cancel()
+          }
+        }
+        else if (keys instanceof KeyboardInstance) {
+          if (keys) {
+            console.info(`keyboard=${keys.keyboard.name} for gesture=${gesture}`)
 
-      // dispatch to eval composer
-      const { closedKeyboard } = keys.dispatch(
-        target === textAreaEdit.current.target.current ? textAreaEdit.current : undefined, 
-        keyGridState!
-      )
-      if (closedKeyboard) {
-        gesture.cancel()
-      }
-    }
-    else if (keys instanceof KeyboardInstance) {
-      if (keys) {
-        console.info(`keyboard=${keys.keyboard.name} for gesture=${gesture}`)
+            if (configCtx.mode === ConfigEvalMode.Eval) {
+              switch (keys.size) {
+                case KeyboardSize.Fill:
+                  keyGridState.addKeyGrid(
+                    keys, 
+                    false, 
+                    activateKeyGrid.current
+                  )
+                  break
 
-        if (configCtx.mode === ConfigEvalMode.Eval) {
-          switch (keys.size) {
-            case KeyboardSize.Fill:
-              keyGridState!.addKeyGrid(
-                keys, 
-                false, 
-                activateKeyGrid.current
-              )
-              break
-
-            case KeyboardSize.Embed:
-              if (!embedGrid) {
-                setEmbedGrid(
-                  <KeyGrid
-                    keyboard={keys}
-                    onClose={() => setEmbedGrid(null)}
-                    persistance={keys.persistance}
-                    // don't enable configure of a child keyboard until context switch is explicitly requested by user
-                    configurable={false} />
-                )
+                case KeyboardSize.Embed:
+                  if (!embedGrid) {
+                    setEmbedGrid(
+                      <KeyGrid
+                        keyboard={keys}
+                        onClose={() => setEmbedGrid(null)}
+                        persistance={keys.persistance}
+                        // don't enable configure of a child keyboard until context switch is explicitly requested by user
+                        configurable={false} />
+                    )
+                  }
+                  break
               }
-              break
+            }
+            else {
+              console.info(
+                `suppress auto launch of child key grid ${keys.keyboard.name} `
+                + `while in config mode`
+              )
+            }
           }
         }
         else {
-          console.info(
-            `suppress auto launch of child key grid ${keys.keyboard.name} `
-            + `while in config mode`
-          )
+          console.info(`no mapping for gesture=${gesture}`)
         }
+
+        if (configCtx.mode === ConfigEvalMode.Config) {
+          // load in config
+          configCtx.loadKey(index, gesture, keys)
+        }
+
+        setGestureSegment({})
       }
-    }
-    else {
-      console.info(`no mapping for gesture=${gesture}`)
-    }
-
-    if (configCtx.mode === ConfigEvalMode.Config) {
-      // load in config
-      configCtx.loadKey(index, gesture, keys)
-    }
-
-    setGestureSegment({})
-  }
+    },
+    [ configCtx, keyGridState, map ]
+  )
 
   const onGestureSegment = (
     label.pseudoZoneCardinalSwipeDefined 
@@ -156,7 +164,7 @@ export default function KeyCell(
 
       return () => { space?.removeAll() }
     }, 
-    [gesture]
+    [ gesture ]
   )
 
   // listen to modifier keys
@@ -178,12 +186,16 @@ export default function KeyCell(
         }
       }
     },
-    [keyGridState, label]
+    [ keyGridState, label ]
   )
 
   // listen to mouse and touch events
   useEffect(
     () => {
+      if (!onGesture.current) {
+        return
+      }
+
       const start = (e: TouchEvent|MouseEvent) => {
         e.preventDefault()
         e.stopPropagation()
@@ -191,7 +203,7 @@ export default function KeyCell(
           e, 
           getGestureSegmentLength(),
           map,
-          onGesture, 
+          onGesture.current, 
           onGestureSegment
         ))
       }
@@ -259,6 +271,10 @@ export default function KeyCell(
   // read key config updates
   useEffect(
     () => {
+      if (!configCtx) {
+        return 
+      }
+      
       const name = configListenerName(KeyCell.name + `[${index.col},${index.row}]`)
       configCtx.addSaveListener(name, KeyDefinition.name, () => {
         if (
@@ -279,7 +295,7 @@ export default function KeyCell(
 
       return () => configCtx.deleteSaveListener(name, KeyDefinition.name)
     },
-    []
+    [ configCtx ]
   )
 
   return (

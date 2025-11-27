@@ -5,7 +5,6 @@ import KeyLabel, { Zone } from "@lib/keyLabel"
 import KeyMap from "@lib/keyMap"
 import KeyStroke, { MetaChar } from "@lib/keyStroke"
 import { AbstractTouchGesture } from "@lib/touchGesture"
-
 import { ChangeEvent, Dispatch, SetStateAction, useContext, useEffect, useRef, useState } from "react"
 import GestureTypeLabel from "./gestureType"
 import KeyZoneLabel from "@component/keyZoneLabel"
@@ -27,23 +26,25 @@ export default function ConfigKeyCell() {
   // init on new config context
   useEffect(
     () => {
-      const name = configListenerName(ConfigKeyCell.name)
-      configCtx.addLoadListener(name, () => {
-        let key: KeyDefinition|undefined
-        if (configCtx.keyboardInstance && configCtx.keyIndex) {
-          keyIndex.current = configCtx.keyIndex
-          key = configCtx.keyboardInstance.keyboard.getKey(configCtx.keyIndex.row, configCtx.keyIndex.col)
-        }
+      if (configCtx) {
+        const name = configListenerName(ConfigKeyCell.name)
+        configCtx.addLoadListener(name, () => {
+          let key: KeyDefinition|undefined
+          if (configCtx.keyboardInstance && configCtx.keyIndex) {
+            keyIndex.current = configCtx.keyIndex
+            key = configCtx.keyboardInstance.keyboard.getKey(configCtx.keyIndex.row, configCtx.keyIndex.col)
+          }
 
-        setKeyLabel(key?.label)
-        keyMap.current = key?.map
-        setKeyStroke(configCtx.keystroke?.clone())
-        setGesture(configCtx.gesture?.clone())
-      })
+          setKeyLabel(key?.label)
+          keyMap.current = key?.map
+          setKeyStroke(configCtx.keystroke?.clone())
+          setGesture(configCtx.gesture?.clone())
+        })
 
-      return () => configCtx.deleteLoadListener(name)
+        return () => configCtx.deleteLoadListener(name)
+      }
     },
-    []
+    [ configCtx ]
   )
 
   // listen to modifier keys
@@ -69,24 +70,28 @@ export default function ConfigKeyCell() {
   // write to config context
   useEffect(
     () => {
-      if (keyLabel && keyMap.current) {
-        if (gesture) {
-          keyMap.current.set(gesture, keyStroke)
-        }
+      if (configCtx) {
+        if (keyLabel && keyMap.current) {
+          if (gesture) {
+            keyMap.current.set(gesture, keyStroke)
+          }
 
-        const keyDef = new KeyDefinition({ label: keyLabel, map: keyMap.current })
-        if (!keyDef.equals(configCtx.getKeyDefinition(keyIndex.current)!)) {
-          configCtx.setKey(keyIndex.current, keyDef)
+          const keyDef = new KeyDefinition({ label: keyLabel, map: keyMap.current })
+          if (!keyDef.equals(configCtx.getKeyDefinition(keyIndex.current)!)) {
+            configCtx.setKey(keyIndex.current, keyDef)
+          }
         }
       }
     },
-    [ keyLabel, keyStroke ]
+    [ configCtx, keyLabel, keyStroke ]
   )
 
   const onMajRadioChange = (e: ChangeEvent<HTMLInputElement>) => {
     setIsShift(e.target.value === MetaChar.SHIFT)
     setIsCapsLock(e.target.value === MetaChar.CAPS_LOCK)
   }
+
+  // TODO write modifier keys to grid context
   
   return (
     <div
