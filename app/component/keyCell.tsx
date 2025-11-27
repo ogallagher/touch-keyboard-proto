@@ -170,20 +170,20 @@ export default function KeyCell(
   // listen to modifier keys
   useEffect(
     () => {
-      if (keyGridState) {
-        const mkeyListeners: [Set<ModifierKeyListener>, Dispatch<SetStateAction<boolean>>][] = []
+      if (!keyGridState) return
 
-        if (label.pseudoZoneShiftDefined || label.pseudoZoneCapsLockDefined) {
-          keyGridState.shiftListeners.add(setIsShift)
-          mkeyListeners.push([keyGridState.shiftListeners, setIsShift])
+      const mkeyListeners: [Set<ModifierKeyListener>, Dispatch<SetStateAction<boolean>>][] = []
 
-          keyGridState.capsLockListeners.add(setIsCapsLock)
-          mkeyListeners.push([keyGridState.capsLockListeners, setIsCapsLock])
-        }
+      if (label.pseudoZoneShiftDefined || label.pseudoZoneCapsLockDefined) {
+        keyGridState.shiftListeners.add(setIsShift)
+        mkeyListeners.push([keyGridState.shiftListeners, setIsShift])
 
-        return () => { 
-          mkeyListeners.forEach(([ls, l]) => ls.delete(l))
-        }
+        keyGridState.capsLockListeners.add(setIsCapsLock)
+        mkeyListeners.push([keyGridState.capsLockListeners, setIsCapsLock])
+      }
+
+      return () => { 
+        mkeyListeners.forEach(([ls, l]) => ls.delete(l))
       }
     },
     [ keyGridState, label ]
@@ -274,7 +274,7 @@ export default function KeyCell(
       if (!configCtx) {
         return 
       }
-      
+
       const name = configListenerName(KeyCell.name + `[${index.col},${index.row}]`)
       configCtx.addSaveListener(name, KeyDefinition.name, () => {
         if (

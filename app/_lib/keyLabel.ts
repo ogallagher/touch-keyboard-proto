@@ -83,7 +83,9 @@ export default class KeyLabel {
     for (const dir of directions) {
       for (const zone of zones) {
         res ||= this.values.get(new ZoneKey(zone, pseudo, dir).toString())
+        if (res) break
       }
+      if (res) break
     }
     
     return res

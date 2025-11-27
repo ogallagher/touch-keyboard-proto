@@ -91,7 +91,22 @@ export default function ConfigKeyCell() {
     setIsCapsLock(e.target.value === MetaChar.CAPS_LOCK)
   }
 
-  // TODO write modifier keys to grid context
+  // write modifier keys to grid context
+  useEffect(
+    () => {
+      if (!gridCtx) return
+
+      const presses = [] as MetaChar[]
+      const releases = [] as MetaChar[]
+
+      (isShift ? presses : releases).push(MetaChar.SHIFT);
+      (isCapsLock ? presses : releases).push(MetaChar.CAPS_LOCK)
+
+      gridCtx.pressModifierKeys(...presses)
+      gridCtx.releaseModifierKeys(...releases)
+    },
+    [ gridCtx, isShift, isCapsLock ]
+  )
   
   return (
     <div
