@@ -40,7 +40,6 @@ export class KeyGridState {
     mkeys.forEach(mkey => {
       this._modifierKeys.set(mkey, value)
 
-
       if (mkey === MetaChar.SHIFT) {
         updateMinMaj = true
         updateShift = true

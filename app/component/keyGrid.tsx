@@ -1,12 +1,13 @@
 import GridDimensions from "@lib/gridDimensions"
 import KeyCell from "@component/keyCell"
 import { KeyboardInstance, KeyboardPersistance } from "@lib/keyboardDefinition"
-import KeyLabel from "@lib/keyLabel"
-import KeyMap from "@lib/keyMap"
 import { useContext, useEffect, useRef, useState } from "react"
 import { KeyGridCtx } from "@context/keyGridCtx"
 import { isTouchScreen } from "@lib/platform"
 import { ConfigCtx, configListenerName } from "@context/configCtx"
+import { ConfigEvalMode } from "@lib/control"
+
+const scrollEventTypes = ['scroll', 'touchmove', 'wheel', 'drag']
 
 export default function KeyGrid(
   { keyboard, persistance = KeyboardPersistance.Indefinite, onClose, configurable }: {
@@ -17,7 +18,6 @@ export default function KeyGrid(
   }
 ) {
   const grid = useRef(null as unknown as HTMLDivElement)
-  const [active, setActive] = useState(true)
   const keyGridState = useContext(KeyGridCtx)
   const configCtx = useContext(ConfigCtx)
   const [dimensions, setDimensions] = useState(keyboard.keyboard.dimensions as GridDimensions|undefined)
@@ -25,7 +25,7 @@ export default function KeyGrid(
   // read subsequent keyboard config updates
   useEffect(
     () => {
-      if (configurable) {
+      if (configCtx && configurable) {
         const name = configListenerName(KeyGrid.name)
         configCtx.addSaveListener(name, GridDimensions.name, () => {
           setDimensions(configCtx.keyboardInstance?.keyboard.dimensions)
@@ -34,13 +34,13 @@ export default function KeyGrid(
         return () => configCtx.deleteSaveListener(name, GridDimensions.name)  
       }
     },
-    [ configurable ]
+    [ configCtx, configurable ]
   )
 
+  // TODO define all of these methods once with useRef
+  const ignoreScroll = (e: Event) => { e.preventDefault() }
+  const unlockScroll = () => scrollEventTypes.forEach((eventType) => grid.current?.removeEventListener(eventType, ignoreScroll))
   const lockScroll = () => {
-    const ignoreScroll = (e: Event) => { e.preventDefault() }
-    const scrollEventTypes = ['scroll', 'touchmove', 'wheel', 'drag']
-
     scrollEventTypes.forEach((eventType) => {
       grid.current.addEventListener(
         eventType, 
@@ -48,51 +48,48 @@ export default function KeyGrid(
       )
     })
 
-    // document.body.classList.add('overflow-hidden')
-
-    return () => scrollEventTypes.forEach((eventType) => grid.current?.removeEventListener(eventType, ignoreScroll))
+    return unlockScroll
   }
 
-  const enableMouseEvents = () => {
-    if (!isTouchScreen()) {
-      const relay = (e: MouseEvent) => {
-        const _e = new MouseEvent(
-          e.type,
-          {
-            clientX: e.clientX,
-            clientY: e.clientY
-          }
-        )
-        keyGridState?.mouseHoverKeyCell.current?.dispatchEvent(_e)
+  const relayMouseEvent = isTouchScreen() ? undefined : (e: MouseEvent) => {
+    const _e = new MouseEvent(
+      e.type,
+      {
+        clientX: e.clientX,
+        clientY: e.clientY
       }
+    )
+    keyGridState?.mouseHoverKeyCell.current?.dispatchEvent(_e)
+  }
+  const disableMouseEvents = !relayMouseEvent ? undefined : () => {
+    window.removeEventListener('mousemove', relayMouseEvent)
+    window.removeEventListener('mouseup', relayMouseEvent)
+  }
+  const enableMouseEvents = !relayMouseEvent ? undefined : () => {
+    window.addEventListener('mousemove', relayMouseEvent)
+    window.addEventListener('mouseup', relayMouseEvent)
 
-      window.addEventListener('mousemove', relay)
-      window.addEventListener('mouseup', relay)
+    return disableMouseEvents
+  }
 
-      return () => {
-        window.removeEventListener('mousemove', relay)
-        window.removeEventListener('mouseup', relay)
-      }
+  const deactivate = useRef((closeKeyboard: boolean) => {
+    unlockScroll()
+
+    if (disableMouseEvents) {
+      disableMouseEvents()
     }
-  }
 
+    if (closeKeyboard && onClose) {
+      onClose()
+    }
+  })
   const activate = useRef(() => {
-    setActive(true)
-    const unlockScroll = lockScroll()
-    const disableMouseEvents = enableMouseEvents()
-
-    return (closeKeyboard: boolean) => { 
-      setActive(false)
-      unlockScroll()
-
-      if (disableMouseEvents) {
-        disableMouseEvents()
-      }
-
-      if (closeKeyboard && onClose) {
-        onClose()
-      }
+    lockScroll()
+    if (enableMouseEvents) {
+      enableMouseEvents!()
     }
+
+    return deactivate.current
   })
 
   function* getKeyCells(row: number) {
@@ -104,7 +101,8 @@ export default function KeyGrid(
         <KeyCell 
           key={`${row},${col}`}
           index={{ row, col }}
-          activateKeyGrid={activate} />
+          activateKeyGrid={activate}
+          keyboard={keyboard} />
       )
     }
   }
@@ -124,23 +122,42 @@ export default function KeyGrid(
   // activate
   useEffect(
     () => {
-      if (keyGridState) {
-        const deactivate = activate.current()
-
-        keyGridState.deactivateKeyGrid.current = deactivate
-        keyGridState.gridPersistance.current = persistance
-
-        return () => deactivate(false)
+      if (!keyGridState) {
+        return
       }
+
+      const deactivate = activate.current()
+
+      keyGridState.deactivateKeyGrid.current = deactivate
+      keyGridState.gridPersistance.current = persistance
+
+      return () => deactivate(false)
     },
     [ keyGridState ]
+  )
+
+  // deactivate on mode=config if not configurable
+  useEffect(
+    () => {
+      if (configCtx && !configurable) {
+        const name = configListenerName(KeyGrid.name)
+        configCtx.addModeListener(name, () => {
+          if (configCtx.mode === ConfigEvalMode.Config) {
+            deactivate.current(true)
+          }
+        })
+
+        return () => configCtx.deleteModeListener(name)
+      }
+    },
+    [ configCtx, configurable ]
   )
 
   return (
     <div 
       className={[
         'top-0 left-0 right-0 bottom-0',
-        active ? 'absolute' : 'hidden'
+        'absolute'
       ].join(' ')} >
         <div
           ref={grid}

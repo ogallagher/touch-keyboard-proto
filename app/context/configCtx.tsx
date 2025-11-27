@@ -2,12 +2,12 @@ import { ConfigEvalMode } from "@lib/control"
 import GridDimensions from "@lib/gridDimensions"
 import { KeyboardInstance, KeyIndex } from "@lib/keyboardDefinition"
 import { KeyDefinition } from "@lib/keyDefinition"
-import KeyLabel from "@lib/keyLabel"
 import KeyStroke from "@lib/keyStroke"
 import { AbstractTouchGesture } from "@lib/touchGesture"
 import { createContext } from "react"
 
 export type ClassName = string
+export type ModeListener = () => void
 export type LoadListener = () => void
 export type SaveListener = () => void
 
@@ -16,13 +16,31 @@ export function configListenerName(className: string) {
 }
 
 export class ConfigureKeyBoard {
-  public mode = ConfigEvalMode.Eval
+  private _mode = ConfigEvalMode.Eval
   private _keyboardInstance?: KeyboardInstance
   private _keyIndex?: KeyIndex
   private _gesture?: AbstractTouchGesture
   private _keystroke?: KeyStroke|KeyboardInstance
+  private readonly modeListeners: Map<string, ModeListener> = new Map()
   private readonly loadListeners: Map<string, LoadListener> = new Map()
   private readonly saveListeners: Map<ClassName, Map<string, SaveListener>> = new Map()
+
+  get mode() {
+    return this._mode
+  }
+
+  set mode(mode: ConfigEvalMode) {
+    this._mode = mode
+    this.modeListeners.values().forEach(l => l())
+  }
+
+  addModeListener(name: string, listener: ModeListener) {
+    this.modeListeners.set(name, listener)
+  }
+
+  deleteModeListener(name: string) {
+    this.modeListeners.delete(name)
+  }
 
   get keyboardInstance() { return this._keyboardInstance }
 
@@ -92,4 +110,4 @@ export class ConfigureKeyBoard {
   }
 }
 
-export const ConfigCtx = createContext(null as unknown as ConfigureKeyBoard)
+export const ConfigCtx = createContext(null as unknown as ConfigureKeyBoard|null)
