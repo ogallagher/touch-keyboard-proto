@@ -12,11 +12,10 @@ export default function IncDec(
     <div
       className={[
         'flex justify-evenly',
-        `flex-${orientation === Orientation.Horizontal ? 'row' : 'col'}`,
-        (orientation === Orientation.Horizontal ? '' : 'flex-col-reverse')
+        `flex-${orientation === Orientation.Horizontal ? 'row' : 'col'}`
       ].join(' ')}
       title={orientation === Orientation.Horizontal ? 'Adjust column count' : 'Adjust row count'} >
-      {/* add */}
+      {/* sub */}
       <button 
         className={[
           'cursor-pointer',
@@ -25,7 +24,7 @@ export default function IncDec(
         onClick={onDec} >
         <FileMinus />
       </button>
-      {/* sub */}
+      {/* add */}
       <button 
         className={[
           'cursor-pointer',

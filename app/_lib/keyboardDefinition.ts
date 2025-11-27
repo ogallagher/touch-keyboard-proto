@@ -28,16 +28,23 @@ export enum KeyboardSize {
 export interface KeyIndex { row: number, col: number }
 export type KeyOverride = KeyIndex & {
   key: KeyAttributes
-} 
+}
+
+const editLockError = (name: string) => new Error(`keyboard name=${name} is locked for editing; create an editable clone first`)
 
 export default class KeyboardDefinition {
   protected _name: string
+  private _prevVersion: KeyboardDefinition|undefined
+  private _saved: boolean = true
+
   constructor(
     name: string,
     protected keys: KeyDefinition[][],
-    public readonly lockEdit: boolean = true
+    public readonly lockEdit: boolean = true,
+    prevVersion?: KeyboardDefinition
   ) {
     this._name = name
+    this._prevVersion = prevVersion
   }
 
   get name() {
@@ -46,7 +53,7 @@ export default class KeyboardDefinition {
 
   set name(name: string) {
     if (this.lockEdit) {
-      throw new Error(`keyboard name=${this._name} is locked for editing; create an editable clone first`)
+      throw editLockError(this.name)
     }
     this._name = name
   }
@@ -56,10 +63,14 @@ export default class KeyboardDefinition {
   }
 
   setKey(index: KeyIndex, key: KeyDefinition) {
+    if (this.lockEdit) {
+      throw editLockError(this.name)
+    }
     const dim = this.dimensions
     if (index.row < dim.height && index.col < dim.width) {
       this.keys[index.row][index.col] = key
     }
+    this._saved = false
   }
 
   get dimensions() {
@@ -68,20 +79,33 @@ export default class KeyboardDefinition {
 
   set dimensions(dimensions: GridDimensions) {
     if (this.lockEdit) {
-      throw new Error(`keyboard name=${this._name} is locked for editing; create an editable clone first`)
+      throw editLockError(this.name)
     }
 
     // create adjusted keys grid with empty keys in new cells
     const keys = new Array(dimensions.height)
     for (let r = 0; r < dimensions.height; r++) {
-      keys[r] = this.keys[r]?.slice(0, dimensions.width) || new Array(dimensions.width)
-
-      for (let c = 0; c < dimensions.width; c++) {
-        keys[r][c] = keys[r][c] || { label: new KeyLabel(), map: new KeyMap() }
-      }
+      keys[r] = this.getRowSlice(r, dimensions.width)
     }
 
     this.keys = keys
+    this._saved = false
+  }
+
+  private getRowSlice(row: number, length: number): KeyDefinition[] {
+    let rowSlice: KeyDefinition[] = this.keys[row]?.slice(0, length) || []
+
+    // attempt to get from previous version
+    rowSlice = rowSlice.concat(
+      (this._prevVersion?.keys[row] || []).slice(rowSlice.length, length)
+    )
+    
+    // if row is still too short, add empty keys
+    for (let c = rowSlice.length; c < length; c++) {
+      rowSlice.push(KeyDefinition.empty())
+    }
+
+    return rowSlice
   }
 
   clone(name: string = this._name, lockEdit: boolean = false) {
@@ -95,8 +119,14 @@ export default class KeyboardDefinition {
           })
         })
       }),
-      lockEdit
+      lockEdit,
+      this
     )
+  }
+
+  save() {
+    this._prevVersion = this
+    this._saved = true
   }
 }
 
@@ -128,7 +158,7 @@ export class KeyboardInstance {
     )
   }
 
-  saveKey(keyOverride: KeyOverride) {
+  private saveKey(keyOverride: KeyOverride) {
     const key = this.keyboard.getKey(keyOverride.row, keyOverride.col)
     if (key === undefined) {
       throw new Error(
