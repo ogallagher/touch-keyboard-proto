@@ -14,16 +14,23 @@ export default function IncDec(
         'flex justify-evenly',
         `flex-${orientation === Orientation.Horizontal ? 'row' : 'col'}`,
         (orientation === Orientation.Horizontal ? '' : 'flex-col-reverse')
-      ].join(' ')}>
+      ].join(' ')}
+      title={orientation === Orientation.Horizontal ? 'Adjust column count' : 'Adjust row count'} >
       {/* add */}
       <button 
-        className={orientation == Orientation.Horizontal ? '' : `rotate-90`}
+        className={[
+          'cursor-pointer',
+          orientation == Orientation.Horizontal ? '' : `rotate-90`
+        ].join(' ')}
         onClick={onDec} >
         <FileMinus />
       </button>
       {/* sub */}
       <button 
-        className={orientation == Orientation.Horizontal ? '' : `rotate-90`}
+        className={[
+          'cursor-pointer',
+          orientation == Orientation.Horizontal ? '' : `rotate-90`
+        ].join(' ')}
         onClick={onInc} >
         <FilePlus />
       </button>
