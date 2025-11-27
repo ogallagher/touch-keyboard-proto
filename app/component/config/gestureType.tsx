@@ -3,6 +3,8 @@ import { websiteBasePath } from "@lib/path"
 import { AbstractTouchGesture, gestureTypeToPhrase } from "@lib/touchGesture"
 import { Direction, directionToHeading, isCardinal, radianToDegree } from "@lib/orientation"
 
+const imageSpacerChar = 'm'
+
 export default function GestureTypeLabel(
   { gesture }: {
     gesture: AbstractTouchGesture|undefined
@@ -21,7 +23,8 @@ export default function GestureTypeLabel(
           ))
         }deg)`
       }}>
-      m
+      {/* Letter as parent container dimensions placeholder for next Image.fill adapt to font size. */}
+      {gesture?.type && imageSpacerChar}
       {gesture?.type && (
         <Image 
           src={`${websiteBasePath}/gestureType/${gesture.type}.svg`}

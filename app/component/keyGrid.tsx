@@ -100,15 +100,10 @@ export default function KeyGrid(
     const h = dimensions?.height || 0
 
     for (let col=0; col < w; col++) {
-      let label: KeyLabel = keyboard.keyboard.getKey(row, col)?.label || new KeyLabel()
-      let map: KeyMap = keyboard.keyboard.getKey(row, col)?.map || new KeyMap()
-
       yield (
         <KeyCell 
           key={`${row},${col}`}
           index={{ row, col }}
-          label={label}
-          map={map}
           activateKeyGrid={activate} />
       )
     }

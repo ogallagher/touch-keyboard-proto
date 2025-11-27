@@ -65,7 +65,7 @@ export default function ConfigKeyGrid() {
         <input
           type='text'
           value={keyboardName || 'no keyboard loaded'} 
-          onChange={(e) => setKeyboardName(e.target.value)} />
+          onChange={e => setKeyboardName(e.target.value)} />
       </div>
     </div>
   )

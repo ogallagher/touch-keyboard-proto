@@ -4,6 +4,8 @@ import { KeyboardPersistance } from "./keyboardDefinition"
 
 export type TypeChar = string
 
+const metaCharStrPrefix = '<'
+const metaCharStrSuffix = '>'
 export enum MetaChar {
   SHIFT = '<shift>',
   CAPS_LOCK = '<caps-lock>',
@@ -24,6 +26,15 @@ export enum MetaChar {
   CLOSE_KEYBOARD = '<close-keyb>'
 }
 
+export function stringToMetaChar(s: string) {
+  if (!s.startsWith(metaCharStrPrefix) || !s.endsWith(metaCharStrSuffix)) {
+    return
+  }
+  else {
+    return s in Object.keys(MetaChar) ? s as MetaChar : undefined
+  }
+}
+
 export type KeyChar = TypeChar|MetaChar
 
 export const cursorChar = '┃' // 0x2503
@@ -33,6 +44,27 @@ export default class KeyStroke {
 
   constructor(...chars: KeyChar[]) {
     this.chars = this.chars.concat(chars)
+  }
+
+  toChars() {
+    return [...this.chars]
+  }
+
+  static parse(s: string): KeyStroke {
+    const chars: KeyChar[] = []
+
+    for (let i=0; i<s.length; i++) {
+      const mc = stringToMetaChar(s.substring(i))
+      if (mc !== undefined) {
+        chars.push(mc)
+        i += mc.length - 1
+      }
+      else {
+        chars.push(s[i])
+      }
+    }
+
+    return new KeyStroke(...chars)
   }
 
   toString() {

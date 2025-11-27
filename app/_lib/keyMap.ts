@@ -32,13 +32,21 @@ export default class KeyMap {
     }))
   }
 
-  set(gesture: AbstractTouchGesture, keys: KeyStroke|KeyboardInstance) {
+  /**
+   * @param gesture Touch gesture input.
+   * @param keys Keystroke or child keyboard output. If not defined, output for this gesture is likewise not defined.
+   */
+  set(gesture: AbstractTouchGesture, keys: KeyStroke|KeyboardInstance|undefined) {
     this.gestures.set(gesture.id, gesture)
     if (keys instanceof KeyStroke) {
       this.gestureToKeystroke.set(gesture.id, keys)
     }
-    else {
+    else if (keys !== undefined) {
       this.gestureToKeyboard.set(gesture.id, keys)
+    }
+    else {
+      this.gestureToKeystroke.delete(gesture.id)
+      this.gestureToKeyboard.delete(gesture.id)
     }
   }
 
@@ -109,5 +117,23 @@ export default class KeyMap {
     }
 
     return abstractGesture
+  }
+
+  equals(other: KeyMap) {
+    if (this.gestures.size !== other.gestures.size) {
+      return false
+    }
+
+    const gestureIds = new Set(this.gestures.keys())
+    other.gestures.keys().forEach(gi => gestureIds.add(gi))
+
+    for (const gestureId of gestureIds) {
+      const gesture = this.gestures.get(gestureId)!
+      if (this.getKeys(gesture, false, false) !== other.getKeys(gesture, false, false)) {
+        return false
+      }
+    }
+
+    return true
   }
 }

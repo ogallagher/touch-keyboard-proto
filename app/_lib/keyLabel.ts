@@ -56,6 +56,23 @@ export default class KeyLabel {
     }
   }
 
+  equals(other: KeyLabel) {
+    if (this.values.size != other.values.size) {
+      return false
+    }
+
+    const zoneKeys = new Set(this.values.keys())
+    other.values.keys().forEach(zk => zoneKeys.add(zk))
+
+    for (const zoneKey of zoneKeys) {
+      if (this.values.get(zoneKey) !== other.values.get(zoneKey)) {
+        return false
+      }
+    }
+
+    return true
+  }
+
   protected pseudoZoneDefined(
     pseudo: PseudoCond, 
     directions: (Direction|Cardinal|Diagonal|undefined)[] = [undefined], 

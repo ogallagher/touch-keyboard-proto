@@ -11,15 +11,14 @@ import { isTouchScreen } from "@lib/platform"
 import { KeyboardInstance, KeyboardSize, KeyIndex } from "@lib/keyboardDefinition"
 import KeyGrid from "./keyGrid"
 import KeyStroke from "@lib/keyStroke"
-import { ConfigCtx } from "@context/configCtx"
+import { ConfigCtx, configListenerName } from "@context/configCtx"
 import { ConfigEvalMode } from "@lib/control"
 import KeyZoneLabel from "./keyZoneLabel"
+import { KeyDefinition } from "@lib/keyDefinition"
 
 export default function KeyCell(
-  { index, label, map, activateKeyGrid }: {
+  { index, activateKeyGrid }: {
     index: KeyIndex
-    label: KeyLabel
-    map: KeyMap
     activateKeyGrid: RefObject<() => void>
   }
 ) {
@@ -35,6 +34,14 @@ export default function KeyCell(
   const textAreaEdit = useContext(TextAreaEditCtx)
   const keyGridState = useContext(KeyGridCtx)
   const configCtx = useContext(ConfigCtx)
+  const [label, setLabel] = useState(
+    configCtx.keyboardInstance?.keyboard.getKey(index.row, index.col)?.label 
+    || new KeyLabel()
+  )
+  const [map, setMap] = useState(
+    configCtx.keyboardInstance?.keyboard.getKey(index.row, index.col)?.map 
+    || new KeyMap()
+  )
 
   const getGestureSegmentLength = () => (
     Math.min(self.current!.clientWidth, self.current!.clientHeight) * 0.4
@@ -247,6 +254,32 @@ export default function KeyCell(
     [gesture]
   )
 
+  // read key config updates
+  useEffect(
+    () => {
+      const name = configListenerName(KeyCell.name + `[${index.col},${index.row}]`)
+      configCtx.addSaveListener(name, KeyDefinition.name, () => {
+        if (
+          configCtx.keyboardInstance
+          && configCtx.keyIndex?.col === index.col && configCtx.keyIndex.row === index.row
+        ) {
+          setLabel(
+            configCtx.keyboardInstance.keyboard.getKey(index.row, index.col)?.label 
+            || new KeyLabel()
+          )
+
+          setMap(
+            configCtx.keyboardInstance.keyboard.getKey(index.row, index.col)?.map 
+            || new KeyMap()
+          )
+        }
+      })
+
+      return () => configCtx.deleteSaveListener(name, KeyDefinition.name)
+    },
+    []
+  )
+
   return (
     <div className='relative grow' >
       <div 
@@ -267,7 +300,7 @@ export default function KeyCell(
           ].join(' ')} >
           {(['upleft', 'up', 'upright', 'left', 'center', 'right', 'downleft', 'down', 'downright'] as Zone[]).map(
             (zone) => (
-              <KeyZoneLabel zone={zone} label={label} isShift={isShift} isCapsLock={isCapsLock} gestureSegment={gestureSegment} />
+              <KeyZoneLabel key={zone} zone={zone} label={label} isShift={isShift} isCapsLock={isCapsLock} gestureSegment={gestureSegment} />
             )
           )}
         </div>

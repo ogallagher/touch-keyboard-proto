@@ -1,8 +1,10 @@
 import { ConfigEvalMode } from "@lib/control"
 import GridDimensions from "@lib/gridDimensions"
 import { KeyboardInstance, KeyIndex } from "@lib/keyboardDefinition"
+import { KeyDefinition } from "@lib/keyDefinition"
+import KeyLabel from "@lib/keyLabel"
 import KeyStroke from "@lib/keyStroke"
-import TouchGesture from "@lib/touchGesture"
+import { AbstractTouchGesture } from "@lib/touchGesture"
 import { createContext } from "react"
 
 export type ClassName = string
@@ -17,7 +19,7 @@ export class ConfigureKeyBoard {
   public mode = ConfigEvalMode.Eval
   private _keyboardInstance?: KeyboardInstance
   private _keyIndex?: KeyIndex
-  private _gesture?: TouchGesture
+  private _gesture?: AbstractTouchGesture
   private _keystroke?: KeyStroke|KeyboardInstance
   private readonly loadListeners: Map<string, LoadListener> = new Map()
   private readonly saveListeners: Map<ClassName, Map<string, SaveListener>> = new Map()
@@ -32,6 +34,10 @@ export class ConfigureKeyBoard {
     if (this._keystroke instanceof KeyStroke) {
       return this._keystroke
     }
+  }
+
+  getKeyDefinition(keyIndex: KeyIndex) {
+    return this._keyboardInstance?.keyboard.getKey(keyIndex.row, keyIndex.col)
   }
 
   get childKeyboardInstance() {
@@ -63,7 +69,7 @@ export class ConfigureKeyBoard {
     this.loadListeners.values().forEach(l => l())
   }
 
-  loadKey(index: KeyIndex, gesture: TouchGesture, keystroke?: KeyStroke|KeyboardInstance) {
+  loadKey(index: KeyIndex, gesture: AbstractTouchGesture, keystroke?: KeyStroke|KeyboardInstance) {
     this._keyIndex = index
     this._gesture = gesture
     this._keystroke = keystroke
@@ -74,6 +80,14 @@ export class ConfigureKeyBoard {
     if (this._keyboardInstance) {
       this._keyboardInstance.keyboard.dimensions = gridDimensions
       this.saveListeners.get(GridDimensions.name)?.values().forEach(l => l())
+    }
+  }
+
+  setKey(index: KeyIndex, key: KeyDefinition) {
+    if (this._keyboardInstance) {
+      this._keyIndex = index
+      this._keyboardInstance?.keyboard.setKey(index, key)
+      this.saveListeners.get(KeyDefinition.name)?.values().forEach(l => l())
     }
   }
 }
