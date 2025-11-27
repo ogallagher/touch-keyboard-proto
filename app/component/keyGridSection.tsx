@@ -43,7 +43,7 @@ export default function KeyGridSection() {
   )
   
   return (
-    <KeyGridCtx value={keyGridState}>
+    <KeyGridCtx value={keyGridState.current}>
       <div className='relative grow' >
         {[...children.values()]}
       </div>

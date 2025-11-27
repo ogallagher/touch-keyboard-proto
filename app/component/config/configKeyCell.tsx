@@ -3,13 +3,13 @@ import { KeyIndex } from "@lib/keyboardDefinition"
 import { KeyDefinition } from "@lib/keyDefinition"
 import KeyLabel, { Zone } from "@lib/keyLabel"
 import KeyMap from "@lib/keyMap"
-import KeyStroke from "@lib/keyStroke"
+import KeyStroke, { MetaChar } from "@lib/keyStroke"
 import { AbstractTouchGesture } from "@lib/touchGesture"
 
-import { useContext, useEffect, useRef, useState } from "react"
+import { ChangeEvent, Dispatch, SetStateAction, useContext, useEffect, useRef, useState } from "react"
 import GestureTypeLabel from "./gestureType"
 import KeyZoneLabel from "@component/keyZoneLabel"
-import { KeyGridCtx } from "@context/keyGridCtx"
+import { KeyGridCtx, ModifierKeyListener } from "@context/keyGridCtx"
 
 export default function ConfigKeyCell() {
   const configCtx = useContext(ConfigCtx)
@@ -19,6 +19,10 @@ export default function ConfigKeyCell() {
   const keyMap = useRef(undefined as KeyMap|undefined)
   const [keyStroke, setKeyStroke] = useState(undefined as KeyStroke|undefined)
   const [gesture, setGesture] = useState(undefined as AbstractTouchGesture|undefined)
+  const [labelZoneUseGesture, setLabelZoneUseGesture] = useState(false)
+  const [labelZoneUseModKeys, setLabelZoneUseModKeys] = useState(false)
+  const [isShift, setIsShift] = useState(false)
+  const [isCapsLock, setIsCapsLock] = useState(false)
 
   // init on new config context
   useEffect(
@@ -42,6 +46,26 @@ export default function ConfigKeyCell() {
     []
   )
 
+  // listen to modifier keys
+  useEffect(
+    () => {
+      if (gridCtx) {
+        const mkeyListeners: [Set<ModifierKeyListener>, Dispatch<SetStateAction<boolean>>][] = []
+
+        gridCtx.shiftListeners.add(setIsShift)
+        mkeyListeners.push([gridCtx.shiftListeners, setIsShift])
+
+        gridCtx.capsLockListeners.add(setIsCapsLock)
+        mkeyListeners.push([gridCtx.capsLockListeners, setIsCapsLock])
+
+        return () => { 
+          mkeyListeners.forEach(([ls, l]) => ls.delete(l))
+        }
+      }
+    },
+    [ gridCtx ]
+  )
+
   // write to config context
   useEffect(
     () => {
@@ -59,37 +83,123 @@ export default function ConfigKeyCell() {
     [ keyLabel, keyStroke ]
   )
 
-  // TODO listen to modifier keys
+  const onMajRadioChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setIsShift(e.target.value === MetaChar.SHIFT)
+    setIsCapsLock(e.target.value === MetaChar.CAPS_LOCK)
+  }
   
   return (
     <div
-      className='flex flex-col justify-between gap-1 text-xl' >
-      {/* gesture */}
-      <div
-        className='flex flex-row gap-1 justify-center text-7xl' >
-        <GestureTypeLabel gesture={gesture} />
+      className='flex flex-2/3 flex-col justify-between gap-1' >
+      
+      <div className='flex flex-row gap-2 justify-between'>
+        {/* key label pseudozone use gesture */}
+        <div className='flex flex-row gap-1 justify-start text-sm'>
+          <input
+            type='checkbox'
+            name='labelZoneUseGesture'
+            className='cursor-pointer'
+            checked={labelZoneUseGesture}
+            onChange={e => setLabelZoneUseGesture(e.target.checked)} />
+
+          <div className='flex flex-col justify-center'>
+            <label htmlFor='labelZoneUseGesture' >
+              Use gesture as label condition
+            </label>
+          </div>
+        </div>
+
+        {/* gesture */}
+        <div
+          className='flex-none flex-row gap-1 justify-center text-7xl' >
+          <GestureTypeLabel gesture={gesture} />
+        </div>
       </div>
+      
+
+      <div className='flex flex-row gap-4 justify-between'>
+        {/* key label pseudozone use modifier keys */}      
+        <div
+          className='flex flex-row gap-2 justify-start text-sm'>
+          <input 
+            type='checkbox'
+            name='labelZoneUseModKeys'
+            className='cursor-pointer'
+            checked={labelZoneUseModKeys}
+            onChange={e => setLabelZoneUseModKeys(e.target.checked)} />
+
+          <div className='flex flex-col justify-center'>
+            <label htmlFor='labelZoneUseModKeys' >
+              Use modifier keys as label condition
+            </label>
+          </div>
+        </div>
+
+        <div className='flex flex-row gap-1 justify-start' title='shift'>
+          <input 
+            type='radio'
+            name='modKeysMaj'
+            value={MetaChar.SHIFT}
+            className='cursor-pointer'
+            checked={isShift}
+            onChange={onMajRadioChange} />
+
+          <div className='flex flex-col justify-center'>
+            <label htmlFor='modKeysMaj' >
+              ⇧
+            </label>
+          </div>
+          
+        </div>
+        <div className='flex flex-row gap-1 justify-start' title='caps-lock'>
+          <input 
+            type='radio'
+            name='modKeysMaj'
+            value={MetaChar.CAPS_LOCK}
+            className='cursor-pointer'
+            checked={isCapsLock}
+            onChange={onMajRadioChange} />
+
+          <div className='flex flex-col justify-center'>
+            <label htmlFor='modKeysMaj' >
+              ⇪
+            </label>
+          </div>
+        </div>
+        <input 
+            title='none'
+            type='radio'
+            name='modKeysMaj'
+            value={''}
+            className='cursor-pointer'
+            checked={!isShift && !isCapsLock}
+            onChange={onMajRadioChange} />
+      </div>
+
       {/* key label */}
       <div
-        className='grid grid-cols-3 gap-1' >
+        className='grid grid-cols-3 gap-1 text-xl' >
         {(['upleft', 'up', 'upright', 'left', 'center', 'right', 'downleft', 'down', 'downright'] as Zone[]).map(
           (zone) => (
             <div key={`wrap-${zone}`} className='dark:bg-zinc-700 bg-zinc-300 rounded-lg'>
               <KeyZoneLabel 
                 key={zone} 
                 zone={zone} label={keyLabel} 
-                isShift={false} isCapsLock={false} gestureSegment={undefined}
+                isShift={labelZoneUseModKeys && isShift} isCapsLock={labelZoneUseModKeys && isCapsLock} 
+                gestureSegment={undefined}
                 setKeyLabel={keyLabel ? setKeyLabel : undefined} />
             </div>
           )
         )}
       </div>
+
       {/* key map */}
       <div
-        className='flex flex-row justify-start gap-2' >
-        <label>keystroke</label>
+        className='flex flex-row justify-start gap-2 text-xl' >
+        <label htmlFor='keyStroke'>keystroke</label>
         <input 
           className='field-sizing-content min-w-8'
+          name='keyStroke'
           value={keyStroke?.toChars().join('') || ''}
           placeholder='none'
           onChange={e => setKeyStroke(KeyStroke.parse(e.target.value))} />

@@ -87,4 +87,4 @@ export class KeyGridState {
   }
 }
 
-export const KeyGridCtx = createContext(null as unknown as RefObject<KeyGridState>)
+export const KeyGridCtx = createContext(null as KeyGridState|null)

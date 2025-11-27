@@ -63,7 +63,7 @@ export default function KeyGrid(
             clientY: e.clientY
           }
         )
-        keyGridState.current?.mouseHoverKeyCell.current?.dispatchEvent(_e)
+        keyGridState?.mouseHoverKeyCell.current?.dispatchEvent(_e)
       }
 
       window.addEventListener('mousemove', relay)
@@ -124,14 +124,16 @@ export default function KeyGrid(
   // activate
   useEffect(
     () => {
-      const deactivate = activate.current()
+      if (keyGridState) {
+        const deactivate = activate.current()
 
-      keyGridState.current.deactivateKeyGrid.current = deactivate
-      keyGridState.current.gridPersistance.current = persistance
+        keyGridState.deactivateKeyGrid.current = deactivate
+        keyGridState.gridPersistance.current = persistance
 
-      return () => deactivate(false)
+        return () => deactivate(false)
+      }
     },
-    []
+    [ keyGridState ]
   )
 
   return (

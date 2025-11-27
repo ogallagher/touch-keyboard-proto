@@ -276,7 +276,8 @@ const row4: KeyDefinition[] = [
       [new ZoneKey('left'), '('],
       [new ZoneKey('right'), ')'],
       [new ZoneKey('up'), '"'],
-      [new ZoneKey('down'), '⇪'],
+      [new ZoneKey('down'), '⇧'],
+      [new ZoneKey('down', InitGestureSegmentType.CARDINAL_SWIPE, Cardinal.DOWN), '⇪'],
     ]),
     map: new KeyMap([
       [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke("'")],

@@ -57,7 +57,7 @@ export default function KeyCell(
       // dispatch to eval composer
       const { closedKeyboard } = keys.dispatch(
         target === textAreaEdit.current.target.current ? textAreaEdit.current : undefined, 
-        keyGridState.current
+        keyGridState!
       )
       if (closedKeyboard) {
         gesture.cancel()
@@ -70,7 +70,7 @@ export default function KeyCell(
         if (configCtx.mode === ConfigEvalMode.Eval) {
           switch (keys.size) {
             case KeyboardSize.Fill:
-              keyGridState.current.addKeyGrid(
+              keyGridState!.addKeyGrid(
                 keys, 
                 false, 
                 activateKeyGrid.current
@@ -162,21 +162,23 @@ export default function KeyCell(
   // listen to modifier keys
   useEffect(
     () => {
-      const mkeyListeners: [Set<ModifierKeyListener>, Dispatch<SetStateAction<boolean>>][] = []
+      if (keyGridState) {
+        const mkeyListeners: [Set<ModifierKeyListener>, Dispatch<SetStateAction<boolean>>][] = []
 
-      if (label.pseudoZoneShiftDefined || label.pseudoZoneCapsLockDefined) {
-        keyGridState.current.shiftListeners.add(setIsShift)
-        mkeyListeners.push([keyGridState.current.shiftListeners, setIsShift])
+        if (label.pseudoZoneShiftDefined || label.pseudoZoneCapsLockDefined) {
+          keyGridState.shiftListeners.add(setIsShift)
+          mkeyListeners.push([keyGridState.shiftListeners, setIsShift])
 
-        keyGridState.current.capsLockListeners.add(setIsCapsLock)
-        mkeyListeners.push([keyGridState.current.capsLockListeners, setIsCapsLock])
-      }
+          keyGridState.capsLockListeners.add(setIsCapsLock)
+          mkeyListeners.push([keyGridState.capsLockListeners, setIsCapsLock])
+        }
 
-      return () => { 
-        mkeyListeners.forEach(([ls, l]) => ls.delete(l))
+        return () => { 
+          mkeyListeners.forEach(([ls, l]) => ls.delete(l))
+        }
       }
     },
-    [label]
+    [keyGridState, label]
   )
 
   // listen to mouse and touch events
@@ -211,13 +213,13 @@ export default function KeyCell(
       }
 
       const setMouseHover = () => {
-        if (gesture && !gesture.complete) {
-          keyGridState.current.mouseHoverKeyCell.current = self.current
+        if (gesture && !gesture.complete && keyGridState) {
+          keyGridState.mouseHoverKeyCell.current = self.current
         }
       }
       const unsetMouseHover = () => {
-        if (keyGridState.current.mouseHoverKeyCell.current === self.current) {
-          keyGridState.current.mouseHoverKeyCell.current = null
+        if (keyGridState?.mouseHoverKeyCell.current === self.current) {
+          keyGridState.mouseHoverKeyCell.current = null
         }
       }
 
@@ -251,7 +253,7 @@ export default function KeyCell(
         }
       }
     },
-    [gesture]
+    [ keyGridState, gesture ]
   )
 
   // read key config updates

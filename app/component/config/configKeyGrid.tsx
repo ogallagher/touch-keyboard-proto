@@ -2,6 +2,7 @@ import IncDec from "@component/incDec"
 import { ConfigCtx, configListenerName } from "@context/configCtx"
 import { Orientation } from "@lib/orientation"
 import { useContext, useEffect, useState } from "react"
+import { Grid3x3 } from "react-bootstrap-icons"
 
 export default function ConfigKeyGrid() {
   const configCtx = useContext(ConfigCtx)
@@ -43,10 +44,13 @@ export default function ConfigKeyGrid() {
   
   return (
     <div
-      className='flex flex-col justify-evenly gap-1' >
+      className='flex flex-1/3 flex-col justify-evenly gap-1' >
       {/* grid dimensions */}
-      <div
-        className='flex flex-row text-2xl'>
+      <div className='flex flex-row justify-center gap-2 text-2xl'>
+        <div className='flex flex-col justify-center'>
+          <Grid3x3 className='text-4xl' />
+        </div>
+
         {/* config grid dimensions.width */}
         <IncDec
           orientation={Orientation.Horizontal} 
@@ -59,10 +63,11 @@ export default function ConfigKeyGrid() {
           onInc={() => setGridDimensions(gridDimensions?.rowAdd(+1))} />
       </div>
       <div
-        className='flex flex-row justify-between gap-1' >
+        className='flex flex-row justify-center gap-2 px-2' >
         {/* name */}
         name: 
         <input
+          className='field-sizing-content min-w-8'
           type='text'
           value={keyboardName || 'no keyboard loaded'} 
           onChange={e => setKeyboardName(e.target.value)} />

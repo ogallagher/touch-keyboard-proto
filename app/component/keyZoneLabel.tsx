@@ -20,7 +20,7 @@ export default function KeyZoneLabel(
       <input 
         className={[
           'field-sizing-content flex flex-col justify-center font-mono',
-          setKeyLabel ? '' : 'pointer-none cursor-default',
+          setKeyLabel ? 'select-all' : 'pointer-none cursor-default',
           zoneLabel === undefined ? 'min-w-4' : ''
         ].join(' ')}
         value={zoneLabel || '  '}
