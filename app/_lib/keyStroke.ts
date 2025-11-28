@@ -15,6 +15,7 @@ export enum MetaChar {
   ALT = '<alt>',
   CMD = '<cmd>',
   ESC = '<esc>',
+  WIN = '<win>',
 
   BACKSPACE = '<backspace>',
   
@@ -31,7 +32,7 @@ export function stringToMetaChar(s: string) {
     return
   }
   else {
-    return s in Object.keys(MetaChar) ? s as MetaChar : undefined
+    return Object.values(MetaChar).indexOf(s as MetaChar) !== -1 ? s as MetaChar : undefined
   }
 }
 
@@ -54,7 +55,7 @@ export default class KeyStroke {
     const chars: KeyChar[] = []
 
     for (let i=0; i<s.length; i++) {
-      const mc = stringToMetaChar(s.substring(i))
+      const mc = stringToMetaChar(s.substring(i, s.indexOf(metaCharStrSuffix, i)+1))
       if (mc !== undefined) {
         chars.push(mc)
         i += mc.length - 1

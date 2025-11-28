@@ -50,7 +50,7 @@ export default function ConfigKeyGrid() {
   
   return (
     <div
-      className='flex flex-1/3 flex-col justify-evenly gap-1' >
+      className='flex flex-col justify-evenly gap-1' >
       {/* grid dimensions */}
       <div 
         className='flex flex-row justify-center gap-2 text-2xl'

@@ -48,7 +48,7 @@ export default function ConfigEvalSection(
       {/* config mode */}
       <section
         className={[
-          'flex flex-row justify-evenly gap-4 pl-2',
+          'flex flex-row justify-evenly gap-4 flex-wrap pl-2',
           mode === ConfigEvalMode.Config ? 'flex' : 'hidden'
         ].join(' ')} >
         

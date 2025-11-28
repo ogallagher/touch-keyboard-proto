@@ -15,9 +15,8 @@ export default function KeyZoneLabel(
 ) {
   const pseudoCond = label?.getPseudo(isShift, isCapsLock, gestureSegment?.segment)
   const zoneLabel = label?.getZone(zone, pseudoCond, gestureSegment?.direction)
-  if (gestureSegment?.segment == InitGestureSegmentType.CARDINAL_SWIPE) {
-    console.log('here') // TODO delete me
-  }
+
+  const filterValue = (v: string) => (v.trim() === '') ? undefined : v
 
   return (
     <div className='flex flex-row justify-center'>
@@ -33,7 +32,7 @@ export default function KeyZoneLabel(
           const newLabel = label.clone()
           newLabel.set(
             new ZoneKey(zone, pseudoCond, gestureSegment?.direction), 
-            e.target.value.trim() === '' ? undefined : e.target.value
+            filterValue(e.target.value)
           )
 
           setKeyLabel(newLabel)

@@ -9,6 +9,7 @@ import { ChangeEvent, Dispatch, SetStateAction, useContext, useEffect, useRef, u
 import GestureTypeLabel from "./gestureType"
 import KeyZoneLabel from "@component/keyZoneLabel"
 import { KeyGridCtx, ModifierKeyListener } from "@context/keyGridCtx"
+import MetaCharControl from "@component/metaChar"
 
 export default function ConfigKeyCell() {
   const configCtx = useContext(ConfigCtx)
@@ -17,6 +18,7 @@ export default function ConfigKeyCell() {
   const [keyLabel, setKeyLabel] = useState(undefined as KeyLabel|undefined)
   const keyMap = useRef(undefined as KeyMap|undefined)
   const [keyStroke, setKeyStroke] = useState(undefined as KeyStroke|undefined)
+  const keyStrokeInput = useRef(null as unknown as HTMLInputElement)
   const [gesture, setGesture] = useState(undefined as AbstractTouchGesture|undefined)
   const [labelZoneUseGesture, setLabelZoneUseGesture] = useState(false)
   const [labelZoneUseModKeys, setLabelZoneUseModKeys] = useState(false)
@@ -110,8 +112,7 @@ export default function ConfigKeyCell() {
   
   return (
     <div
-      className='flex flex-2/3 flex-col justify-between gap-1' >
-      
+      className='flex flex-col justify-between gap-1' >
       <div className='flex flex-row gap-2 justify-between'>
         {/* key label pseudozone use gesture */}
         <div className='flex flex-row gap-1 justify-start text-sm'>
@@ -226,14 +227,37 @@ export default function ConfigKeyCell() {
 
       {/* key map */}
       <div
-        className='flex flex-row justify-start gap-2 text-lg' >
-        <label htmlFor='keyStroke'>keystroke:</label>
+        className='flex flex-row justify-start gap-2' >
+        <label className='text-lg' htmlFor='keyStroke'>keystroke:</label>
         <input 
+          ref={keyStrokeInput}
           className='field-sizing-content min-w-8 text-base font-mono dark:bg-zinc-700 bg-zinc-300 rounded-md p-1'
           name='keyStroke'
           value={keyStroke?.toChars().join('') || ''}
           placeholder='none'
-          onChange={e => setKeyStroke(KeyStroke.parse(e.target.value))} />
+          disabled={keyIndex.current.row < 0}
+          onChange={e => {
+            setKeyStroke(KeyStroke.parse(e.target.value))}
+          } />
+        <div
+          className='flex flex-row flex-wrap gap-1 text-base'>
+          {
+            // subset of meta chars that are currently supported for keystrokes
+            [
+              MetaChar.SHIFT, MetaChar.CAPS_LOCK,
+              MetaChar.BACKSPACE, 
+              MetaChar.UP, MetaChar.RIGHT, MetaChar.DOWN, MetaChar.LEFT,
+            ].map(metaChar => 
+              <MetaCharControl 
+                key={metaChar}
+                metaChar={metaChar} 
+                keystroke={keyStroke} 
+                setKeystrokeInput={v => {
+                  setKeyStroke(KeyStroke.parse(v))
+                }} />
+            )
+          }
+        </div>
       </div>
     </div>
   )
