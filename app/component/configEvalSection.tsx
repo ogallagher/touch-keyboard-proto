@@ -13,14 +13,16 @@ export default function ConfigEvalSection(
   }
 ) {
   const configCtx = useContext(ConfigCtx)
-  const [mode, setMode] = useState(configCtx.mode)
+  const [mode, setMode] = useState(configCtx?.mode || ConfigEvalMode.Eval)
 
   // write to config context
   useEffect(
     () => {
+      if (!configCtx) return
+      
       configCtx.mode = mode
     },
-    [ mode ]
+    [ configCtx, mode ]
   )
 
   return (
@@ -46,7 +48,7 @@ export default function ConfigEvalSection(
       {/* config mode */}
       <section
         className={[
-          'flex flex-row justify-evenly gap-4',
+          'flex flex-row justify-evenly gap-4 pl-2',
           mode === ConfigEvalMode.Config ? 'flex' : 'hidden'
         ].join(' ')} >
         

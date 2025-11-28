@@ -1,4 +1,4 @@
-import KeyLabel, { Zone } from "@lib/keyLabel"
+import KeyLabel, { GestureSegment, Zone } from "@lib/keyLabel"
 import TouchGesture, { InitGestureSegmentType } from "@lib/touchGesture"
 import { useRef, useContext, useEffect, useState, Dispatch, SetStateAction, RefObject, JSX } from "react"
 import { PageCanvasCtx } from "@context/pageCanvasCtx"
@@ -27,9 +27,7 @@ export default function KeyCell(
   const [gesture, setGesture] = useState(null as TouchGesture|null)
   const [isShift, setIsShift] = useState(false)
   const [isCapsLock, setIsCapsLock] = useState(false)
-  const [gestureSegment, setGestureSegment] = useState(
-    {} as {segment?: InitGestureSegmentType, direction?: Direction}
-  )
+  const [gestureSegment, setGestureSegment] = useState({} as GestureSegment)
   const [embedGrid, setEmbedGrid] = useState(null as JSX.Element|null)
   const canvas = useContext(PageCanvasCtx)
   const textAreaEdit = useContext(TextAreaEditCtx)
@@ -44,6 +42,7 @@ export default function KeyCell(
     || new KeyMap()
   )
   const onGesture = useRef(undefined as undefined|((g: TouchGesture) => void))
+  const onGestureSegment = useRef(undefined as undefined|((gs: GestureSegment) => void))
 
   const getGestureSegmentLength = () => (
     Math.min(self.current!.clientWidth, self.current!.clientHeight) * 0.4
@@ -119,10 +118,12 @@ export default function KeyCell(
     [ configCtx, keyGridState, map ]
   )
 
-  const onGestureSegment = (
-    label.pseudoZoneCardinalSwipeDefined 
-    ? (segment: InitGestureSegmentType, direction: Direction) => { setGestureSegment({segment, direction}) } 
-    : undefined
+  // define onGestureSegment
+  useEffect(
+    () => {
+      onGestureSegment.current = label.pseudoZoneGestureSegmentDefined ? setGestureSegment : undefined
+    },
+    [ label ]
   )
 
   // draw gesture
@@ -204,7 +205,7 @@ export default function KeyCell(
           getGestureSegmentLength(),
           map,
           onGesture.current, 
-          onGestureSegment
+          onGestureSegment.current
         ))
       }
 
@@ -281,15 +282,15 @@ export default function KeyCell(
           configCtx.keyboardInstance
           && configCtx.keyIndex?.col === index.col && configCtx.keyIndex.row === index.row
         ) {
-          setLabel(
-            configCtx.keyboardInstance.keyboard.getKey(index.row, index.col)?.label 
-            || new KeyLabel()
-          )
-
-          setMap(
-            configCtx.keyboardInstance.keyboard.getKey(index.row, index.col)?.map 
-            || new KeyMap()
-          )
+          const newLabel = configCtx.keyboardInstance.keyboard.getKey(index.row, index.col)?.label || new KeyLabel()
+          if (!label.equals(newLabel)) {
+            setLabel(newLabel)
+          }
+          
+          const newMap = configCtx.keyboardInstance.keyboard.getKey(index.row, index.col)?.map || new KeyMap()
+          if (!map.equals(newMap)) {
+            setMap(newMap)
+          }
         }
       })
 
@@ -318,7 +319,10 @@ export default function KeyCell(
           ].join(' ')} >
           {(['upleft', 'up', 'upright', 'left', 'center', 'right', 'downleft', 'down', 'downright'] as Zone[]).map(
             (zone) => (
-              <KeyZoneLabel key={zone} zone={zone} label={label} isShift={isShift} isCapsLock={isCapsLock} gestureSegment={gestureSegment} />
+              <KeyZoneLabel 
+                key={zone} zone={zone} label={label} 
+                isShift={isShift} isCapsLock={isCapsLock} 
+                gestureSegment={gestureSegment} />
             )
           )}
         </div>

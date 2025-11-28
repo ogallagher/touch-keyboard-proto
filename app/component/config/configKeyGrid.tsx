@@ -70,12 +70,14 @@ export default function ConfigKeyGrid() {
           onDec={() => setGridDimensions(gridDimensions?.rowAdd(-1))}
           onInc={() => setGridDimensions(gridDimensions?.rowAdd(+1))} />
       </div>
+      {/* name */}
       <div
         className='flex flex-row justify-center gap-2 px-2' >
-        {/* name */}
-        name: 
+        <div className='flex flex-col justify-center'>
+          name: 
+        </div>
         <input
-          className='field-sizing-content min-w-8'
+          className='field-sizing-content min-w-8 text-base font-mono dark:bg-zinc-700 bg-zinc-300 rounded-md p-1'
           type='text'
           value={keyboardName || 'no keyboard loaded'} 
           onChange={e => setKeyboardName(e.target.value)} />

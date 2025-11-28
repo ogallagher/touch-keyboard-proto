@@ -1,24 +1,25 @@
 import { Cardinal, Diagonal, Direction, headingToDirection, isAcute, isCardinal, isPerpendicular, toOpposite } from "@lib/orientation"
 import { Group, IPt, Pt } from "pts"
 import KeyMap from "@lib/keyMap"
+import { GestureSegment } from "./keyLabel"
 
 export const holdDelaySec = 0.5
 export const gestureTypeSegmentDelim = '-'
 
-export const enum InitGestureSegmentType {
+export enum InitGestureSegmentType {
   TOUCH = 't',
   CARDINAL_SWIPE = 'cs',
   DIAGONAL_SWIPE = 'ds'
 }
 
-export const enum TermGestureSegmentType {
+export enum TermGestureSegmentType {
   HOLD = 'h',
   CORNER = 'L',
   RETURN = 'r',
   RETURN_OVER = 'ro'
 }
 
-export const enum TouchGestureSegmentType {
+export enum TouchGestureSegmentType {
   TOUCH = InitGestureSegmentType.TOUCH,
   CARDINAL_SWIPE = InitGestureSegmentType.CARDINAL_SWIPE,
   DIAGONAL_SWIPE = InitGestureSegmentType.DIAGONAL_SWIPE,
@@ -118,13 +119,13 @@ export class AbstractTouchGesture {
   private readonly _chainOnHold: boolean|null
 
   constructor(
-    type: TouchGestureType,
+    type: TouchGestureType|InitGestureSegmentType,
     direction?: Direction,
     cornerDirection?: Direction,
     chainOnHold: boolean|null = true
   ) {
     // TODO could validate that type and direction match
-    this._type = type
+    this._type = type as TouchGestureType
     this._direction = direction
     this._cornerDirection = cornerDirection
     this._chainOnHold = chainOnHold
@@ -144,6 +145,27 @@ export class AbstractTouchGesture {
 
   get chainOnHold() {
     return this._chainOnHold
+  }
+
+  /**
+   * Defined for config key derive inner segment from gesture, since key cell gestureSegment is only defined for
+   * incomplete gestures.
+   * 
+   * Split type into segments, return last that is an init segment.
+   */
+  get initType() {
+    const initSegmentTypes = Object.values(InitGestureSegmentType)
+    let lastInitSegment: InitGestureSegmentType
+    for (const segment of this.type.split(gestureTypeSegmentDelim) as (InitGestureSegmentType|TouchGestureSegmentType)[]) {
+      if (initSegmentTypes.includes(segment as InitGestureSegmentType)) {
+        lastInitSegment = segment as InitGestureSegmentType
+      }
+      else {
+        break
+      }
+    }
+
+    return lastInitSegment!
   }
 
   equals(other: AbstractTouchGesture) {
@@ -194,7 +216,7 @@ export class AbstractTouchGesture {
 export default class TouchGesture extends AbstractTouchGesture {
   private _complete: boolean
   private onComplete?: (g: TouchGesture) => void
-  private onSegment?: (s: InitGestureSegmentType, d: Direction) => void
+  private onSegment?: (gs: GestureSegment) => void
   private _points: Group
   private times: Date[] = []
   private readonly segmentLength: number
@@ -211,7 +233,7 @@ export default class TouchGesture extends AbstractTouchGesture {
       segmentLength: number
       map: KeyMap
       onComplete?: (g: TouchGesture) => void
-      onSegment?: (s: InitGestureSegmentType, d: Direction) => void
+      onSegment?: (gs: GestureSegment) => void
     }
   ) {
     super(type, direction, cornerDirection, null)
@@ -225,16 +247,16 @@ export default class TouchGesture extends AbstractTouchGesture {
     this.startHoldTimeout()
 
     if (type === TouchGestureType.TOUCH) {
-      this.innerType = InitGestureSegmentType.TOUCH
+      this.initType = InitGestureSegmentType.TOUCH
     }
   }
 
-  set innerType(type: InitGestureSegmentType) {
+  set initType(type: InitGestureSegmentType) {
     if (this._type !== type as unknown as TouchGestureType) {
       this._type = (type as unknown as TouchGestureType)
 
       if (this.onSegment) {
-        this.onSegment(type, this.direction!)
+        this.onSegment({ segment: type, direction: this.direction })
       }
     }
   }
@@ -281,7 +303,7 @@ export default class TouchGesture extends AbstractTouchGesture {
     this._complete = true
   }
 
-  static create(e: TouchEvent|MouseEvent, segmentLength: number, map: KeyMap, onComplete?: (g: TouchGesture) => void, onSegment?: (s: InitGestureSegmentType, d: Direction) => void) {
+  static create(e: TouchEvent|MouseEvent, segmentLength: number, map: KeyMap, onComplete?: (g: TouchGesture) => void, onSegment?: (gs: GestureSegment) => void) {
     console.info(`create gesture on event type=${e.type}`)
 
     return new TouchGesture({ 
@@ -350,7 +372,7 @@ export default class TouchGesture extends AbstractTouchGesture {
             // swipe from center
             this._points.push(p)
             this._direction = dir
-            this.innerType = (
+            this.initType = (
               isCardinal(dir) ? InitGestureSegmentType.CARDINAL_SWIPE : InitGestureSegmentType.DIAGONAL_SWIPE
             )
 

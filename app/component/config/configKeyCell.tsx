@@ -1,7 +1,7 @@
 import { ConfigCtx, configListenerName } from "@context/configCtx"
 import { KeyIndex } from "@lib/keyboardDefinition"
 import { KeyDefinition } from "@lib/keyDefinition"
-import KeyLabel, { Zone } from "@lib/keyLabel"
+import KeyLabel, { GestureSegment, Zone } from "@lib/keyLabel"
 import KeyMap from "@lib/keyMap"
 import KeyStroke, { MetaChar } from "@lib/keyStroke"
 import { AbstractTouchGesture } from "@lib/touchGesture"
@@ -124,21 +124,27 @@ export default function ConfigKeyCell() {
 
           <div className='flex flex-col justify-center'>
             <label htmlFor='labelZoneUseGesture' >
-              Use gesture as label condition
+              Use gesture start segment as label condition
             </label>
           </div>
         </div>
-
-        {/* gesture */}
+        
         <div
-          className='flex-none flex-row gap-1 justify-center text-7xl' >
+          className='flex flex-row gap-1 justify-center text-7xl' >
+          {/* gesture init segment */}
+          <GestureTypeLabel
+            gesture={
+              !gesture ? undefined
+              : new AbstractTouchGesture(gesture.initType, gesture.direction)
+            } />
+          {/* gesture */}
           <GestureTypeLabel gesture={gesture} />
         </div>
       </div>
       
-
-      <div className='flex flex-row gap-4 justify-between'>
-        {/* key label pseudozone use modifier keys */}      
+      
+      <div className='flex flex-row gap-4 justify-between'>   
+        {/* key label pseudozone use modifier keys */}   
         <div
           className='flex flex-row gap-2 justify-start text-sm'>
           <input 
@@ -155,6 +161,7 @@ export default function ConfigKeyCell() {
           </div>
         </div>
 
+        {/* modifier key controls */}
         <div className='flex flex-row gap-1 justify-start' title='shift'>
           <input 
             type='radio'
@@ -206,7 +213,11 @@ export default function ConfigKeyCell() {
                 key={zone} 
                 zone={zone} label={keyLabel} 
                 isShift={labelZoneUseModKeys && isShift} isCapsLock={labelZoneUseModKeys && isCapsLock} 
-                gestureSegment={undefined}
+                gestureSegment={
+                  labelZoneUseGesture 
+                  ? { segment: gesture?.initType, direction: gesture?.direction } 
+                  : undefined
+                }
                 setKeyLabel={keyLabel ? setKeyLabel : undefined} />
             </div>
           )
@@ -215,10 +226,10 @@ export default function ConfigKeyCell() {
 
       {/* key map */}
       <div
-        className='flex flex-row justify-start gap-2 text-xl' >
-        <label htmlFor='keyStroke'>keystroke</label>
+        className='flex flex-row justify-start gap-2 text-lg' >
+        <label htmlFor='keyStroke'>keystroke:</label>
         <input 
-          className='field-sizing-content min-w-8'
+          className='field-sizing-content min-w-8 text-base font-mono dark:bg-zinc-700 bg-zinc-300 rounded-md p-1'
           name='keyStroke'
           value={keyStroke?.toChars().join('') || ''}
           placeholder='none'

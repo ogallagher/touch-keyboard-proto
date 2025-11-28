@@ -13,7 +13,11 @@ export default function KeyZoneLabel(
     setKeyLabel?: Dispatch<SetStateAction<KeyLabel | undefined>>
   }
 ) {
-  const zoneLabel = label?.getZone(zone, label.getPseudo(isShift, isCapsLock, gestureSegment?.segment), gestureSegment?.direction)
+  const pseudoCond = label?.getPseudo(isShift, isCapsLock, gestureSegment?.segment)
+  const zoneLabel = label?.getZone(zone, pseudoCond, gestureSegment?.direction)
+  if (gestureSegment?.segment == InitGestureSegmentType.CARDINAL_SWIPE) {
+    console.log('here') // TODO delete me
+  }
 
   return (
     <div className='flex flex-row justify-center'>
@@ -23,10 +27,13 @@ export default function KeyZoneLabel(
           setKeyLabel ? 'select-all' : 'pointer-none cursor-default',
           zoneLabel === undefined ? 'min-w-4' : ''
         ].join(' ')}
-        value={zoneLabel || '  '}
+        value={zoneLabel || ''}
         onChange={setKeyLabel && label && ( (e) => {
           const newLabel = label.clone()
-          newLabel.set(new ZoneKey(zone), e.target.value.trim() === '' ? undefined : e.target.value)
+          newLabel.set(
+            new ZoneKey(zone, pseudoCond, gestureSegment?.direction), 
+            e.target.value.trim() === '' ? undefined : e.target.value
+          )
 
           setKeyLabel(newLabel)
         } )}

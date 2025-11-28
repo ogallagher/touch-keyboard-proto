@@ -4,6 +4,14 @@ import { InitGestureSegmentType } from "@lib/touchGesture"
 export type Zone = 'center'|'up'|'right'|'down'|'left'|'upright'|'downright'|'downleft'|'upleft'
 export type PseudoCond = 'shift'|'capslock'|InitGestureSegmentType
 
+/**
+ * A non terminal gesture segment and direction used for defining a key label pseudozone.
+ */
+export type GestureSegment = {
+  segment?: InitGestureSegmentType, 
+  direction?: Direction
+}
+
 export class ZoneKey {
   static readonly strDelim = '_'
 
@@ -29,10 +37,23 @@ export class ZoneKey {
 
 export default class KeyLabel {
   protected readonly values: Map<string, string> = new Map()
+  protected _pseudoZoneShiftDefined: boolean = false
+  protected _pseudoZoneCapsLockDefined: boolean = false
+  protected _pseudoZoneGestureSegmentDefined: boolean = false
 
   constructor(values: [ZoneKey, string][] = []) {
     for (const [key, val] of values) {
       this.set(key, val)
+
+      if (!this._pseudoZoneShiftDefined && key.pseudo === 'shift') {
+        this._pseudoZoneShiftDefined = true
+      }
+      else if (!this._pseudoZoneCapsLockDefined && key.pseudo === 'capslock') {
+        this._pseudoZoneCapsLockDefined = true
+      }
+      else if (!this._pseudoZoneGestureSegmentDefined && key.pseudo !== undefined) {
+        this._pseudoZoneGestureSegmentDefined = true
+      }
     }
   }
 
@@ -73,39 +94,20 @@ export default class KeyLabel {
     return true
   }
 
-  protected pseudoZoneDefined(
-    pseudo: PseudoCond, 
-    directions: (Direction|Cardinal|Diagonal|undefined)[] = [undefined], 
-    zones: Zone[] = ['center', 'up', 'right', 'down', 'left', 'upright', 'downright', 'downleft', 'upleft']
-  ) {
-    let res: string|undefined = undefined
+  /**
+   * Return whether any zone pseudo condition includes shift.
+   */
+  get pseudoZoneShiftDefined() { return this._pseudoZoneShiftDefined }
 
-    for (const dir of directions) {
-      for (const zone of zones) {
-        res ||= this.values.get(new ZoneKey(zone, pseudo, dir).toString())
-        if (res) break
-      }
-      if (res) break
-    }
-    
-    return res
-  }
-
-  get pseudoZoneShiftDefined() {
-    return this.pseudoZoneDefined('shift')
-  }
-
-  get pseudoZoneCapsLockDefined() {
-    return this.pseudoZoneDefined('capslock')
-  }
-
-  get pseudoZoneCardinalSwipeDefined() {
-    return this.pseudoZoneDefined(
-      InitGestureSegmentType.CARDINAL_SWIPE, 
-      [Cardinal.UP, Cardinal.RIGHT, Cardinal.DOWN, Cardinal.LEFT],
-      ['center', 'up', 'right', 'down', 'left']
-    )
-  }
+  /**
+   * Return whether any zone pseudo condition includes capslock.
+   */
+  get pseudoZoneCapsLockDefined() { return this._pseudoZoneCapsLockDefined }
+  
+  /**
+   * Return any zone pseudo condition includes any initial gesture segment.
+   */
+  get pseudoZoneGestureSegmentDefined() { return this._pseudoZoneGestureSegmentDefined }
 
   getPseudo(shift?: boolean, capslock?: boolean, gestureSegment?: InitGestureSegmentType): PseudoCond|undefined {
     if (shift) return 'shift'
