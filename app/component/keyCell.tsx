@@ -10,7 +10,8 @@ import { isTouchScreen } from "@lib/platform"
 import { KeyboardInstance, KeyboardSize, KeyIndex } from "@lib/keyboardDefinition"
 import KeyGrid from "./keyGrid"
 import KeyStroke from "@lib/keyStroke"
-import { ConfigCtx, configListenerName } from "@context/configCtx"
+import { ConfigCtx } from "@context/configCtx"
+import { listenerName } from "@lib/eventSync"
 import { ConfigEvalMode } from "@lib/control"
 import KeyZoneLabel from "./keyZoneLabel"
 import { KeyDefinition } from "@lib/keyDefinition"
@@ -277,7 +278,7 @@ export default function KeyCell(
         return 
       }
 
-      const name = configListenerName(KeyCell.name + `[${index.col},${index.row}]`)
+      const name = listenerName(KeyCell.name + `[${index.col},${index.row}]`)
       configCtx.addSaveListener(name, KeyDefinition.name, () => {
         if (
           configCtx.keyboardInstance

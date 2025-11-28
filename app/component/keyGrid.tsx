@@ -4,7 +4,8 @@ import { KeyboardInstance, KeyboardPersistance } from "@lib/keyboardDefinition"
 import { useContext, useEffect, useRef, useState } from "react"
 import { KeyGridCtx } from "@context/keyGridCtx"
 import { isTouchScreen } from "@lib/platform"
-import { ConfigCtx, configListenerName } from "@context/configCtx"
+import { ConfigCtx } from "@context/configCtx"
+import { listenerName } from "@lib/eventSync"
 import { ConfigEvalMode } from "@lib/control"
 
 const scrollEventTypes = ['scroll', 'touchmove', 'wheel', 'drag']
@@ -26,7 +27,7 @@ export default function KeyGrid(
   useEffect(
     () => {
       if (configCtx && configurable) {
-        const name = configListenerName(KeyGrid.name)
+        const name = listenerName(KeyGrid.name)
         configCtx.addSaveListener(name, GridDimensions.name, () => {
           setDimensions(configCtx.keyboardInstance?.keyboard.dimensions)
         })
@@ -139,7 +140,7 @@ export default function KeyGrid(
   useEffect(
     () => {
       if (configCtx && !configurable) {
-        const name = configListenerName(KeyGrid.name)
+        const name = listenerName(KeyGrid.name)
         configCtx.addModeListener(name, () => {
           if (configCtx.mode === ConfigEvalMode.Config) {
             deactivate.current(true)

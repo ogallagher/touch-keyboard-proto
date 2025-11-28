@@ -1,4 +1,5 @@
-import { ConfigCtx, configListenerName } from "@context/configCtx"
+import { ConfigCtx } from "@context/configCtx"
+import { listenerName } from "@lib/eventSync"
 import { KeyIndex } from "@lib/keyboardDefinition"
 import { KeyDefinition } from "@lib/keyDefinition"
 import KeyLabel, { Zone } from "@lib/keyLabel"
@@ -29,7 +30,7 @@ export default function ConfigKeyCell() {
   useEffect(
     () => {
       if (configCtx) {
-        const name = configListenerName(ConfigKeyCell.name)
+        const name = listenerName(ConfigKeyCell.name)
         configCtx.addLoadListener(name, () => {
           let key: KeyDefinition|undefined
           if (configCtx.keyboardInstance && configCtx.keyIndex) {

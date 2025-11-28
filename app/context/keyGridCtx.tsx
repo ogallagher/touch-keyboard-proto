@@ -3,13 +3,46 @@ import { MetaChar } from "@lib/keyStroke"
 import { createContext, RefObject } from "react"
 
 export type AddKeyGrid = (keyboard: KeyboardInstance, configurable: boolean, onClose?: () => void) => void
+export type DeleteKeyGrid = (keyboardInstanceId: string) => void
+export type KeyboardsListListener = () => void
 export type ModifierKeyListener = (v: boolean) => void
 
 export class KeyGridState {
+  private readonly _keyboards: Map<string, KeyboardInstance> = new Map()
+  get keyboards() {
+    return [...this._keyboards.values()]
+  }
+  getKeyboard(instanceId: string) {
+    return this._keyboards.get(instanceId)
+  }
+  public readonly keyboardsListListeners: Map<string, KeyboardsListListener> = new Map()
+
   private _addKeyGrid = null as unknown as AddKeyGrid
-  get addKeyGrid() { return this._addKeyGrid }
+  get addKeyGrid() { 
+    const addKeyboard: AddKeyGrid = (keyboard, configurable, onClose?) => {
+      this._addKeyGrid(keyboard, configurable, onClose)
+      this._keyboards.set(keyboard.instanceId, keyboard)
+      this.keyboardsListListeners.values().forEach(l => l())
+    }
+
+    return addKeyboard
+  }
   setAddKeyGrid(v: AddKeyGrid) {
     this._addKeyGrid = v
+  }
+
+  private _deleteKeyGrid = null as unknown as DeleteKeyGrid
+  get deleteKeyGrid() {
+    const deleteKeyboard: DeleteKeyGrid = (keyboardInstanceId) => {
+      this._deleteKeyGrid(keyboardInstanceId)
+      this._keyboards.delete(keyboardInstanceId)
+      this.keyboardsListListeners.values().forEach(l => l())
+    }
+
+    return deleteKeyboard
+  }
+  setDeleteKeyGrid(v: DeleteKeyGrid) {
+    this._deleteKeyGrid = v
   }
 
   public readonly deactivateKeyGrid: RefObject<(closeKeyboard: boolean) => void> = {

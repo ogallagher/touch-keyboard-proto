@@ -171,19 +171,22 @@ export default class KeyboardDefinition {
 }
 
 export class KeyboardInstance {
+  public readonly instanceId: string
   public readonly keyboard: KeyboardDefinition
   public readonly persistance: KeyboardPersistance
   public readonly size: KeyboardSize
 
   constructor(
     keyboard: KeyboardDefinition,
-    { persistance, size, name, keyOverrides = [] }: { 
+    { index = 0, persistance, size, name, keyOverrides = [] }: { 
+      index?: number
       persistance: KeyboardPersistance
       size: KeyboardSize
       name?: string
       keyOverrides?: KeyOverride[]
     }
   ) {
+    this.instanceId = `${KeyboardInstance.name}[${index}]@${new Date().toISOString()}`
     this.keyboard = keyboard.clone(name, false)
     this.persistance = persistance
     this.size = size

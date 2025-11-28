@@ -27,7 +27,7 @@ export default function ConfigEvalSection() {
       {/* eval mode */}
       <section
         className={[
-          'flex-row justify-evenly',
+          'flex-row justify-center gap-2',
           mode === ConfigEvalMode.Eval ? 'flex' : 'hidden' 
         ].join(' ')} >
         <ComposerTextArea visible={mode === ConfigEvalMode.Eval} />
@@ -45,7 +45,7 @@ export default function ConfigEvalSection() {
       {/* config mode */}
       <section
         className={[
-          'flex flex-row justify-evenly gap-4 flex-wrap pl-2',
+          'flex flex-row justify-evenly gap-4 flex-wrap px-2',
           mode === ConfigEvalMode.Config ? 'flex' : 'hidden'
         ].join(' ')} >
         
@@ -56,7 +56,7 @@ export default function ConfigEvalSection() {
 
       {/* switch between modes */}
       <button 
-        className="absolute bottom-0 right-0 p-4 cursor-pointer" 
+        className="absolute bottom-0 right-0 px-1 cursor-pointer" 
         onClick={() => {
           if (mode === ConfigEvalMode.Eval) {
             setMode(ConfigEvalMode.Config)

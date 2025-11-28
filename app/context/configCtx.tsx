@@ -11,10 +11,6 @@ export type ModeListener = () => void
 export type LoadListener = () => void
 export type SaveListener = () => void
 
-export function configListenerName(className: string) {
-  return `${className}${new Date().toISOString()}`
-}
-
 export class ConfigureKeyBoard {
   private _mode = ConfigEvalMode.Eval
   private _keyboardInstance?: KeyboardInstance
@@ -84,6 +80,11 @@ export class ConfigureKeyBoard {
 
   loadKeyboard(keyboardInstance: KeyboardInstance) {
     this._keyboardInstance = keyboardInstance
+    this.loadListeners.values().forEach(l => l())
+  }
+
+  unloadKeyboard() {
+    this._keyboardInstance = undefined
     this.loadListeners.values().forEach(l => l())
   }
 
