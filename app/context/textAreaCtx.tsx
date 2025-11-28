@@ -1,66 +1,86 @@
 import { cursorChar } from "@lib/keyStroke"
-import { createContext, RefObject } from "react"
+import { createContext } from "react"
 
 export class EditTextArea {
-  constructor(
-    public readonly target: RefObject<HTMLTextAreaElement>,
-    public readonly cursor: RefObject<number>
-  ) {
+  private _target: HTMLTextAreaElement|undefined
+
+  private _cursor: number = 0
+
+  constructor() {
     this.reset()
+  }
+
+  get target() {
+    return this._target
+  }
+  setTarget(t: HTMLTextAreaElement) {
+    this._target = t
+  }
+
+  get cursor() {
+    return this._cursor
   }
 
   moveCursor(delta: number) {
     if (delta === 0) return
+    if (!this._target) return
 
-    const newCursorPos = this.cursor.current + delta
-    if (newCursorPos < 0 || newCursorPos >= this.target.current.value.length) return
+    const newCursorPos = this._cursor + delta
+    if (newCursorPos < 0 || newCursorPos >= this._target.value.length) return
 
     if (delta < 0) {
-      this.target.current.value = (
-        this.target.current.value.substring(0, newCursorPos)
+      this._target.value = (
+        this._target.value.substring(0, newCursorPos)
         + cursorChar
-        + this.target.current.value.substring(newCursorPos, this.cursor.current)
-        + this.target.current.value.substring(this.cursor.current+1)
+        + this._target.value.substring(newCursorPos, this._cursor)
+        + this._target.value.substring(this._cursor+1)
       )
     }
     else {
-      this.target.current.value = (
-        this.target.current.value.substring(0, this.cursor.current)
-        + this.target.current.value.substring(this.cursor.current+1, newCursorPos+1)
+      this._target.value = (
+        this._target.value.substring(0, this._cursor)
+        + this._target.value.substring(this._cursor+1, newCursorPos+1)
         + cursorChar
-        + this.target.current.value.substring(newCursorPos+1)
+        + this._target.value.substring(newCursorPos+1)
       )
     }
 
-    this.cursor.current = newCursorPos
+    this._cursor = newCursorPos
   }
 
   typeChars(chars: string) {
+    if (!this._target) return
+
     // insert chars before cursor char
-    this.target.current.value = (
-      this.target.current.value.substring(0, this.cursor.current)
+    this._target.value = (
+      this._target.value.substring(0, this._cursor)
       + chars
-      + this.target.current.value.substring(this.cursor.current)
+      + this._target.value.substring(this._cursor)
     )
 
-    this.cursor.current += chars.length
+    this._cursor += chars.length
   }
 
   deleteChars(count: number) {
+    if (!this._target) return
+
     // delete chars before cursor char
-    this.target.current.value = (
-      this.target.current.value.substring(0, this.cursor.current-count)
-      + this.target.current.value.substring(this.cursor.current)
+    this._target.value = (
+      this._target.value.substring(0, this._cursor-count)
+      + this._target.value.substring(this._cursor)
     )
 
-    this.cursor.current -= count
+    this._cursor -= count
   }
 
   reset() {
-    this.target.current.value = cursorChar
-    this.cursor.current = 0
-    this.target.current.focus()
+    this._cursor = 0
+
+    if (this._target) {
+      this._target.value = cursorChar
+      this._target.focus()
+    }
   }
 }
 
-export const TextAreaEditCtx = createContext(null as unknown as RefObject<EditTextArea>)
+export const TextAreaEditCtx = createContext(null as unknown as EditTextArea)

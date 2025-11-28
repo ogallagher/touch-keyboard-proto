@@ -11,10 +11,10 @@ import { KeyGridCtx, KeyGridState } from "@context/keyGridCtx"
 
 const config = new ConfigureKeyBoard()
 const keyGridState = new KeyGridState()
+const textAreaEdit = new EditTextArea()
 
 export default function Home() {
   const canvas = useRef(null as unknown as HTMLCanvasElement)
-  const textAreaEdit = useRef(null as unknown as EditTextArea)
   
   return (
     <div 
@@ -31,16 +31,14 @@ export default function Home() {
       <Header />
 
       <KeyGridCtx value={keyGridState}>
-        <ConfigCtx 
-          value={config} >
-          <ConfigEvalSection
-            textAreaEdit={textAreaEdit} />
+        <ConfigCtx value={config} >
+          <TextAreaEditCtx value={textAreaEdit}>
+            <ConfigEvalSection />
 
-          <PageCanvasCtx value={canvas}>
-            <TextAreaEditCtx value={textAreaEdit}>
+            <PageCanvasCtx value={canvas}>
               <KeyGridSection />
-            </TextAreaEditCtx>
-          </PageCanvasCtx>
+            </PageCanvasCtx>
+          </TextAreaEditCtx>
         </ConfigCtx>
       </KeyGridCtx>
     </div>

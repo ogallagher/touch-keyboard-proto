@@ -1,18 +1,15 @@
 import { Gear, Play, Trash } from "react-bootstrap-icons"
-import TextArea from "@component/textArea"
-import { RefObject, useContext, useEffect, useState } from "react"
-import { EditTextArea } from "@context/textAreaCtx"
+import ComposerTextArea from "@component/textArea"
+import { useContext, useEffect, useState } from "react"
+import { TextAreaEditCtx } from "@context/textAreaCtx"
 import { ConfigEvalMode } from "@lib/control"
 import { ConfigCtx } from "@context/configCtx"
 import ConfigKeyCell from "./config/configKeyCell"
 import ConfigKeyGrid from "./config/configKeyGrid"
 
-export default function ConfigEvalSection(
-  { textAreaEdit }: {
-    textAreaEdit: RefObject<EditTextArea>
-  }
-) {
+export default function ConfigEvalSection() {
   const configCtx = useContext(ConfigCtx)
+  const textAreaEdit = useContext(TextAreaEditCtx)
   const [mode, setMode] = useState(configCtx?.mode || ConfigEvalMode.Eval)
 
   // write to config context
@@ -33,12 +30,12 @@ export default function ConfigEvalSection(
           'flex-row justify-evenly',
           mode === ConfigEvalMode.Eval ? 'flex' : 'hidden' 
         ].join(' ')} >
-        <TextArea edit={textAreaEdit} visible={mode === ConfigEvalMode.Eval} />
+        <ComposerTextArea visible={mode === ConfigEvalMode.Eval} />
 
         <button
           className="cursor-pointer"
           onClick={() => {
-            textAreaEdit.current.reset()
+            textAreaEdit.reset()
           }}
           title='clear composer text area' >
           <Trash />

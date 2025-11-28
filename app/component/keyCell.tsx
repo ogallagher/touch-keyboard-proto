@@ -59,7 +59,7 @@ export default function KeyCell(
 
           // dispatch to eval composer
           const { closedKeyboard } = keys.dispatch(
-            target === textAreaEdit.current.target.current ? textAreaEdit.current : undefined, 
+            target === textAreaEdit.target ? textAreaEdit : undefined, 
             keyGridState
           )
           if (closedKeyboard) {

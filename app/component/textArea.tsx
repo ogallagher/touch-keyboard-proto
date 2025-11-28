@@ -1,21 +1,20 @@
-import { RefObject, useEffect, useRef } from "react"
-import { EditTextArea } from "@context/textAreaCtx"
+import { useContext, useEffect, useRef } from "react"
+import { TextAreaEditCtx } from "@context/textAreaCtx"
 
-export default function TextArea(
-  { edit: editRef, visible }: {
-    edit: RefObject<EditTextArea>
+export default function ComposerTextArea(
+  { visible }: {
     visible: boolean
   }
 ) {
+  const textAreaEdit = useContext(TextAreaEditCtx)
   const textArea = useRef(null as unknown as HTMLTextAreaElement)
-  const cursorPos = useRef(0)
 
   // define editor
   useEffect(
     () => {
-      editRef.current = new EditTextArea(textArea, cursorPos)
+      textAreaEdit.setTarget(textArea.current)
     },
-    [ editRef ]
+    [ textAreaEdit ]
   )
   
   // focus to receive keystrokes
@@ -25,7 +24,7 @@ export default function TextArea(
         textArea.current.focus()
       }
     },
-    [visible]
+    [ visible ]
   )
   
   return (
