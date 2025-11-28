@@ -211,6 +211,19 @@ export class AbstractTouchGesture {
       `TG[${this.id}]`
     )
   }
+
+  toJSON() {
+    return {
+      type: this._type,
+      direction: this._direction,
+      cornerDirection: this._cornerDirection,
+      chainOnHold: this._chainOnHold
+    }
+  }
+
+  static fromJSON(o: any) {
+    return new AbstractTouchGesture(o.type, o.direction, o.cornerDirection, o.chainOnHold)
+  }
 }
 
 export default class TouchGesture extends AbstractTouchGesture {

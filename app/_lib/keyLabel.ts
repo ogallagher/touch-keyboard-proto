@@ -121,4 +121,17 @@ export default class KeyLabel {
 
     return res
   }
+
+  toJSON() {
+    return {
+      values: Object.fromEntries(this.values.entries())
+    }
+  }
+
+  static fromJSON(o: any) {
+    return new KeyLabel(
+      Object.entries(o.values as object)
+      .map(([zkStr, label]) => [ZoneKey.fromString(zkStr), label])
+    )
+  }
 }

@@ -27,6 +27,7 @@ export interface KeyIndex { row: number, col: number }
 export type KeyOverride = KeyIndex & {
   key: KeyAttributes
 }
+export type KeyboardInstanceString = string
 
 const editLockError = (name: string) => new Error(`keyboard name=${name} is locked for editing; create an editable clone first`)
 
@@ -126,6 +127,47 @@ export default class KeyboardDefinition {
     this._prevVersion = this
     this._saved = true
   }
+
+  equals(other: KeyboardDefinition, includeName: boolean = true) {
+    if (includeName && this._name !== other._name) return false
+
+    const dimensions = this.dimensions
+    if (!dimensions.equals(other.dimensions)) return false
+
+    let key: KeyDefinition|undefined, otherKey: KeyDefinition|undefined
+    for (let r=0; r<dimensions.height; r++) {
+      for (let c=0; c<dimensions.width; c++) {
+        key = this.getKey(r, c)
+        otherKey = other.getKey(r, c)
+        
+        // either key is undefined and other is not
+        if (key !== otherKey && (key || otherKey) === undefined) {
+          return false
+        }
+
+        // key definition mismatch
+        if (!key?.equals(otherKey)) {
+          return false
+        }
+      }
+    }
+
+    return true
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      keys: this.keys
+    }
+  }
+
+  static fromJSON(o: any) {
+    return new KeyboardDefinition(
+      o.name, 
+      (o.keys as KeyDefinition[][]).map(row => row.map(key => KeyDefinition.fromJSON(key)))
+    )
+  }
 }
 
 export class KeyboardInstance {
@@ -175,5 +217,41 @@ export class KeyboardInstance {
         key.map.set(gesture, keys)
       }
     }
+  }
+
+  save(): KeyboardInstanceString {
+    return JSON.stringify(this)
+  }
+
+  static fromJSON(o: any) {
+    return new KeyboardInstance(
+      KeyboardDefinition.fromJSON(o.keyboard),
+      {...o}
+    )
+  }
+
+  static load(
+    s: KeyboardInstanceString, 
+    { persistance, size, keyOverrides } : {
+      persistance?: KeyboardPersistance
+      size?: KeyboardSize
+      keyOverrides?: KeyOverride[]
+    } = {}
+  ) {
+    const raw = JSON.parse(s)
+
+    raw.persistance = (persistance || raw.persistance)
+    raw.size = (size || raw.size)
+    raw.keyOverrides = keyOverrides
+
+    return this.fromJSON(raw)
+  }
+
+  equals(other: KeyboardInstance, includeName: boolean = false) {
+    return (
+      this.keyboard.equals(other.keyboard, includeName)
+      && this.persistance === other.persistance
+      && this.size === other.size
+    )
   }
 }

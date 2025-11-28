@@ -1,5 +1,5 @@
 import { AbstractTouchGesture, TouchGestureType, typeWithoutHold, typeWithoutOverReturn } from "@lib/touchGesture"
-import KeyStroke from "@lib/keyStroke"
+import KeyStroke, { KeyChar } from "@lib/keyStroke"
 import { KeyboardInstance } from "./keyboardDefinition"
 
 export default class KeyMap {
@@ -129,11 +129,40 @@ export default class KeyMap {
 
     for (const gestureId of gestureIds) {
       const gesture = this.gestures.get(gestureId)!
-      if (this.getKeys(gesture, false, false) !== other.getKeys(gesture, false, false)) {
-        return false
+      const keys = this.getKeys(gesture, false, false)
+      const otherKeys = other.getKeys(gesture, false, false)
+      
+      if (keys === undefined) {
+        if (otherKeys !== undefined) return false
+      }
+      else if (keys instanceof KeyStroke) {
+        if (!(otherKeys instanceof KeyStroke) || !keys.equals(otherKeys)) return false
+      }
+      else if (keys instanceof KeyboardInstance) {
+        if (!(otherKeys instanceof KeyboardInstance) || !keys.equals(otherKeys, true)) return false
       }
     }
 
     return true
+  }
+
+  toJSON() {
+    return {
+      values: this.entries()
+    }
+  }
+
+  static fromJSON(o: any) {
+    return new KeyMap(
+      (o.values as [AbstractTouchGesture, {chars: KeyChar[]}|KeyboardInstance][])
+      .map(([gesture, keys]) => [
+        AbstractTouchGesture.fromJSON(gesture), 
+        (
+          'chars' in keys 
+          ? KeyStroke.fromJSON(keys) 
+          : KeyboardInstance.fromJSON(keys)
+        )
+      ])
+    )
   }
 }

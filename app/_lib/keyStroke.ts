@@ -138,4 +138,16 @@ export default class KeyStroke {
   clone() {
     return new KeyStroke(...this.chars)
   }
+
+  equals(other: KeyStroke) {
+    return this.chars.join('') === other.chars.join('')
+  }
+
+  toJSON() {
+    return { chars: this.chars }
+  }
+
+  static fromJSON(o: any) {
+    return new KeyStroke(...(o.chars as KeyChar[]))
+  }
 }

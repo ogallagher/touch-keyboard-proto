@@ -31,4 +31,8 @@ export default class GridDimensions {
   toString() {
     return `${this.width}x${this.height}`
   }
+
+  equals(other: GridDimensions) {
+    return this.width === other.width && this.height === other.height
+  }
 }

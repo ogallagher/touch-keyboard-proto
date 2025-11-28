@@ -289,6 +289,7 @@ export default function KeyCell(
           }
           
           const newMap = configCtx.keyboardInstance.keyboard.getKey(index.row, index.col)?.map || new KeyMap()
+          // consider removing or reducing comparison that reduces render count in case it's too expensive
           if (!map.equals(newMap)) {
             setMap(newMap)
           }

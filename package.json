@@ -9,7 +9,8 @@
     "_start": "next start --port $PORT",
     "start": "dotenv-run-script -- _start",
     "start-forever": "forever start -c 'npm run start' .",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "mocha test/**/*.ts"
   },
   "dependencies": {
     "dotenv-run-script": "^0.4.1",
@@ -21,13 +22,16 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/mocha": "^10.0.10",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "baseline-browser-mapping": "^2.8.32",
     "eslint": "^9",
     "eslint-config-next": "16.0.3",
+    "mocha": "^11.7.5",
     "tailwindcss": "^4",
+    "tsx": "^4.20.6",
     "typescript": "^5"
   },
   "optionalDependencies": {
