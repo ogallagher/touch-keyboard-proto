@@ -338,7 +338,7 @@ export default class TouchGesture extends AbstractTouchGesture {
         }
       }
 
-      if (this.map.getAbstractGesture(this)!.chainOnHold) {
+      if (this.map.getAbstractGesture(this)?.chainOnHold) {
         if (this.onComplete) {
           this.onComplete(this)
         }

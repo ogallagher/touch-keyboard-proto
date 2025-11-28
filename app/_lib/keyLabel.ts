@@ -36,7 +36,7 @@ export class ZoneKey {
 }
 
 export default class KeyLabel {
-  protected readonly values: Map<string, string> = new Map()
+  protected readonly values: Map<string, string|undefined> = new Map()
   protected _pseudoZoneShiftDefined: boolean = false
   protected _pseudoZoneCapsLockDefined: boolean = false
   protected _pseudoZoneGestureSegmentDefined: boolean = false
@@ -69,12 +69,7 @@ export default class KeyLabel {
   }
 
   set(zone: ZoneKey, label: string|undefined) {
-    if (label === undefined) {
-      this.values.delete(zone.toString())
-    }
-    else {
-      this.values.set(zone.toString(), label)
-    }
+    this.values.set(zone.toString(), label)
   }
 
   equals(other: KeyLabel) {

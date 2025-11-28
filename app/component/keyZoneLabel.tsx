@@ -27,6 +27,7 @@ export default function KeyZoneLabel(
           setKeyLabel ? 'select-all' : 'pointer-none cursor-default',
           zoneLabel === undefined ? 'min-w-4' : ''
         ].join(' ')}
+        placeholder={setKeyLabel ? '*' : undefined}
         value={zoneLabel || ''}
         onChange={setKeyLabel && label && ( (e) => {
           const newLabel = label.clone()
