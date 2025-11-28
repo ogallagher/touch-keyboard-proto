@@ -1,5 +1,3 @@
-import KeyLabel from "@lib/keyLabel"
-import KeyMap from "@lib/keyMap"
 import GridDimensions from "@lib/gridDimensions"
 import { KeyAttributes, KeyDefinition } from "@lib/keyDefinition"
 

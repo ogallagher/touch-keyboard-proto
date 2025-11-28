@@ -29,7 +29,7 @@ export class ConfigureKeyBoard {
     return this._mode
   }
 
-  set mode(mode: ConfigEvalMode) {
+  setMode(mode: ConfigEvalMode) {
     this._mode = mode
     this.modeListeners.values().forEach(l => l())
   }
@@ -106,6 +106,12 @@ export class ConfigureKeyBoard {
       this._keyIndex = index
       this._keyboardInstance?.keyboard.setKey(index, key)
       this.saveListeners.get(KeyDefinition.name)?.values().forEach(l => l())
+    }
+  }
+
+  setKeyboardName(name: string) {
+    if (this._keyboardInstance) {
+      this._keyboardInstance.keyboard.name = name
     }
   }
 }

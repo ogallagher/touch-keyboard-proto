@@ -94,7 +94,6 @@ export default function KeyGrid(
 
   function* getKeyCells(row: number) {
     const w = dimensions?.width || 0
-    const h = dimensions?.height || 0
 
     for (let col=0; col < w; col++) {
       yield (
@@ -133,7 +132,7 @@ export default function KeyGrid(
 
       return () => deactivate(false)
     },
-    [ keyGridState ]
+    [ keyGridState, persistance ]
   )
 
   // deactivate on mode=config if not configurable

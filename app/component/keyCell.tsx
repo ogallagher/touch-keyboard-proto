@@ -1,12 +1,11 @@
 import KeyLabel, { GestureSegment, Zone } from "@lib/keyLabel"
-import TouchGesture, { InitGestureSegmentType } from "@lib/touchGesture"
+import TouchGesture from "@lib/touchGesture"
 import { useRef, useContext, useEffect, useState, Dispatch, SetStateAction, RefObject, JSX } from "react"
 import { PageCanvasCtx } from "@context/pageCanvasCtx"
 import { CanvasSpace, Circle } from "pts"
 import KeyMap from "@lib/keyMap"
 import { TextAreaEditCtx } from "@context/textAreaCtx"
 import { KeyGridCtx, ModifierKeyListener } from "@context/keyGridCtx"
-import { Direction } from "@lib/orientation"
 import { isTouchScreen } from "@lib/platform"
 import { KeyboardInstance, KeyboardSize, KeyIndex } from "@lib/keyboardDefinition"
 import KeyGrid from "./keyGrid"
@@ -115,7 +114,7 @@ export default function KeyCell(
         setGestureSegment({})
       }
     },
-    [ configCtx, keyGridState, map ]
+    [ configCtx, keyGridState, textAreaEdit, activateKeyGrid, index, embedGrid, map ]
   )
 
   // define onGestureSegment
@@ -137,7 +136,7 @@ export default function KeyCell(
         const form = space.getForm()
 
         // animation
-        space.add((_time, _ftime) => {
+        space.add(() => {
           space!.clear('transparent')
 
           if (gesture.points.length > 1) {
@@ -165,7 +164,7 @@ export default function KeyCell(
 
       return () => { space?.removeAll() }
     }, 
-    [ gesture ]
+    [ canvas, gesture ]
   )
 
   // listen to modifier keys
@@ -197,6 +196,8 @@ export default function KeyCell(
         return
       }
 
+      const _self = self.current
+
       const start = (e: TouchEvent|MouseEvent) => {
         e.preventDefault()
         e.stopPropagation()
@@ -227,46 +228,46 @@ export default function KeyCell(
 
       const setMouseHover = () => {
         if (gesture && !gesture.complete && keyGridState) {
-          keyGridState.mouseHoverKeyCell.current = self.current
+          keyGridState.mouseHoverKeyCell.current = _self
         }
       }
       const unsetMouseHover = () => {
-        if (keyGridState?.mouseHoverKeyCell.current === self.current) {
+        if (keyGridState?.mouseHoverKeyCell.current === _self) {
           keyGridState.mouseHoverKeyCell.current = null
         }
       }
 
       if (isTouchScreen()) {
-        self.current?.addEventListener('touchstart', start)
-        self.current?.addEventListener('touchmove', move)
-        self.current?.addEventListener('touchend', end)
+        _self?.addEventListener('touchstart', start)
+        _self?.addEventListener('touchmove', move)
+        _self?.addEventListener('touchend', end)
       }
       else {
-        self.current?.addEventListener('mousedown', start)
-        self.current?.addEventListener('mousemove', move)
-        self.current?.addEventListener('mouseup', end)
-        self.current?.addEventListener('mouseup', unsetMouseHover)
-        self.current?.addEventListener('mouseleave', setMouseHover)
-        self.current?.addEventListener('mouseenter', unsetMouseHover)
+        _self?.addEventListener('mousedown', start)
+        _self?.addEventListener('mousemove', move)
+        _self?.addEventListener('mouseup', end)
+        _self?.addEventListener('mouseup', unsetMouseHover)
+        _self?.addEventListener('mouseleave', setMouseHover)
+        _self?.addEventListener('mouseenter', unsetMouseHover)
       }
 
       return () => {
         if (isTouchScreen()) {
-          self.current?.removeEventListener('touchstart', start)
-          self.current?.removeEventListener('touchmove', move)
-          self.current?.removeEventListener('touchend', end)
+          _self?.removeEventListener('touchstart', start)
+          _self?.removeEventListener('touchmove', move)
+          _self?.removeEventListener('touchend', end)
         }
         else {
-          self.current?.removeEventListener('mousedown', start)
-          self.current?.removeEventListener('mousemove', move)
-          self.current?.removeEventListener('mouseup', end)
-          self.current?.removeEventListener('mouseup', unsetMouseHover)
-          self.current?.removeEventListener('mouseleave', setMouseHover)
-          self.current?.removeEventListener('mouseenter', unsetMouseHover)
+          _self?.removeEventListener('mousedown', start)
+          _self?.removeEventListener('mousemove', move)
+          _self?.removeEventListener('mouseup', end)
+          _self?.removeEventListener('mouseup', unsetMouseHover)
+          _self?.removeEventListener('mouseleave', setMouseHover)
+          _self?.removeEventListener('mouseenter', unsetMouseHover)
         }
       }
     },
-    [ keyGridState, gesture ]
+    [ keyGridState, gesture, map ]
   )
 
   // read key config updates
@@ -296,7 +297,7 @@ export default function KeyCell(
 
       return () => configCtx.deleteSaveListener(name, KeyDefinition.name)
     },
-    [ configCtx ]
+    [ configCtx, index, label, map ]
   )
 
   return (

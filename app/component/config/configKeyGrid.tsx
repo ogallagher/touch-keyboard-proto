@@ -28,11 +28,9 @@ export default function ConfigKeyGrid() {
   // write to config context
   useEffect(
     () => {
-      if (!configCtx) return
+      if (!configCtx || !keyboardName) return
 
-      if (configCtx.keyboardInstance && keyboardName) {
-        configCtx.keyboardInstance.keyboard.name = keyboardName
-      }
+      configCtx.setKeyboardName(keyboardName)
     },
     [ configCtx, keyboardName ]
   )

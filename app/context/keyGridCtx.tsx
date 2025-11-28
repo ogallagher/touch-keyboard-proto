@@ -6,7 +6,11 @@ export type AddKeyGrid = (keyboard: KeyboardInstance, configurable: boolean, onC
 export type ModifierKeyListener = (v: boolean) => void
 
 export class KeyGridState {
-  public addKeyGrid = null as unknown as AddKeyGrid
+  private _addKeyGrid = null as unknown as AddKeyGrid
+  get addKeyGrid() { return this._addKeyGrid }
+  setAddKeyGrid(v: AddKeyGrid) {
+    this._addKeyGrid = v
+  }
 
   public readonly deactivateKeyGrid: RefObject<(closeKeyboard: boolean) => void> = {
     current: null as unknown as (closeKeyboard: boolean) => void

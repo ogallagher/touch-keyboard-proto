@@ -1,6 +1,6 @@
 import Image from "next/image"
 import { websiteBasePath } from "@lib/path"
-import { AbstractTouchGesture, gestureTypeToPhrase, InitGestureSegmentType, TouchGestureType } from "@lib/touchGesture"
+import { AbstractTouchGesture, gestureTypeToPhrase, InitGestureSegmentType } from "@lib/touchGesture"
 import { Direction, directionToHeading, isCardinal, radianToDegree } from "@lib/orientation"
 
 const imageSpacerChar = 'm'

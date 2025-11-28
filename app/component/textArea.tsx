@@ -15,7 +15,7 @@ export default function TextArea(
     () => {
       editRef.current = new EditTextArea(textArea, cursorPos)
     },
-    []
+    [ editRef ]
   )
   
   // focus to receive keystrokes

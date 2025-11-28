@@ -9,11 +9,12 @@ import KeyGridSection from "@component/keyGridSection"
 import { ConfigCtx, ConfigureKeyBoard } from "@context/configCtx"
 import { KeyGridCtx, KeyGridState } from "@context/keyGridCtx"
 
+const config = new ConfigureKeyBoard()
+const keyGridState = new KeyGridState()
+
 export default function Home() {
   const canvas = useRef(null as unknown as HTMLCanvasElement)
   const textAreaEdit = useRef(null as unknown as EditTextArea)
-  const config = useRef(new ConfigureKeyBoard())
-  const keyGridState = useRef(new KeyGridState())
   
   return (
     <div 
@@ -29,9 +30,9 @@ export default function Home() {
       {/* header */}
       <Header />
 
-      <KeyGridCtx value={keyGridState.current}>
+      <KeyGridCtx value={keyGridState}>
         <ConfigCtx 
-          value={config.current} >
+          value={config} >
           <ConfigEvalSection
             textAreaEdit={textAreaEdit} />
 

@@ -20,7 +20,7 @@ export default function ConfigEvalSection(
     () => {
       if (!configCtx) return
       
-      configCtx.mode = mode
+      configCtx.setMode(mode)
     },
     [ configCtx, mode ]
   )

@@ -1,7 +1,7 @@
 import { ConfigCtx, configListenerName } from "@context/configCtx"
 import { KeyIndex } from "@lib/keyboardDefinition"
 import { KeyDefinition } from "@lib/keyDefinition"
-import KeyLabel, { GestureSegment, Zone } from "@lib/keyLabel"
+import KeyLabel, { Zone } from "@lib/keyLabel"
 import KeyMap from "@lib/keyMap"
 import KeyStroke, { MetaChar } from "@lib/keyStroke"
 import { AbstractTouchGesture } from "@lib/touchGesture"
@@ -85,7 +85,7 @@ export default function ConfigKeyCell() {
         }
       }
     },
-    [ configCtx, keyLabel, keyStroke ]
+    [ configCtx, gesture, keyLabel, keyStroke ]
   )
 
   const onMajRadioChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -235,7 +235,7 @@ export default function ConfigKeyCell() {
           name='keyStroke'
           value={keyStroke?.toChars().join('') || ''}
           placeholder='none'
-          disabled={keyIndex.current.row < 0}
+          disabled={keyMap === undefined}
           onChange={e => {
             setKeyStroke(KeyStroke.parse(e.target.value))}
           } />

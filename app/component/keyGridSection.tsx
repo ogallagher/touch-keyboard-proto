@@ -17,7 +17,7 @@ export default function KeyGridSection() {
         return
       }
 
-      keyGridState.addKeyGrid = (keyboard, configurable, onClose) => {  
+      keyGridState.setAddKeyGrid((keyboard, configurable, onClose) => {  
         children.set(
           keyboard.keyboard.name, 
           <KeyGrid 
@@ -29,9 +29,9 @@ export default function KeyGridSection() {
         setChildren(new Map(children.entries()))
 
         configCtx.loadKeyboard(keyboard)
-      }
+      })
     },
-    [ keyGridState, children, configCtx ]
+    [ keyGridState, children, children.size, configCtx ]
   )
   
   // add default grid
@@ -47,7 +47,7 @@ export default function KeyGridSection() {
         )
       }
     },
-    [ keyGridState ]
+    [ keyGridState, children.size ]
   )
   
   return (
