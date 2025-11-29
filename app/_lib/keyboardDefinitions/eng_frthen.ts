@@ -223,13 +223,15 @@ const row3: KeyDefinition[] = [
       [new ZoneKey('right', 'shift'), 'C'],
       [new ZoneKey('up', 'shift'), 'Sh'],
       [new ZoneKey('up', 'capslock'), 'SH'],
+      [new ZoneKey('upright', InitGestureSegmentType.CARDINAL_SWIPE, Cardinal.RIGHT), 'ch'],
     ]),
     map: new KeyMap([
       [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('s')],
       [new AbstractTouchGesture(TouchGestureType.TOUCH_HOLD, undefined, undefined, false), new KeyStroke("'", 's')],
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.LEFT), new KeyStroke('z')],
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.RIGHT), new KeyStroke('c')],
-      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.UP), new KeyStroke('s', 'h')]
+      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.UP), new KeyStroke('s', 'h')],
+      [new AbstractTouchGesture(TouchGestureType.CARDINAL_CORNER_SWIPE, Direction.RIGHT, Direction.UP), new KeyStroke('c', 'h')],
     ])
   }),
   new KeyDefinition({
