@@ -4,7 +4,7 @@ import { listenerName } from "@lib/eventSync"
 import { KeyGridCtx } from "@context/keyGridCtx"
 import { Orientation } from "@lib/orientation"
 import { useContext, useEffect, useRef, useState } from "react"
-import { Grid3x3, ListUl, PlusCircle } from "react-bootstrap-icons"
+import { BoxArrowInUp, BoxArrowUp, FileEarmarkArrowDown, Grid3x3, ListUl, PlusCircle, Share } from "react-bootstrap-icons"
 import SessionKeyboardListItem from "./sessionKeyboardListItem"
 import KeyboardDefinition, { KeyboardInstance, KeyboardPersistance, KeyboardSize } from "@lib/keyboardDefinition"
 import { KeyDefinition } from "@lib/keyDefinition"
@@ -19,6 +19,7 @@ export default function ConfigKeyGrid() {
   const [keyboardName, setKeyboardName] = useState(configCtx?.keyboardInstance?.keyboard.name)
   const addKeyboard = useRef(null as unknown as () => void)
   const [showKeyboardsList, setShowKeyboardsList] = useState(false)
+  const [showExport, setShowExport] = useState(false)
 
   // listen to session keyboards list
   useEffect(
@@ -26,13 +27,7 @@ export default function ConfigKeyGrid() {
       if (!keyGridState) return
 
       const name = listenerName(ConfigKeyGrid.name)
-      keyGridState.keyboardsListListeners.set(name, () => {
-        setKeyboardInstanceIds(
-          // derive ids from map values instead of keys to remain independent of gridCtx implementation
-          [...keyGridState.keyboards.values()]
-          .map(ki => ki.instanceId)
-        )
-      })
+      keyGridState.keyboardsListListeners.set(name, () => setKeyboardInstanceIds([...keyGridState.keyboardIds]))
 
       return () => { keyGridState.keyboardsListListeners.delete(name) }
     },
@@ -115,30 +110,78 @@ export default function ConfigKeyGrid() {
   return (
     <div
       className='flex flex-col justify-evenly gap-1 pb-4' >
-      {/* session keyboards list */}
-      <div className='flex flex-row justify-between gap-1'>
+      {/* session keyboards */}
+      <div className='flex flex-row flex-wrap justify-between gap-1'>
         <div>session keyboards</div>
+
+        {/* toggle show list */}
         <button
           className='cursor-pointer'
           title='Toggle display list'
           onClick={() => setShowKeyboardsList(!showKeyboardsList)} >
           <ListUl />
         </button>
+
+        {/* toggle show export */}
+        <button
+          className='cursor-pointer'
+          title='Export keyboards'
+          onClick={() => setShowExport(!showExport)} >
+          <BoxArrowUp />
+        </button>
+
+        {/* import from file */}
+        <button
+          className='cursor-pointer'
+          title='Import keyboards from file'
+          onClick={() => console.log('// TODO import keyboards')} >
+          <BoxArrowInUp />
+        </button>
       </div>
+
+      {/* session keyboards list */}
       <div 
         title='Session keyboards list'
-        className={showKeyboardsList ? '' : 'hidden'} >
+        className={[
+          showKeyboardsList ? '' : 'hidden',
+          'border-b-2 border-t-2 my-1'
+        ].join(' ')} >
         {keyboardInstanceIds.map(keyboardInstanceId => (
           <SessionKeyboardListItem 
             key={keyboardInstanceId}
             keyboardInstanceId={keyboardInstanceId} />
         ))}
         {/* add keyboard */}
+        <div className='flex flex-row justify-center pb-1'>
+          <button
+            className='cursor-pointer'
+            title='Add new empty keyboard'
+            onClick={addKeyboard.current} >
+            <PlusCircle />
+          </button>
+        </div>
+      </div>
+
+      <div 
+        className={[
+          'flex-row justify-between gap-1 border-b-2 pb-2',
+          (showExport ? 'flex' : 'hidden')
+        ].join(' ')}
+        title='Export options' >
+        {/* export file */}
         <button
           className='cursor-pointer'
-          title='Add new empty keyboard'
-          onClick={addKeyboard.current} >
-          <PlusCircle />
+          title='Download file'
+          onClick={() => console.log('// TODO download file')} >
+          <FileEarmarkArrowDown />
+        </button>
+
+        {/* share url */}
+        <button
+          className='cursor-pointer'
+          title='Share link'
+          onClick={() => console.log('// TODO share link')} >
+          <Share />
         </button>
       </div>
 
@@ -146,7 +189,7 @@ export default function ConfigKeyGrid() {
       <div 
         className='flex flex-row justify-center gap-2 text-2xl'
         title='Keyboard grid dimensions' >
-        <div className='flex flex-col justify-center'>
+        <div className='flex flex-col justify-center pr-2'>
           <Grid3x3 className='text-4xl' />
         </div>
 

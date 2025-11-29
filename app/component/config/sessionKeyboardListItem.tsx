@@ -1,5 +1,5 @@
 import { KeyGridCtx } from "@context/keyGridCtx"
-import { useContext, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { DashCircle } from "react-bootstrap-icons"
 
 export default function SessionKeyboardListItem(
@@ -8,9 +8,21 @@ export default function SessionKeyboardListItem(
   }
 ) {
   const keyGridState = useContext(KeyGridCtx)
-  const [checked, setChecked] = useState(false)
+  const [exportInclude, setExportInclude] = useState(false)
 
   const keyboardName = keyGridState?.getKeyboard(keyboardInstanceId)?.keyboard.name || '<no-name>'
+
+  // write exportInclude to grid context
+  useEffect(
+    () => {
+      if (!keyGridState) return
+
+      keyGridState.setKeyboardExportConfig(keyboardInstanceId, {
+        include: exportInclude
+      })
+    },
+    [ keyGridState, exportInclude ]
+  )
 
   return (
     <div 
@@ -21,9 +33,9 @@ export default function SessionKeyboardListItem(
           type='checkbox' 
           title='include in export/share'
           name={keyboardInstanceId}
-          checked={checked}
+          checked={exportInclude}
           onChange={(e) => {
-            setChecked(e.target.checked)
+            setExportInclude(e.target.checked)
           }} />
         
         <div className='flex flex-col justify-center'>
@@ -33,7 +45,6 @@ export default function SessionKeyboardListItem(
         </div>
       </div>
       
-
       <button
         className='cursor-pointer'
         title='remove from session'

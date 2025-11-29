@@ -6,9 +6,15 @@ export type AddKeyGrid = (keyboard: KeyboardInstance, configurable: boolean, onC
 export type DeleteKeyGrid = (keyboardInstanceId: string) => void
 export type KeyboardsListListener = () => void
 export type ModifierKeyListener = (v: boolean) => void
+export type KeyboardExportConfig = {
+  include: boolean
+}
 
 export class KeyGridState {
   private readonly _keyboards: Map<string, KeyboardInstance> = new Map()
+  get keyboardIds() {
+    return [...this._keyboards.keys()]
+  }
   get keyboards() {
     return [...this._keyboards.values()]
   }
@@ -43,6 +49,16 @@ export class KeyGridState {
   }
   setDeleteKeyGrid(v: DeleteKeyGrid) {
     this._deleteKeyGrid = v
+  }
+
+  private readonly _keyboardExportConfig: Map<string, KeyboardExportConfig> = new Map()
+  getKeyboardExportConfig(instanceId: string): KeyboardExportConfig {
+    return this._keyboardExportConfig.get(instanceId) || {
+      include: false
+    }
+  }
+  setKeyboardExportConfig(instanceId: string, config: KeyboardExportConfig) {
+    this._keyboardExportConfig.set(instanceId, config)
   }
 
   public readonly deactivateKeyGrid: RefObject<(closeKeyboard: boolean) => void> = {
