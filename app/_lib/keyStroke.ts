@@ -37,6 +37,7 @@ export function stringToMetaChar(s: string) {
 }
 
 export type KeyChar = TypeChar|MetaChar
+export type SerializedKeyStroke = {chars: KeyChar[]}
 
 export const cursorChar = '┃' // 0x2503
 
@@ -147,7 +148,7 @@ export default class KeyStroke {
     return { chars: this.chars }
   }
 
-  static fromJSON(o: any) {
+  static fromJSON(o: SerializedKeyStroke) {
     return new KeyStroke(...(o.chars as KeyChar[]))
   }
 }

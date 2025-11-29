@@ -6,7 +6,6 @@ import { KeyboardInstance, KeyboardPersistance, KeyboardSize } from "@lib/keyboa
 import { ConfigCtx } from "@context/configCtx"
 import { exportShareUrlKeyboardsQueryKey } from "@lib/path"
 import { useSearchParams } from "next/navigation"
-import pako from "pako"
 import { decompressString } from "@lib/data"
 
 export default function KeyGridSection() {
@@ -20,7 +19,7 @@ export default function KeyGridSection() {
   const configCtx = useContext(ConfigCtx)
   const searchQueryParams = useSearchParams()
   const addChild = useRef(null as unknown as AddKeyGrid)
-  const [loadedSearchQuery, setLoadedSearchQuery] = useState(false)
+  const loadedSearchQuery = useRef(false)
 
   // update definition of add
   useEffect(
@@ -101,7 +100,7 @@ export default function KeyGridSection() {
   // load keyboards from search query
   useEffect(
     () => {
-      if (!keyGridState || !searchQueryParams || loadedSearchQuery) return
+      if (!keyGridState || !searchQueryParams || loadedSearchQuery.current) return
 
       const keyboardsCompressed = searchQueryParams.get(exportShareUrlKeyboardsQueryKey)
       if (keyboardsCompressed) {
@@ -121,9 +120,9 @@ export default function KeyGridSection() {
           keyGridState.addKeyGrid(keyboardInstance, true)
         })
       }
-      setLoadedSearchQuery(true)
+      loadedSearchQuery.current = true
     },
-    [ keyGridState, searchQueryParams, children.size, loadedSearchQuery ]
+    [ keyGridState, searchQueryParams, children.size ]
   )
   
   return (

@@ -21,7 +21,7 @@ export default function SessionKeyboardListItem(
         include: exportInclude
       })
     },
-    [ keyGridState, exportInclude ]
+    [ keyGridState, exportInclude, keyboardInstanceId ]
   )
 
   return (

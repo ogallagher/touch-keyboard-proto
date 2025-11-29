@@ -2,6 +2,8 @@ import { AbstractTouchGesture, TouchGestureType, typeWithoutHold, typeWithoutOve
 import KeyStroke, { KeyChar } from "@lib/keyStroke"
 import { KeyboardInstance } from "./keyboardDefinition"
 
+export type SerializedKeyMap = {values: [AbstractTouchGesture, {chars: KeyChar[]}|KeyboardInstance][]}
+
 export default class KeyMap {
   private readonly gestures: Map<string, AbstractTouchGesture> = new Map()
   private readonly gestureToKeystroke: Map<string, KeyStroke> = new Map()
@@ -152,10 +154,9 @@ export default class KeyMap {
     }
   }
 
-  static fromJSON(o: any) {
+  static fromJSON(o: SerializedKeyMap) {
     return new KeyMap(
-      (o.values as [AbstractTouchGesture, {chars: KeyChar[]}|KeyboardInstance][])
-      .map(([gesture, keys]) => [
+      o.values.map(([gesture, keys]) => [
         AbstractTouchGesture.fromJSON(gesture), 
         (
           'chars' in keys 

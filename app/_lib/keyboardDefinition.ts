@@ -1,5 +1,5 @@
 import GridDimensions from "@lib/gridDimensions"
-import { KeyAttributes, KeyDefinition } from "@lib/keyDefinition"
+import { KeyAttributes, KeyDefinition, SerializedKeyDefinition } from "@lib/keyDefinition"
 
 export enum KeyboardPersistance {
   /**
@@ -28,6 +28,14 @@ export type KeyOverride = KeyIndex & {
   key: KeyAttributes
 }
 export type KeyboardInstanceString = string
+export type SerializedKeyboardDefinition = {name: string, keys: SerializedKeyDefinition[][]}
+export type SerializedKeyboardInstance = {
+  keyboard: SerializedKeyboardDefinition
+  index?: number
+  persistance: KeyboardPersistance
+  size: KeyboardSize
+  keyOverrides?: KeyOverride[]
+}
 
 const editLockError = (name: string) => new Error(`keyboard name=${name} is locked for editing; create an editable clone first`)
 
@@ -162,10 +170,10 @@ export default class KeyboardDefinition {
     }
   }
 
-  static fromJSON(o: any) {
+  static fromJSON(o: SerializedKeyboardDefinition) {
     return new KeyboardDefinition(
       o.name, 
-      (o.keys as KeyDefinition[][]).map(row => row.map(key => KeyDefinition.fromJSON(key)))
+      o.keys.map(row => row.map(key => KeyDefinition.fromJSON(key)))
     )
   }
 }
@@ -234,7 +242,7 @@ export class KeyboardInstance {
     }
   }
 
-  static fromJSON(o: any) {
+  static fromJSON(o: SerializedKeyboardInstance) {
     return new KeyboardInstance(
       KeyboardDefinition.fromJSON(o.keyboard),
       {...o}
@@ -242,7 +250,7 @@ export class KeyboardInstance {
   }
 
   static load(
-    s: KeyboardInstanceString|any, 
+    s: KeyboardInstanceString|SerializedKeyboardInstance, 
     { persistance, size, keyOverrides } : {
       persistance?: KeyboardPersistance
       size?: KeyboardSize
@@ -266,7 +274,7 @@ export class KeyboardInstance {
       keyOverrides?: KeyOverride[]
     } = {}
   ) {
-    const raw: any[] = JSON.parse(s)
+    const raw: SerializedKeyboardInstance[] = JSON.parse(s)
 
     return raw.map(s => this.load(s, { persistance, size, keyOverrides }))
   }

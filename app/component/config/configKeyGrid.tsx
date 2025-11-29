@@ -11,7 +11,6 @@ import { KeyDefinition } from "@lib/keyDefinition"
 import KeyLabel from "@lib/keyLabel"
 import KeyMap from "@lib/keyMap"
 import { exportShareUrlKeyboardsQueryKey, keyboardFilePartDelim, keyboardFileSuffix, keyboardsFileSuffix } from "@lib/path"
-import pako from 'pako'
 import { compressString } from "@lib/data"
 
 type OnExport = (exportType: 'file'|'url') => void
@@ -272,7 +271,7 @@ export default function ConfigKeyGrid() {
           className='hidden'
           type='file'
           accept='application/json,.json' multiple={true}
-          onChange={onImportFileInput.current} />
+          onChange={() => onImportFileInput.current()} />
         <button
           className='cursor-pointer'
           title='Import keyboards from file'
@@ -313,7 +312,7 @@ export default function ConfigKeyGrid() {
           <button
             className='cursor-pointer'
             title='Add new empty keyboard'
-            onClick={addKeyboard.current} >
+            onClick={() => addKeyboard.current()} >
             <PlusCircle />
           </button>
         </div>

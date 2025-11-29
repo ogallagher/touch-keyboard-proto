@@ -112,6 +112,13 @@ export function typeWithoutOverReturn(t: TouchGestureType) {
   }
 }
 
+export type SerializedAbstractGesture = {
+  type: TouchGestureType|InitGestureSegmentType,
+  direction?: Direction,
+  cornerDirection?: Direction,
+  chainOnHold?: boolean
+}
+
 export class AbstractTouchGesture {
   protected _type: TouchGestureType
   protected _direction?: Direction
@@ -221,7 +228,7 @@ export class AbstractTouchGesture {
     }
   }
 
-  static fromJSON(o: any) {
+  static fromJSON(o: SerializedAbstractGesture) {
     return new AbstractTouchGesture(o.type, o.direction, o.cornerDirection, o.chainOnHold)
   }
 }

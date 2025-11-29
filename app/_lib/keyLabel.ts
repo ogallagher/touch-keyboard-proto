@@ -12,6 +12,8 @@ export type GestureSegment = {
   direction?: Direction
 }
 
+export type SerializedKeyLabel = {values: object}
+
 export class ZoneKey {
   static readonly strDelim = '_'
 
@@ -122,13 +124,13 @@ export default class KeyLabel {
     return res
   }
 
-  toJSON() {
+  toJSON(): SerializedKeyLabel {
     return {
       values: Object.fromEntries(this.values.entries())
     }
   }
 
-  static fromJSON(o: any) {
+  static fromJSON(o: SerializedKeyLabel) {
     return new KeyLabel(
       Object.entries(o.values as object)
       .map(([zkStr, label]) => [ZoneKey.fromString(zkStr), label])

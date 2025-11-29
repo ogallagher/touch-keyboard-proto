@@ -1,7 +1,8 @@
-import KeyLabel from "@lib/keyLabel"
-import KeyMap from "@lib/keyMap"
+import KeyLabel, { SerializedKeyLabel } from "@lib/keyLabel"
+import KeyMap, { SerializedKeyMap } from "@lib/keyMap"
 
 export interface KeyAttributes { label?: KeyLabel; map?: KeyMap}
+export type SerializedKeyDefinition = {label: SerializedKeyLabel, map: SerializedKeyMap}
 
 export class KeyDefinition implements KeyAttributes { 
   label: KeyLabel
@@ -29,7 +30,7 @@ export class KeyDefinition implements KeyAttributes {
     return new KeyDefinition({ label: new KeyLabel(), map: new KeyMap() })
   }
 
-  static fromJSON(o: any): KeyDefinition {
+  static fromJSON(o: SerializedKeyDefinition): KeyDefinition {
     return new KeyDefinition({
       label: KeyLabel.fromJSON(o.label),
       map: KeyMap.fromJSON(o.map)
