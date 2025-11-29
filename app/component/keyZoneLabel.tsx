@@ -19,11 +19,11 @@ export default function KeyZoneLabel(
   const filterValue = (v: string) => (v.trim() === '') ? undefined : v
 
   return (
-    <div className='flex flex-row justify-center'>
+    <div className='flex flex-row justify-center overflow-x-clip'>
       <input 
         className={[
-          'field-sizing-content flex flex-col justify-center font-mono',
-          setKeyLabel ? 'select-all' : 'pointer-none cursor-default',
+          'flex flex-col justify-center font-mono text-center',
+          setKeyLabel ? 'select-all field-sizing-content' : 'pointer-none cursor-default',
           zoneLabel === undefined ? 'min-w-4' : ''
         ].join(' ')}
         name={KeyZoneLabel.name}
