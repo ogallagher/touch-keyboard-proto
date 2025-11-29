@@ -11,7 +11,7 @@ import GestureTypeLabel from "./gestureType"
 import KeyZoneLabel from "@component/keyZoneLabel"
 import { KeyGridCtx, ModifierKeyListener } from "@context/keyGridCtx"
 import MetaCharControl from "@component/metaChar"
-import { ConfigSection } from "@lib/control"
+import { ConfigEvalMode, ConfigSection } from "@lib/control"
 
 export default function ConfigKeyCell(
   { configSection }: {
@@ -31,7 +31,7 @@ export default function ConfigKeyCell(
   const [isShift, setIsShift] = useState(false)
   const [isCapsLock, setIsCapsLock] = useState(false)
 
-  // init on new config context
+  // init key load listener on new config context
   useEffect(
     () => {
       if (configCtx) {
@@ -40,7 +40,7 @@ export default function ConfigKeyCell(
           let key: KeyDefinition|undefined
           if (configCtx.keyboardInstance && configCtx.keyIndex) {
             keyIndex.current = configCtx.keyIndex
-            key = configCtx.keyboardInstance.keyboard.getKey(configCtx.keyIndex.row, configCtx.keyIndex.col)
+            key = configCtx.getKeyDefinition(configCtx.keyIndex)
           }
 
           setKeyLabel(key?.label)
@@ -78,16 +78,18 @@ export default function ConfigKeyCell(
   // write to config context
   useEffect(
     () => {
-      if (configCtx) {
-        if (keyLabel && keyMap.current) {
-          if (gesture) {
-            keyMap.current.set(gesture, keyStroke)
-          }
+      if (!configCtx || configCtx.mode !== ConfigEvalMode.Config) return
 
-          const keyDef = new KeyDefinition({ label: keyLabel, map: keyMap.current })
-          if (!keyDef.equals(configCtx.getKeyDefinition(keyIndex.current)!)) {
-            configCtx.setKey(keyIndex.current, keyDef)
-          }
+      if (keyLabel && keyMap.current) {
+        // don't update keyMap ref directly; delegate to configCtx in order to notify listeners
+        const newKeyMap = keyMap.current.clone(false)
+        if (gesture) {
+          newKeyMap.set(gesture, keyStroke)
+        }
+
+        const keyDef = new KeyDefinition({ label: keyLabel, map: newKeyMap })
+        if (!keyDef.equals(configCtx.getKeyDefinition(keyIndex.current)!)) {
+          configCtx.setKey(keyIndex.current, keyDef)
         }
       }
     },
@@ -114,6 +116,27 @@ export default function ConfigKeyCell(
       gridCtx.releaseModifierKeys(...releases)
     },
     [ gridCtx, isShift, isCapsLock ]
+  )
+
+  // reset on close config mode
+  useEffect(
+    () => {
+      if (!configCtx) return
+
+      const name = listenerName(ConfigKeyCell.name)
+      configCtx.addModeListener(name, () => {
+        if (configCtx.mode === ConfigEvalMode.Eval) {
+          keyIndex.current = {row: -1, col: -1}
+          setKeyLabel(undefined)
+          keyMap.current = undefined
+          setKeyStroke(undefined)
+          setGesture(undefined)
+        }
+      })
+
+      return () => configCtx.deleteModeListener(name)
+    },
+    [ configCtx ]
   )
   
   return (
@@ -243,7 +266,7 @@ export default function ConfigKeyCell(
         </label>
         <input 
           ref={keyStrokeInput}
-          className='field-sizing-content min-w-8 text-base font-mono dark:bg-zinc-700 bg-zinc-300 rounded-md p-1'
+          className='field-sizing-content select-all min-w-8 text-base font-mono dark:bg-zinc-700 bg-zinc-300 rounded-md p-1'
           id='keyStroke'
           value={keyStroke?.toChars().join('') || ''}
           placeholder='none'

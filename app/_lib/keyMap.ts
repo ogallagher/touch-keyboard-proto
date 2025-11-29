@@ -28,9 +28,13 @@ export default class KeyMap {
     return keystrokes.concat(keyboards)
   }
 
-  clone() {
+  clone(deep: boolean = true) {
     return new KeyMap(this.entries().map(([gesture, keys]) => {
-      return [gesture.clone(), keys.clone()]
+      return (
+        deep
+        ? [gesture.clone(), keys.clone()]
+        : [gesture, keys]
+      )
     }))
   }
 
@@ -135,9 +139,9 @@ export default class KeyMap {
     Array.from(other.gestures.keys()).forEach(gi => gestureIds.add(gi))
 
     for (const gestureId of Array.from(gestureIds)) {
-      const gesture = this.gestures.get(gestureId)!
-      const keys = this.getKeys(gesture, false, false)
-      const otherKeys = other.getKeys(gesture, false, false)
+      const gesture = this.gestures.get(gestureId) || other.gestures.get(gestureId)
+      const keys = this.getKeys(gesture!, false, false)
+      const otherKeys = other.getKeys(gesture!, false, false)
       
       if (keys === undefined) {
         if (otherKeys !== undefined) return false

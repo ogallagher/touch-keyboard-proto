@@ -35,7 +35,7 @@ export default function KeyGridSection() {
         newChildren.set(
           keyboard.instanceId, 
           <KeyGrid 
-            key={`${children.size}@${new Date().toISOString()}`} 
+            key={`${keyboard.instanceId}@${new Date().toISOString()}`} 
             keyboard={keyboard} onClose={onClose}
             configurable={configurable} />
         )
@@ -52,7 +52,7 @@ export default function KeyGridSection() {
         addChild.current(keyboard, configurable, onClose)
       })
     },
-    [ keyGridState, children, children.size, configCtx ]
+    [ keyGridState, configCtx ]
   )
   // update definition of delete
   useEffect(

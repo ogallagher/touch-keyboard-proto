@@ -73,11 +73,15 @@ export default function KeyCell(
             console.info(`keyboard=${keys.keyboard.name} for gesture=${gesture}`)
 
             if (configCtx.mode === ConfigEvalMode.Eval) {
+              // Enable config if already selected for config.
+              // Otherwise, wait until context switch is explicitly requested by user.
+              const configurable = configCtx.keyboardInstance?.instanceId === keys.instanceId
+
               switch (keys.size) {
                 case KeyboardSize.Fill:
                   keyGridState.addKeyGrid(
                     keys, 
-                    false, 
+                    configurable, 
                     activateKeyGrid.current
                   )
                   break
@@ -89,8 +93,7 @@ export default function KeyCell(
                         keyboard={keys}
                         onClose={() => setEmbedGrid(null)}
                         persistance={keys.persistance}
-                        // don't enable configure of a child keyboard until context switch is explicitly requested by user
-                        configurable={false} />
+                        configurable={configurable} />
                     )
                   }
                   break
@@ -285,12 +288,14 @@ export default function KeyCell(
           configCtx.keyboardInstance
           && configCtx.keyIndex?.col === index.col && configCtx.keyIndex.row === index.row
         ) {
-          const newLabel = configCtx.keyboardInstance.keyboard.getKey(index.row, index.col)?.label || new KeyLabel()
+          const key = configCtx.getKeyDefinition(index)
+
+          const newLabel = key?.label || new KeyLabel()
           if (!label.equals(newLabel)) {
             setLabel(newLabel)
           }
           
-          const newMap = configCtx.keyboardInstance.keyboard.getKey(index.row, index.col)?.map || new KeyMap()
+          const newMap = key?.map || new KeyMap()
           // consider removing or reducing comparison that reduces render count in case it's too expensive
           if (!map.equals(newMap)) {
             setMap(newMap)
@@ -298,7 +303,9 @@ export default function KeyCell(
         }
       })
 
-      return () => configCtx.deleteSaveListener(name, KeyDefinition.name)
+      return () => {
+        configCtx.deleteSaveListener(name, KeyDefinition.name)
+      }
     },
     [ configCtx, index, label, map ]
   )

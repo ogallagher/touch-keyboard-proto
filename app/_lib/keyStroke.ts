@@ -31,7 +31,7 @@ export enum MetaChar {
   SWITCH_KEYBOARD = '<switch-keyb>'
 }
 
-export function stringToMetaChar(s: string) {
+export function stringToMetaChar(s: string): MetaChar|undefined {
   if (!s.startsWith(metaCharStrPrefix) || !s.endsWith(metaCharStrSuffix)) {
     return
   }
