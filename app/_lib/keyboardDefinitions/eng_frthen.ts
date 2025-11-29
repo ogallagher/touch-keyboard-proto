@@ -21,6 +21,7 @@ const row1: KeyDefinition[] = [
       [new ZoneKey('center'), 'f'],
       [new ZoneKey('down'), 'v'],
       [new ZoneKey('right'), '123'],
+      [new ZoneKey('left'), '⋮'],
       [new ZoneKey('center', 'shift'), 'F'],
       [new ZoneKey('down', 'shift'), 'V']
     ]),
@@ -43,6 +44,10 @@ const row1: KeyDefinition[] = [
             }}
           ]
         })
+      ],
+      [
+        new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.LEFT, undefined, false), 
+        new KeyStroke(MetaChar.SWITCH_KEYBOARD)
       ]
     ])
   }),

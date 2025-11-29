@@ -25,7 +25,7 @@ export function getSwitchKeyboard(
 
   const keys: KeyDefinition[][] = (
     Array.from(new Array(dims.height))
-    .map(_r => new Array(dims.width))
+    .map(() => new Array(dims.width))
   )
   
   let c = 0, r = 0

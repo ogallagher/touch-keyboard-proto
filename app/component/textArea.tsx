@@ -20,6 +20,8 @@ export default function ComposerTextArea(
   // focus to receive keystrokes
   useEffect(
     () => {
+      if (!textAreaEdit) return
+
       if (visible) {
         textArea.current.focus()
         
@@ -28,7 +30,7 @@ export default function ComposerTextArea(
         }
       }
     },
-    [ visible ]
+    [ textAreaEdit, visible ]
   )
   
   return (
