@@ -1,7 +1,10 @@
 import pako from "pako"
 
 export function compressString(s: string) {
-  return pako.deflate(Buffer.from(s, 'utf-8')).toBase64()
+  return (
+    Buffer.from(pako.deflate(Buffer.from(s, 'utf-8')))
+    .toString('base64')
+  )
 }
 
 export function decompressString(s: string) {
