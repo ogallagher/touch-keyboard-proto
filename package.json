@@ -1,6 +1,6 @@
 {
   "name": "touch-keyboard-proto",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "private": true,
   "scripts": {
     "_dev": "next dev --turbopack --port $PORT",
