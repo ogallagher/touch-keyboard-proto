@@ -234,20 +234,33 @@ export class KeyboardInstance {
   }
 
   static load(
-    s: KeyboardInstanceString, 
+    s: KeyboardInstanceString|any, 
     { persistance, size, keyOverrides } : {
       persistance?: KeyboardPersistance
       size?: KeyboardSize
       keyOverrides?: KeyOverride[]
     } = {}
   ) {
-    const raw = JSON.parse(s)
+    const raw = typeof s === 'string' ? JSON.parse(s) : s
 
     raw.persistance = (persistance || raw.persistance)
     raw.size = (size || raw.size)
     raw.keyOverrides = keyOverrides
 
     return this.fromJSON(raw)
+  }
+
+  static loadMany(
+    s: string, 
+    { persistance, size, keyOverrides } : {
+      persistance?: KeyboardPersistance
+      size?: KeyboardSize
+      keyOverrides?: KeyOverride[]
+    } = {}
+  ) {
+    const raw: any[] = JSON.parse(s)
+
+    return raw.map(s => this.load(s, { persistance, size, keyOverrides }))
   }
 
   equals(other: KeyboardInstance, includeName: boolean = false) {

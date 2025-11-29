@@ -20,6 +20,8 @@ export default function ConfigKeyGrid() {
   const addKeyboard = useRef(null as unknown as () => void)
   const [showKeyboardsList, setShowKeyboardsList] = useState(false)
   const [showExport, setShowExport] = useState(false)
+  const importFileInput = useRef(null as unknown as HTMLInputElement)
+  const onImportFileInput = useRef(null as unknown as () => void)
 
   // listen to session keyboards list
   useEffect(
@@ -106,6 +108,62 @@ export default function ConfigKeyGrid() {
     },
     [ keyGridState, keyboardInstanceIds ]
   )
+
+  // define onImportFileInput
+  useEffect(
+    () => {
+      if (!keyGridState) return
+    
+      onImportFileInput.current = () => {
+        const files = importFileInput.current.files
+        if (!files) return
+
+        const p = []
+
+        for (const file of files) {
+          console.log(`import keyboards from file name=${file.name}`)
+          const reader = new FileReader()
+
+          p.push(new Promise((res) => {
+            reader.onerror = (e) => {
+              console.error(`failed to read keyboards from file name=${file.name}. ${e}`)
+              res(false)
+            }
+            reader.onload = () => {
+              const loadOpts = {
+                persistance: KeyboardPersistance.Indefinite,
+                size: KeyboardSize.Fill
+              }
+              const s = reader.result as string
+              let keyboardInstances: KeyboardInstance[] = []
+
+              if (s.trimStart().startsWith('[')) {
+                keyboardInstances = keyboardInstances.concat(KeyboardInstance.loadMany(s, loadOpts))
+              }
+              else {
+                keyboardInstances.push(KeyboardInstance.load(s, loadOpts))
+              }
+              
+              for (const keyboardInstance of keyboardInstances) {
+                console.log(`loaded keyboard name=${keyboardInstance.keyboard.name}`)
+                keyGridState.addKeyGrid(keyboardInstance, true)
+              }
+              
+              res(true)
+            }
+          }))
+
+          reader.readAsText(file)
+        }
+
+        Promise.all(p).then(() => {
+          // show keyboards on finish
+          setShowKeyboardsList(true)
+        })
+      }
+    },
+    [ keyGridState ]
+  )
   
   return (
     <div
@@ -122,20 +180,26 @@ export default function ConfigKeyGrid() {
           <ListUl />
         </button>
 
+        {/* import from file */}
+        <input
+          ref={importFileInput}
+          className='hidden'
+          type='file'
+          accept='application/json,.json' multiple={true}
+          onChange={onImportFileInput.current} />
+        <button
+          className='cursor-pointer'
+          title='Import keyboards from file'
+          onClick={() => importFileInput.current.click()} >
+          <BoxArrowInUp />
+        </button>
+
         {/* toggle show export */}
         <button
           className='cursor-pointer'
           title='Export keyboards'
           onClick={() => setShowExport(!showExport)} >
           <BoxArrowUp />
-        </button>
-
-        {/* import from file */}
-        <button
-          className='cursor-pointer'
-          title='Import keyboards from file'
-          onClick={() => console.log('// TODO import keyboards')} >
-          <BoxArrowInUp />
         </button>
       </div>
 
