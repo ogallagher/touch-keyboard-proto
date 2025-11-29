@@ -40,7 +40,7 @@ export function getSwitchKeyboard(
     })
 
     c++
-    if (c > dims.width) {
+    if (c >= dims.width) {
       c = 0
       r++
     }
