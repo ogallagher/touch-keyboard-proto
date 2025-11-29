@@ -4,6 +4,10 @@ import { JSX, useContext, useEffect, useRef, useState } from "react"
 import { frthenKeyboard } from "@lib/keyboardDefinitions/eng_frthen"
 import { KeyboardInstance, KeyboardPersistance, KeyboardSize } from "@lib/keyboardDefinition"
 import { ConfigCtx } from "@context/configCtx"
+import { exportShareUrlKeyboardsQueryKey } from "@lib/path"
+import { useSearchParams } from "next/navigation"
+import pako from "pako"
+import { decompressString } from "@lib/data"
 
 export default function KeyGridSection() {
   /*
@@ -14,7 +18,9 @@ export default function KeyGridSection() {
   const [children, setChildren] = useState(new Map() as Map<string, JSX.Element>)
   const keyGridState = useContext(KeyGridCtx)
   const configCtx = useContext(ConfigCtx)
+  const searchQueryParams = useSearchParams()
   const addChild = useRef(null as unknown as AddKeyGrid)
+  const [loadedSearchQuery, setLoadedSearchQuery] = useState(false)
 
   // update definition of add
   useEffect(
@@ -90,6 +96,34 @@ export default function KeyGridSection() {
       }
     },
     [ keyGridState, children.size ]
+  )
+
+  // load keyboards from search query
+  useEffect(
+    () => {
+      if (!keyGridState || !searchQueryParams || loadedSearchQuery) return
+
+      const keyboardsCompressed = searchQueryParams.get(exportShareUrlKeyboardsQueryKey)
+      if (keyboardsCompressed) {
+        const keyboardsStr = (
+          decompressString(keyboardsCompressed)
+          .trimStart()
+        )
+        const keyboardInstances: KeyboardInstance[] = []
+        if (keyboardsStr[0] === '[') {
+          keyboardInstances.push(...KeyboardInstance.loadMany(keyboardsStr))
+        }
+        else {
+          keyboardInstances.push(KeyboardInstance.load(keyboardsStr))
+        }
+        console.info(`loaded count=${keyboardInstances.length} keyboard instances from url search query`)
+        keyboardInstances.forEach((keyboardInstance) => {
+          keyGridState.addKeyGrid(keyboardInstance, true)
+        })
+      }
+      setLoadedSearchQuery(true)
+    },
+    [ keyGridState, searchQueryParams, children.size, loadedSearchQuery ]
   )
   
   return (

@@ -11,6 +11,8 @@ import { KeyDefinition } from "@lib/keyDefinition"
 import KeyLabel from "@lib/keyLabel"
 import KeyMap from "@lib/keyMap"
 import { exportShareUrlKeyboardsQueryKey, keyboardFilePartDelim, keyboardFileSuffix, keyboardsFileSuffix } from "@lib/path"
+import pako from 'pako'
+import { compressString } from "@lib/data"
 
 type OnExport = (exportType: 'file'|'url') => void
 
@@ -196,7 +198,7 @@ export default function ConfigKeyGrid() {
 
         // serialize as str
         const keyboardsStr = keyboards.length > 1 ? JSON.stringify(keyboards) : JSON.stringify(keyboards[0])
-        console.info(`serialized counut=${keyboards} keyboard instances for export`)
+        console.info(`serialized count=${keyboards.length} keyboard instances for export`)
         
         // convert str to url
         new Promise((res: (url?: URL) => void) => {
@@ -223,7 +225,10 @@ export default function ConfigKeyGrid() {
             case 'url':
               const url = new URL(window.location.href)
               url.search = ''
-              url.searchParams.set(exportShareUrlKeyboardsQueryKey, Buffer.from(keyboardsStr, 'utf8').toString('base64'))
+              url.searchParams.set(
+                exportShareUrlKeyboardsQueryKey, 
+                compressString(keyboardsStr)
+              )
               setExportFilename(undefined)
               res(url)
               break
