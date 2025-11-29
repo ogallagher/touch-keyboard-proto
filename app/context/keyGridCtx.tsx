@@ -13,10 +13,10 @@ export type KeyboardExportConfig = {
 export class KeyGridState {
   private readonly _keyboards: Map<string, KeyboardInstance> = new Map()
   get keyboardIds() {
-    return [...this._keyboards.keys()]
+    return Array.from(this._keyboards.keys())
   }
   get keyboards() {
-    return [...this._keyboards.values()]
+    return Array.from(this._keyboards.values())
   }
   getKeyboard(instanceId: string) {
     return this._keyboards.get(instanceId)
@@ -28,7 +28,7 @@ export class KeyGridState {
     const addKeyboard: AddKeyGrid = (keyboard, configurable, onClose?) => {
       this._addKeyGrid(keyboard, configurable, onClose)
       this._keyboards.set(keyboard.instanceId, keyboard)
-      this.keyboardsListListeners.values().forEach(l => l())
+      Array.from(this.keyboardsListListeners.values()).forEach(l => l())
     }
 
     return addKeyboard
@@ -42,7 +42,7 @@ export class KeyGridState {
     const deleteKeyboard: DeleteKeyGrid = (keyboardInstanceId) => {
       this._deleteKeyGrid(keyboardInstanceId)
       this._keyboards.delete(keyboardInstanceId)
-      this.keyboardsListListeners.values().forEach(l => l())
+      Array.from(this.keyboardsListListeners.values()).forEach(l => l())
     }
 
     return deleteKeyboard

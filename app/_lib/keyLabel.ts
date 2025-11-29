@@ -61,7 +61,7 @@ export default class KeyLabel {
 
   entries(): [ZoneKey, string][] {
     return (
-      [...this.values.entries()]
+      Array.from(this.values.entries())
       .map(([zoneStr, label]) => [ZoneKey.fromString(zoneStr), label!])
     )
   }
@@ -80,9 +80,9 @@ export default class KeyLabel {
     }
 
     const zoneKeys = new Set(this.values.keys())
-    other.values.keys().forEach(zk => zoneKeys.add(zk))
+    Array.from(other.values.keys()).forEach(zk => zoneKeys.add(zk))
 
-    for (const zoneKey of zoneKeys) {
+    for (const zoneKey of Array.from(zoneKeys)) {
       if (this.values.get(zoneKey) !== other.values.get(zoneKey)) {
         return false
       }

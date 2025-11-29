@@ -130,7 +130,8 @@ export default function ConfigKeyGrid() {
 
         const p = []
 
-        for (const file of files) {
+        for (let f=0; f<files.length; f++) {
+          const file = files.item(f)!
           console.log(`import keyboards from file name=${file.name}`)
           const reader = new FileReader()
 
@@ -375,12 +376,13 @@ export default function ConfigKeyGrid() {
       {/* name */}
       <div
         className='flex flex-row justify-center gap-2 px-2' >
-        <div className='flex flex-col justify-center'>
+        <label className='flex flex-col justify-center' htmlFor='keyboardName'>
           name: 
-        </div>
+        </label>
         <input
           className='field-sizing-content min-w-8 text-base font-mono dark:bg-zinc-700 bg-zinc-300 rounded-md p-1'
           type='text'
+          id='keyboardName'
           placeholder='keyboard name'
           value={keyboardName || ''} 
           onChange={e => setKeyboardName(e.target.value)} />

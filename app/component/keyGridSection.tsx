@@ -127,7 +127,7 @@ export default function KeyGridSection() {
   
   return (
     <div className='relative grow' >
-      {[...children.values()]}
+      {Array.from(children.values())}
     </div>
   )
 }

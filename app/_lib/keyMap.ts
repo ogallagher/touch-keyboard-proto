@@ -17,11 +17,11 @@ export default class KeyMap {
 
   entries() {
     const keystrokes: [AbstractTouchGesture, KeyStroke|KeyboardInstance][] = (
-      [...this.gestureToKeystroke.entries()]
+      Array.from(this.gestureToKeystroke.entries())
       .map(([gid, keystroke]) => [this.gestures.get(gid)!, keystroke])
     )
     const keyboards: [AbstractTouchGesture, KeyStroke|KeyboardInstance][] = (
-      [...this.gestureToKeyboard.entries()]
+      Array.from(this.gestureToKeyboard.entries())
       .map(([gid, keyboard]) => [this.gestures.get(gid)!, keyboard])
     )
 
@@ -82,12 +82,17 @@ export default class KeyMap {
       }
     }
 
-    for (const _gesture of gestures()) {
+    const _gestures = gestures()
+    let res: IteratorResult<AbstractTouchGesture, void>
+    do {
+      res = _gestures.next()
+      if (res.done) break
+
       for (const map of maps) {
-        keys = map.get(_gesture.id)
+        keys = map.get(res.value.id)
         if (keys) return keys
       }
-    }
+    } while (true)
 
     return keys
   }
@@ -127,9 +132,9 @@ export default class KeyMap {
     }
 
     const gestureIds = new Set(this.gestures.keys())
-    other.gestures.keys().forEach(gi => gestureIds.add(gi))
+    Array.from(other.gestures.keys()).forEach(gi => gestureIds.add(gi))
 
-    for (const gestureId of gestureIds) {
+    for (const gestureId of Array.from(gestureIds)) {
       const gesture = this.gestures.get(gestureId)!
       const keys = this.getKeys(gesture, false, false)
       const otherKeys = other.getKeys(gesture, false, false)

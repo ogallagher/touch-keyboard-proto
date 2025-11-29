@@ -119,7 +119,7 @@ export default function ConfigKeyCell() {
         <div className='flex flex-row gap-1 justify-start text-sm'>
           <input
             type='checkbox'
-            name='labelZoneUseGesture'
+            id='labelZoneUseGesture'
             className='cursor-pointer'
             checked={labelZoneUseGesture}
             onChange={e => setLabelZoneUseGesture(e.target.checked)} />
@@ -151,7 +151,7 @@ export default function ConfigKeyCell() {
           className='flex flex-row gap-2 justify-start text-sm'>
           <input 
             type='checkbox'
-            name='labelZoneUseModKeys'
+            id='labelZoneUseModKeys'
             className='cursor-pointer'
             checked={labelZoneUseModKeys}
             onChange={e => setLabelZoneUseModKeys(e.target.checked)} />
@@ -168,13 +168,14 @@ export default function ConfigKeyCell() {
           <input 
             type='radio'
             name='modKeysMaj'
+            id={`modKeysMaj-${MetaChar.SHIFT}`}
             value={MetaChar.SHIFT}
             className='cursor-pointer'
             checked={isShift}
             onChange={onMajRadioChange} />
 
           <div className='flex flex-col justify-center'>
-            <label htmlFor='modKeysMaj' >
+            <label htmlFor={`modKeysMaj-${MetaChar.SHIFT}`} >
               ⇧
             </label>
           </div>
@@ -184,13 +185,14 @@ export default function ConfigKeyCell() {
           <input 
             type='radio'
             name='modKeysMaj'
+            id={`modKeysMaj-${MetaChar.CAPS_LOCK}`}
             value={MetaChar.CAPS_LOCK}
             className='cursor-pointer'
             checked={isCapsLock}
             onChange={onMajRadioChange} />
 
           <div className='flex flex-col justify-center'>
-            <label htmlFor='modKeysMaj' >
+            <label htmlFor={`modKeysMaj-${MetaChar.CAPS_LOCK}`} >
               ⇪
             </label>
           </div>
@@ -199,6 +201,7 @@ export default function ConfigKeyCell() {
             title='none'
             type='radio'
             name='modKeysMaj'
+            id={`modKeysMaj-none`}
             value={''}
             className='cursor-pointer'
             checked={!isShift && !isCapsLock}
@@ -233,7 +236,7 @@ export default function ConfigKeyCell() {
         <input 
           ref={keyStrokeInput}
           className='field-sizing-content min-w-8 text-base font-mono dark:bg-zinc-700 bg-zinc-300 rounded-md p-1'
-          name='keyStroke'
+          id='keyStroke'
           value={keyStroke?.toChars().join('') || ''}
           placeholder='none'
           disabled={keyMap === undefined}

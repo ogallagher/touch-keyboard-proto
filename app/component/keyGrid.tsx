@@ -45,7 +45,10 @@ export default function KeyGrid(
     scrollEventTypes.forEach((eventType) => {
       grid.current.addEventListener(
         eventType, 
-        ignoreScroll
+        ignoreScroll,
+        {
+          passive: false
+        }
       )
     })
 
@@ -113,7 +116,7 @@ export default function KeyGrid(
         <div
           key={row}
           className='grow flex flex-row justify-evenly gap-1'>
-          {[...getKeyCells(row)]}
+          {Array.from(getKeyCells(row))}
         </div>
       )
     }
@@ -165,7 +168,7 @@ export default function KeyGrid(
             'font-mono',
             'grow flex h-full flex-col justify-evenly gap-1'
           ].join(' ')}>
-          {[...getKeyRows()]}
+          {Array.from(getKeyRows())}
         </div>
     </div>
   )

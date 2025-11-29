@@ -7,6 +7,7 @@ export default function SessionKeyboardListItem(
     keyboardInstanceId: string
   }
 ) {
+  const htmlId = `${SessionKeyboardListItem.name}-${keyboardInstanceId}`
   const keyGridState = useContext(KeyGridCtx)
   const [exportInclude, setExportInclude] = useState(false)
 
@@ -32,14 +33,14 @@ export default function SessionKeyboardListItem(
         <input 
           type='checkbox' 
           title='include in export/share'
-          name={keyboardInstanceId}
+          id={htmlId}
           checked={exportInclude}
           onChange={(e) => {
             setExportInclude(e.target.checked)
           }} />
         
         <div className='flex flex-col justify-center'>
-          <label htmlFor={keyboardInstanceId}>
+          <label htmlFor={htmlId}>
             {keyboardName}
           </label>
         </div>

@@ -27,7 +27,7 @@ export class ConfigureKeyBoard {
 
   setMode(mode: ConfigEvalMode) {
     this._mode = mode
-    this.modeListeners.values().forEach(l => l())
+    Array.from(this.modeListeners.values()).forEach(l => l())
   }
 
   addModeListener(name: string, listener: ModeListener) {
@@ -80,25 +80,28 @@ export class ConfigureKeyBoard {
 
   loadKeyboard(keyboardInstance: KeyboardInstance) {
     this._keyboardInstance = keyboardInstance
-    this.loadListeners.values().forEach(l => l())
+    Array.from(this.loadListeners.values()).forEach(l => l())
   }
 
   unloadKeyboard() {
     this._keyboardInstance = undefined
-    this.loadListeners.values().forEach(l => l())
+    Array.from(this.loadListeners.values()).forEach(l => l())
   }
 
   loadKey(index: KeyIndex, gesture: AbstractTouchGesture, keystroke?: KeyStroke|KeyboardInstance) {
     this._keyIndex = index
     this._gesture = gesture
     this._keystroke = keystroke
-    this.loadListeners.values().forEach(l => l())
+    Array.from(this.loadListeners.values()).forEach(l => l())
   }
 
   setGridDimensions(gridDimensions: GridDimensions) {
     if (this._keyboardInstance) {
       this._keyboardInstance.keyboard.dimensions = gridDimensions
-      this.saveListeners.get(GridDimensions.name)?.values().forEach(l => l())
+      const ls = this.saveListeners.get(GridDimensions.name)?.values()
+      if (ls) {
+        Array.from(ls).forEach(l => l())
+      }
     }
   }
 
@@ -106,7 +109,10 @@ export class ConfigureKeyBoard {
     if (this._keyboardInstance) {
       this._keyIndex = index
       this._keyboardInstance?.keyboard.setKey(index, key)
-      this.saveListeners.get(KeyDefinition.name)?.values().forEach(l => l())
+      const ls = this.saveListeners.get(KeyDefinition.name)?.values()
+      if (ls) {
+        Array.from(ls).forEach(l => l())
+      }
     }
   }
 
