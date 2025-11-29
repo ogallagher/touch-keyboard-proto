@@ -62,7 +62,7 @@ export class EditTextArea {
   }
 
   deleteChars(count: number) {
-    if (!this._target) return
+    if (!this._target || this._cursor === 0) return
 
     // delete chars before cursor char
     this._target.value = (

@@ -22,6 +22,10 @@ export default function ComposerTextArea(
     () => {
       if (visible) {
         textArea.current.focus()
+        
+        if (textArea.current.value.length === 0) {
+          textAreaEdit.reset()
+        }
       }
     },
     [ visible ]
