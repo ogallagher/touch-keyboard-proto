@@ -73,15 +73,12 @@ export default function KeyCell(
             console.info(`keyboard=${keys.keyboard.name} for gesture=${gesture}`)
 
             if (configCtx.mode === ConfigEvalMode.Eval) {
-              // Enable config if already selected for config.
-              // Otherwise, wait until context switch is explicitly requested by user.
-              const configurable = configCtx.keyboardInstance?.instanceId === keys.instanceId
-
               switch (keys.size) {
                 case KeyboardSize.Fill:
                   keyGridState.addKeyGrid(
                     keys, 
-                    configurable, 
+                    // auto switch config context
+                    true, 
                     activateKeyGrid.current
                   )
                   break
@@ -93,7 +90,8 @@ export default function KeyCell(
                         keyboard={keys}
                         onClose={() => setEmbedGrid(null)}
                         persistance={keys.persistance}
-                        configurable={configurable} />
+                        // wait until context switch is explicitly requested by user
+                        configurable={configCtx.keyboardInstance?.instanceId === keys.instanceId} />
                     )
                   }
                   break

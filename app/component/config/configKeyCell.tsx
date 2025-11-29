@@ -96,11 +96,6 @@ export default function ConfigKeyCell(
     [ configCtx, gesture, keyLabel, keyStroke ]
   )
 
-  const onMajRadioChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setIsShift(e.target.value === MetaChar.SHIFT)
-    setIsCapsLock(e.target.value === MetaChar.CAPS_LOCK)
-  }
-
   // write modifier keys to grid context
   useEffect(
     () => {
@@ -138,6 +133,11 @@ export default function ConfigKeyCell(
     },
     [ configCtx ]
   )
+
+  const onMajRadioChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setIsShift(e.target.value === MetaChar.SHIFT)
+    setIsCapsLock(e.target.value === MetaChar.CAPS_LOCK)
+  }
   
   return (
     <div
