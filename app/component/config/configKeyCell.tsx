@@ -130,15 +130,13 @@ export default function ConfigKeyCell(
           <input
             type='checkbox'
             id='labelZoneUseGesture'
-            className='cursor-pointer'
+            className='cursor-pointer my-auto flex-none'
             checked={labelZoneUseGesture}
             onChange={e => setLabelZoneUseGesture(e.target.checked)} />
 
-          <div className='flex flex-col justify-center'>
-            <label htmlFor='labelZoneUseGesture' >
-              Use gesture start segment as label condition
-            </label>
-          </div>
+          <label htmlFor='labelZoneUseGesture' className='my-auto' >
+            Use gesture start segment as label condition
+          </label>
         </div>
         
         <div
@@ -162,15 +160,13 @@ export default function ConfigKeyCell(
           <input 
             type='checkbox'
             id='labelZoneUseModKeys'
-            className='cursor-pointer'
+            className='cursor-pointer my-auto flex-none'
             checked={labelZoneUseModKeys}
             onChange={e => setLabelZoneUseModKeys(e.target.checked)} />
 
-          <div className='flex flex-col justify-center'>
-            <label htmlFor='labelZoneUseModKeys' >
-              Use modifier keys as label condition
-            </label>
-          </div>
+          <label htmlFor='labelZoneUseModKeys' className='my-auto' >
+            Use modifier keys as label condition
+          </label>
         </div>
 
         {/* modifier key controls */}
@@ -180,15 +176,15 @@ export default function ConfigKeyCell(
             name='modKeysMaj'
             id={`modKeysMaj-${MetaChar.SHIFT}`}
             value={MetaChar.SHIFT}
-            className='cursor-pointer'
+            className='cursor-pointer my-auto'
             checked={isShift}
             onChange={onMajRadioChange} />
 
-          <div className='flex flex-col justify-center'>
-            <label htmlFor={`modKeysMaj-${MetaChar.SHIFT}`} >
-              ⇧
-            </label>
-          </div>
+          <label 
+            htmlFor={`modKeysMaj-${MetaChar.SHIFT}`} 
+            className='my-auto text-md' >
+            ⇧
+          </label>
           
         </div>
         <div className='flex flex-row gap-1 justify-start' title='caps-lock'>
@@ -197,15 +193,15 @@ export default function ConfigKeyCell(
             name='modKeysMaj'
             id={`modKeysMaj-${MetaChar.CAPS_LOCK}`}
             value={MetaChar.CAPS_LOCK}
-            className='cursor-pointer'
+            className='cursor-pointer my-auto'
             checked={isCapsLock}
             onChange={onMajRadioChange} />
 
-          <div className='flex flex-col justify-center'>
-            <label htmlFor={`modKeysMaj-${MetaChar.CAPS_LOCK}`} >
+          <label 
+            htmlFor={`modKeysMaj-${MetaChar.CAPS_LOCK}`} 
+            className='my-auto text-2xl' >
               ⇪
-            </label>
-          </div>
+          </label>
         </div>
         <input 
             title='none'
@@ -213,7 +209,7 @@ export default function ConfigKeyCell(
             name='modKeysMaj'
             id={`modKeysMaj-none`}
             value={''}
-            className='cursor-pointer'
+            className='cursor-pointer my-auto'
             checked={!isShift && !isCapsLock}
             onChange={onMajRadioChange} />
       </div>
@@ -242,7 +238,9 @@ export default function ConfigKeyCell(
       {/* key map */}
       <div
         className='flex flex-row justify-start gap-2' >
-        <label className='text-lg' htmlFor='keyStroke'>keystroke:</label>
+        <label className='text-md my-auto' htmlFor='keyStroke'>
+          keystroke:
+        </label>
         <input 
           ref={keyStrokeInput}
           className='field-sizing-content min-w-8 text-base font-mono dark:bg-zinc-700 bg-zinc-300 rounded-md p-1'
@@ -261,6 +259,7 @@ export default function ConfigKeyCell(
               MetaChar.SHIFT, MetaChar.CAPS_LOCK,
               MetaChar.BACKSPACE, 
               MetaChar.UP, MetaChar.RIGHT, MetaChar.DOWN, MetaChar.LEFT,
+              MetaChar.SWITCH_KEYBOARD
             ].map(metaChar => 
               <MetaCharControl 
                 key={metaChar}

@@ -7,6 +7,7 @@ import { ConfigCtx } from "@context/configCtx"
 import { exportShareUrlKeyboardsQueryKey } from "@lib/path"
 import { useSearchParams } from "next/navigation"
 import { decompressString } from "@lib/data"
+import { switchKeyboardName } from "@lib/keyboardDefinitions/meta/switchKeyboard"
 
 export default function KeyGridSection() {
   /*
@@ -41,8 +42,10 @@ export default function KeyGridSection() {
         
         setChildren(new Map(newChildren.entries()))
 
-        // select for config
-        configCtx.loadKeyboard(keyboard)
+        if (configurable) {
+          // select for config
+          configCtx.loadKeyboard(keyboard)
+        }
       }
 
       keyGridState.setAddKeyGrid((keyboard, configurable, onClose) => { 
@@ -72,7 +75,11 @@ export default function KeyGridSection() {
   useEffect(
     () => {
       if (children.size === 0 && keyGridState) {
-        const keyboards = keyGridState.keyboards
+        const keyboards = (
+          keyGridState.keyboards
+          // exclude meta
+          .filter(kbi => kbi.instanceId !== switchKeyboardName)
+        )
 
         if (keyboards.length === 0) {
           // add default keyboard
@@ -90,7 +97,10 @@ export default function KeyGridSection() {
         }
         else {
           // add latest session keyboard
-          addChild.current(keyboards[keyboards.length-1], true)
+          addChild.current(
+            keyboards[keyboards.length-1], 
+            true
+          )
         }
       }
     },

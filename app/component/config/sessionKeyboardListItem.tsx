@@ -30,7 +30,9 @@ export default function SessionKeyboardListItem(
       className='flex flex-row justify-between' 
       title={keyboardName}>
       <div className='flex flex-row gap-1'>
+        
         <input 
+          className='my-auto'
           type='checkbox' 
           title='include in export/share'
           id={htmlId}

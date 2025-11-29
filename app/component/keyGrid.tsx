@@ -18,7 +18,7 @@ export default function KeyGrid(
     configurable: boolean
   }
 ) {
-  const grid = useRef(null as unknown as HTMLDivElement)
+  const grid = useRef(null as unknown as HTMLDivElement|null)
   const keyGridState = useContext(KeyGridCtx)
   const configCtx = useContext(ConfigCtx)
   const [dimensions, setDimensions] = useState(keyboard.keyboard.dimensions as GridDimensions|undefined)
@@ -43,7 +43,7 @@ export default function KeyGrid(
   const unlockScroll = () => scrollEventTypes.forEach((eventType) => grid.current?.removeEventListener(eventType, ignoreScroll))
   const lockScroll = () => {
     scrollEventTypes.forEach((eventType) => {
-      grid.current.addEventListener(
+      grid.current?.addEventListener(
         eventType, 
         ignoreScroll,
         {

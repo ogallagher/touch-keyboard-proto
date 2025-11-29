@@ -13,6 +13,7 @@ import KeyMap from "@lib/keyMap"
 import { exportShareUrlKeyboardsQueryKey, keyboardFilePartDelim, keyboardFileSuffix, keyboardsFileSuffix } from "@lib/path"
 import { compressString } from "@lib/data"
 import { ConfigSection } from "@lib/control"
+import { switchKeyboardName } from "@lib/keyboardDefinitions/meta/switchKeyboard"
 
 type OnExport = (exportType: 'file'|'url') => void
 
@@ -44,7 +45,9 @@ export default function ConfigKeyGrid(
       if (!keyGridState) return
 
       const name = listenerName(ConfigKeyGrid.name)
-      keyGridState.keyboardsListListeners.set(name, () => setKeyboardInstanceIds([...keyGridState.keyboardIds]))
+      keyGridState.keyboardsListListeners.set(name, () => setKeyboardInstanceIds(
+        keyGridState.keyboardIds.filter(kbId => kbId !== switchKeyboardName)
+      ))
 
       return () => { keyGridState.keyboardsListListeners.delete(name) }
     },

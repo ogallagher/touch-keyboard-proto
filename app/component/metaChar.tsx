@@ -1,5 +1,5 @@
 import KeyStroke, { MetaChar } from "@lib/keyStroke"
-import { Alt, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Backspace, Capslock, ChevronBarDown, ChevronUp, Command, Escape, Shift, Windows } from "react-bootstrap-icons"
+import { Alt, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Backspace, Capslock, ChevronBarDown, ChevronUp, Command, Escape, Keyboard, Shift, Windows } from "react-bootstrap-icons"
 
 function MetaCharIcon(
   { c }: {
@@ -39,6 +39,8 @@ function MetaCharIcon(
 
     case MetaChar.CLOSE_KEYBOARD:
       return <ChevronBarDown />
+    case MetaChar.SWITCH_KEYBOARD:
+      return <Keyboard />
   }
 }
 

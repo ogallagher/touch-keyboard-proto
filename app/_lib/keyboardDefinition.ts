@@ -186,7 +186,8 @@ export class KeyboardInstance {
 
   constructor(
     keyboard: KeyboardDefinition,
-    { index = 0, persistance, size, name, keyOverrides = [] }: { 
+    { instanceId, index = 0, persistance, size, name, keyOverrides = [] }: { 
+      instanceId?: string
       index?: number
       persistance: KeyboardPersistance
       size: KeyboardSize
@@ -194,7 +195,7 @@ export class KeyboardInstance {
       keyOverrides?: KeyOverride[]
     }
   ) {
-    this.instanceId = `${KeyboardInstance.name}[${index}]@${new Date().toISOString()}`
+    this.instanceId = instanceId || `${KeyboardInstance.name}[${index}]@${new Date().toISOString()}`
     this.keyboard = keyboard.clone(name, false)
     this.persistance = persistance
     this.size = size

@@ -48,12 +48,12 @@ export default function KeyCell(
     Math.min(self.current!.clientWidth, self.current!.clientHeight) * 0.4
   )
   
-  // define onGesture
+  // define onGesture, perform keystroke
   useEffect(
     () => {
       onGesture.current = !(configCtx && keyGridState) ? undefined : (gesture: TouchGesture) => {
         const keys = map.getKeys(gesture, true, true)
-
+        
         if (keys instanceof KeyStroke) {
           console.info(`keystroke=${keys} for gesture=${gesture}`)
           const target = document.activeElement || document
@@ -61,7 +61,8 @@ export default function KeyCell(
           // dispatch to eval composer
           const { closedKeyboard } = keys.dispatch(
             target === textAreaEdit.target ? textAreaEdit : undefined, 
-            keyGridState
+            keyGridState,
+            configCtx
           )
           if (closedKeyboard) {
             gesture.cancel()

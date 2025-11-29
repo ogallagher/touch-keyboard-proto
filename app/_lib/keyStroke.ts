@@ -1,6 +1,9 @@
 import { KeyGridState } from "@context/keyGridCtx"
 import { EditTextArea } from "@context/textAreaCtx"
-import { KeyboardPersistance } from "./keyboardDefinition"
+import { KeyboardPersistance, KeyboardSize } from "./keyboardDefinition"
+import { getSwitchKeyboard, switchKeyboardName } from "./keyboardDefinitions/meta/switchKeyboard"
+import { ConfigureKeyBoard } from "@context/configCtx"
+import { ConfigEvalMode } from "./control"
 
 export type TypeChar = string
 
@@ -24,7 +27,8 @@ export enum MetaChar {
   DOWN = '<down>',
   LEFT = '<left>',
 
-  CLOSE_KEYBOARD = '<close-keyb>'
+  CLOSE_KEYBOARD = '<close-keyb>',
+  SWITCH_KEYBOARD = '<switch-keyb>'
 }
 
 export function stringToMetaChar(s: string) {
@@ -73,7 +77,7 @@ export default class KeyStroke {
     return `KS[${this.chars.join('+')}]`
   }
 
-  dispatch(textAreaEdit: EditTextArea|undefined, keyGridState: KeyGridState) {
+  dispatch(textAreaEdit: EditTextArea|undefined, keyGridState: KeyGridState, configCtx: ConfigureKeyBoard) {
     let closedKeyboard = false
 
     for (const char of this.chars) {
@@ -113,6 +117,27 @@ export default class KeyStroke {
         case MetaChar.CLOSE_KEYBOARD:
           keyGridState.deactivateKeyGrid.current(true)
           closedKeyboard = true
+          break
+        
+        case MetaChar.SWITCH_KEYBOARD:
+          if (configCtx.mode === ConfigEvalMode.Config) {
+            console.info(
+              `suppress auto launch of child key grid ${switchKeyboardName} `
+              + `while in config mode`
+            )
+          }
+          else {
+            keyGridState.addKeyGrid(
+              getSwitchKeyboard(
+                keyGridState.keyboards, 
+                { 
+                  persistance: KeyboardPersistance.Indefinite, 
+                  size: KeyboardSize.Fill
+                }
+              ),
+              false
+            )
+          }
           break
 
         default:
