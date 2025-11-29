@@ -7,3 +7,8 @@ export const siblingServerUrl = {
   WORDSEARCH: '/wordsearch',
   QUIZCARD: '/quizcard-generator'
 }
+
+export const exportShareUrlKeyboardsQueryKey = 'k'
+export const keyboardFilePartDelim = '.'
+export const keyboardFileSuffix = 'keyboard'
+export const keyboardsFileSuffix = 'keyboards'

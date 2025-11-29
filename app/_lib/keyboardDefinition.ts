@@ -226,6 +226,14 @@ export class KeyboardInstance {
     return JSON.stringify(this)
   }
 
+  toJSON() {
+    return {
+      keyboard: this.keyboard,
+      persistance: this.persistance,
+      size: this.size
+    }
+  }
+
   static fromJSON(o: any) {
     return new KeyboardInstance(
       KeyboardDefinition.fromJSON(o.keyboard),

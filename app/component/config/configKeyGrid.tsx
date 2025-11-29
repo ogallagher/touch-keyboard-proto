@@ -10,6 +10,9 @@ import KeyboardDefinition, { KeyboardInstance, KeyboardPersistance, KeyboardSize
 import { KeyDefinition } from "@lib/keyDefinition"
 import KeyLabel from "@lib/keyLabel"
 import KeyMap from "@lib/keyMap"
+import { exportShareUrlKeyboardsQueryKey, keyboardFilePartDelim, keyboardFileSuffix, keyboardsFileSuffix } from "@lib/path"
+
+type OnExport = (exportType: 'file'|'url') => void
 
 export default function ConfigKeyGrid() {
   const keyGridState = useContext(KeyGridCtx)
@@ -22,6 +25,12 @@ export default function ConfigKeyGrid() {
   const [showExport, setShowExport] = useState(false)
   const importFileInput = useRef(null as unknown as HTMLInputElement)
   const onImportFileInput = useRef(null as unknown as () => void)
+  /**
+   * Either the download file link or the share (keyboards in query params) link.
+   */
+  const [ exportUrl, setExportUrl ] = useState(undefined as URL|undefined)
+  const [ exportFilename, setExportFilename ] = useState(undefined as string|undefined)
+  const onExport = useRef(null as unknown as OnExport)
 
   // listen to session keyboards list
   useEffect(
@@ -143,7 +152,7 @@ export default function ConfigKeyGrid() {
               else {
                 keyboardInstances.push(KeyboardInstance.load(s, loadOpts))
               }
-              
+
               for (const keyboardInstance of keyboardInstances) {
                 console.log(`loaded keyboard name=${keyboardInstance.keyboard.name}`)
                 keyGridState.addKeyGrid(keyboardInstance, true)
@@ -163,6 +172,78 @@ export default function ConfigKeyGrid() {
       }
     },
     [ keyGridState ]
+  )
+
+  // define onExport
+  useEffect(
+    () => {
+      if (!keyGridState) return
+
+      onExport.current = (exportType) => {
+        const keyboards = (
+          // determine list of exported keyboard ids
+          keyboardInstanceIds
+          .filter(kid => keyGridState.getKeyboardExportConfig(kid)?.include ? kid : undefined)
+          // convert to keyboard instances
+          .map(kid => keyGridState.getKeyboard(kid)!)
+        )
+
+        // skip export if no keyboards included
+        if (keyboards.length === 0) {
+          console.warn('no keyboards included for export')
+          return
+        }
+
+        // serialize as str
+        const keyboardsStr = keyboards.length > 1 ? JSON.stringify(keyboards) : JSON.stringify(keyboards[0])
+        console.info(`serialized counut=${keyboards} keyboard instances for export`)
+        
+        // convert str to url
+        new Promise((res: (url?: URL) => void) => {
+          switch (exportType) {
+            case 'file':
+              const reader = new FileReader()
+              reader.onerror = (e) => {
+                console.error(`failed to create file data url from keyboards str. ${e}`)
+              }
+              reader.onload = () => {
+                // set recommended download file name
+                 setExportFilename(
+                  [
+                    (keyboards.length > 1 ? `touch-keyboard-proto.x${keyboards.length}` : keyboards[0].keyboard.name),
+                    (keyboards.length > 1 ? keyboardsFileSuffix : keyboardFileSuffix),
+                    'json'
+                  ].join(keyboardFilePartDelim)
+                )
+                res(new URL(reader.result as string))
+              }
+              reader.readAsDataURL(new Blob([keyboardsStr], { type: 'application/json' }))
+              break
+
+            case 'url':
+              const url = new URL(window.location.href)
+              url.search = ''
+              url.searchParams.set(exportShareUrlKeyboardsQueryKey, Buffer.from(keyboardsStr, 'utf8').toString('base64'))
+              setExportFilename(undefined)
+              res(url)
+              break
+
+            default:
+              console.error(`invalid export type=${exportType}`)
+              res()
+          }
+        })
+        .then((url) => {
+          setExportUrl(undefined)
+
+          setTimeout(
+            () => setExportUrl(url),
+            800
+          )
+        })
+      }
+    },
+    [ keyGridState, keyboardInstanceIds ]
   )
   
   return (
@@ -198,7 +279,14 @@ export default function ConfigKeyGrid() {
         <button
           className='cursor-pointer'
           title='Export keyboards'
-          onClick={() => setShowExport(!showExport)} >
+          onClick={() => {
+            const _showExport = !showExport
+            setShowExport(_showExport)
+            // also open keyboards list to clarify what is included
+            if (_showExport) {
+              setShowKeyboardsList(true)
+            }
+          }} >
           <BoxArrowUp />
         </button>
       </div>
@@ -226,25 +314,36 @@ export default function ConfigKeyGrid() {
         </div>
       </div>
 
+      {/* keyboards export */}
       <div 
         className={[
           'flex-row justify-between gap-1 border-b-2 pb-2',
           (showExport ? 'flex' : 'hidden')
         ].join(' ')}
         title='Export options' >
-        {/* export file */}
+        {/* download file */}
         <button
           className='cursor-pointer'
           title='Download file'
-          onClick={() => console.log('// TODO download file')} >
+          onClick={() => onExport.current('file')} >
           <FileEarmarkArrowDown />
         </button>
+
+        <a 
+          className={[
+            'text-xs hover:underline text-blue-600',
+            (exportUrl !== undefined ? '' : 'hidden')
+          ].join(' ')}
+          href={exportUrl?.toString()}
+          download={exportFilename} >
+          {exportFilename || 'keyboards export url'}
+        </a>
 
         {/* share url */}
         <button
           className='cursor-pointer'
           title='Share link'
-          onClick={() => console.log('// TODO share link')} >
+          onClick={() => onExport.current('url')} >
           <Share />
         </button>
       </div>
