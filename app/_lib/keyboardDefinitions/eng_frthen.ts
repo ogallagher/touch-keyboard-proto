@@ -13,6 +13,7 @@ import { iDia } from "./vowelDiacritics/i"
 import { oDia } from "./vowelDiacritics/o"
 import { nDia } from "./consonantDiacritics/n"
 import { yDia } from "./pseudovowelDiacritics/y"
+import { getReshapedKeyboard } from "./meta/reshape"
 
 // row 1 = f r t
 const row1: KeyDefinition[] = [
@@ -72,7 +73,8 @@ const row1: KeyDefinition[] = [
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.RIGHT, undefined, false), new KeyStroke("'", 'r', 'e')],
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_RETURN_SWIPE, Direction.RIGHT), new KeyStroke('e', 'r')],
 
-      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.LEFT), new KeyboardInstance(yDia,
+      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.LEFT), new KeyboardInstance(
+        getReshapedKeyboard(yDia, { height: 2}),
         {
           persistance: KeyboardPersistance.Brief,
           size: KeyboardSize.Embed
@@ -149,31 +151,36 @@ const row2: KeyDefinition[] = [
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.RIGHT), new KeyStroke('a')],
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.UP), new KeyStroke('o')],
 
-      [new AbstractTouchGesture(TouchGestureType.TOUCH_HOLD), new KeyboardInstance(eDia,
+      [new AbstractTouchGesture(TouchGestureType.TOUCH_HOLD), new KeyboardInstance(
+        getReshapedKeyboard(eDia, { height: 2 }),
         {
           persistance: KeyboardPersistance.Brief,
           size: KeyboardSize.Embed
         }
       )],
-      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.RIGHT), new KeyboardInstance(aDia,
+      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.RIGHT), new KeyboardInstance(
+        getReshapedKeyboard(aDia, { height: 2 }),
         {
           persistance: KeyboardPersistance.Brief,
           size: KeyboardSize.Embed
         }
       )],
-      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.DOWN), new KeyboardInstance(uDia,
+      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.DOWN), new KeyboardInstance(
+        getReshapedKeyboard(uDia, { height: 2 }),
         {
           persistance: KeyboardPersistance.Brief,
           size: KeyboardSize.Embed
         }
       )],
-      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.LEFT), new KeyboardInstance(iDia,
+      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.LEFT), new KeyboardInstance(
+        getReshapedKeyboard(iDia, { height: 2 }),
         {
           persistance: KeyboardPersistance.Brief,
           size: KeyboardSize.Embed
         }
       )],
-      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.UP), new KeyboardInstance(oDia,
+      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.UP), new KeyboardInstance(
+        getReshapedKeyboard(oDia, { height: 2 }),
         {
           persistance: KeyboardPersistance.Brief,
           size: KeyboardSize.Embed
