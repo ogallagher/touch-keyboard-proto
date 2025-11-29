@@ -1,8 +1,8 @@
-import { AbstractTouchGesture, TouchGestureType, typeWithoutHold, typeWithoutOverReturn } from "@lib/touchGesture"
-import KeyStroke, { KeyChar } from "@lib/keyStroke"
-import { KeyboardInstance } from "./keyboardDefinition"
+import { AbstractTouchGesture, SerializedAbstractGesture, TouchGestureType, typeWithoutHold, typeWithoutOverReturn } from "@lib/touchGesture"
+import KeyStroke, { SerializedKeyStroke } from "@lib/keyStroke"
+import { KeyboardInstance, SerializedKeyboardInstance } from "./keyboardDefinition"
 
-export type SerializedKeyMap = {values: [AbstractTouchGesture, {chars: KeyChar[]}|KeyboardInstance][]}
+export type SerializedKeyMap = {values: [SerializedAbstractGesture, SerializedKeyStroke|SerializedKeyboardInstance][]}
 
 export default class KeyMap {
   private readonly gestures: Map<string, AbstractTouchGesture> = new Map()

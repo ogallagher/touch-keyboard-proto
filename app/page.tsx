@@ -1,7 +1,7 @@
 'use client'
 
 import Header from "@component/header"
-import { useRef } from "react"
+import { Suspense, useRef } from "react"
 import { PageCanvasCtx } from "@context/pageCanvasCtx"
 import { EditTextArea, TextAreaEditCtx } from "@context/textAreaCtx"
 import ConfigEvalSection from "@component/configEvalSection"
@@ -36,7 +36,9 @@ export default function Home() {
             <ConfigEvalSection />
 
             <PageCanvasCtx value={canvas}>
-              <KeyGridSection />
+              <Suspense fallback={<div className='relative grow h-[25dvh]'></div>}>
+                <KeyGridSection />
+              </Suspense>
             </PageCanvasCtx>
           </TextAreaEditCtx>
         </ConfigCtx>
