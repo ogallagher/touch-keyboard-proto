@@ -318,6 +318,7 @@ export default function KeyCell(
             'grow h-full',
             'grid grid-cols-3',
             'rounded-lg',
+            'text-sm',
             embedGrid ? 'hidden' : 'flex'
           ].join(' ')} >
           {(['upleft', 'up', 'upright', 'left', 'center', 'right', 'downleft', 'down', 'downright'] as Zone[]).map(

@@ -1,8 +1,8 @@
-import { Gear, Play, Trash } from "react-bootstrap-icons"
+import { Gear, Grid3x3Gap, Grid3x3GapFill, Play, Square, SquareFill, Trash } from "react-bootstrap-icons"
 import ComposerTextArea from "@component/textArea"
 import { useContext, useEffect, useState } from "react"
 import { TextAreaEditCtx } from "@context/textAreaCtx"
-import { ConfigEvalMode } from "@lib/control"
+import { ConfigEvalMode, ConfigSection } from "@lib/control"
 import { ConfigCtx } from "@context/configCtx"
 import ConfigKeyCell from "./config/configKeyCell"
 import ConfigKeyGrid from "./config/configKeyGrid"
@@ -11,6 +11,7 @@ export default function ConfigEvalSection() {
   const configCtx = useContext(ConfigCtx)
   const textAreaEdit = useContext(TextAreaEditCtx)
   const [mode, setMode] = useState(configCtx?.mode || ConfigEvalMode.Eval)
+  const [configShowSection, setConfigShowSection] = useState('key' as ConfigSection)
 
   // write to config context
   useEffect(
@@ -41,22 +42,42 @@ export default function ConfigEvalSection() {
           <Trash />
         </button>
       </section>
-
+      
       {/* config mode */}
+      <div 
+        className={[
+          'flex-row justify-center gap-10 px-2 pb-2',
+          mode === ConfigEvalMode.Config ? 'flex' : 'hidden'
+        ].join(' ')} >
+          {/* select config sub section */}
+          <button 
+            className='cursor-pointer'
+            title='configure keys'
+            onClick={() => setConfigShowSection('key')} >
+            {configShowSection === 'key' ? <SquareFill /> : <Square />}
+          </button>
+          <button 
+            className='cursor-pointer'
+            title='configure keyboards'
+            onClick={() => setConfigShowSection('grid')} >
+              {configShowSection === 'grid' ? <Grid3x3GapFill /> : <Grid3x3Gap />}
+          </button>
+      </div>
+
       <section
         className={[
-          'flex flex-row justify-evenly gap-4 flex-wrap px-2',
+          'flex-row justify-evenly gap-4 flex-wrap px-2',
           mode === ConfigEvalMode.Config ? 'flex' : 'hidden'
         ].join(' ')} >
         
-        <ConfigKeyCell />
+        <ConfigKeyCell configSection={configShowSection} />
 
-        <ConfigKeyGrid />
+        <ConfigKeyGrid configSection={configShowSection} />
       </section>
 
       {/* switch between modes */}
       <button 
-        className="absolute bottom-0 right-0 px-1 cursor-pointer" 
+        className='absolute bottom-0 right-0 px-1 cursor-pointer text-lg' 
         onClick={() => {
           if (mode === ConfigEvalMode.Eval) {
             setMode(ConfigEvalMode.Config)

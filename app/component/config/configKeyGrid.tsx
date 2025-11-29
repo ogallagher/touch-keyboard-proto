@@ -12,10 +12,15 @@ import KeyLabel from "@lib/keyLabel"
 import KeyMap from "@lib/keyMap"
 import { exportShareUrlKeyboardsQueryKey, keyboardFilePartDelim, keyboardFileSuffix, keyboardsFileSuffix } from "@lib/path"
 import { compressString } from "@lib/data"
+import { ConfigSection } from "@lib/control"
 
 type OnExport = (exportType: 'file'|'url') => void
 
-export default function ConfigKeyGrid() {
+export default function ConfigKeyGrid(
+  { configSection }: {
+    configSection: ConfigSection
+  }
+) {
   const keyGridState = useContext(KeyGridCtx)
   const configCtx = useContext(ConfigCtx)
   const [keyboardInstanceIds, setKeyboardInstanceIds] = useState([] as string[])
@@ -253,7 +258,10 @@ export default function ConfigKeyGrid() {
   
   return (
     <div
-      className='flex flex-col justify-evenly gap-1 pb-4' >
+      className={[
+        'flex flex-col justify-evenly gap-1 pb-4',
+        (configSection === 'grid' ? 'flex' : 'hidden')
+      ].join(' ')} >
       {/* session keyboards */}
       <div className='flex flex-row flex-wrap justify-between gap-1'>
         <div>session keyboards</div>

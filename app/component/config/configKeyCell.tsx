@@ -11,8 +11,13 @@ import GestureTypeLabel from "./gestureType"
 import KeyZoneLabel from "@component/keyZoneLabel"
 import { KeyGridCtx, ModifierKeyListener } from "@context/keyGridCtx"
 import MetaCharControl from "@component/metaChar"
+import { ConfigSection } from "@lib/control"
 
-export default function ConfigKeyCell() {
+export default function ConfigKeyCell(
+  { configSection }: {
+    configSection: ConfigSection
+  }
+) {
   const configCtx = useContext(ConfigCtx)
   const gridCtx = useContext(KeyGridCtx)
   const keyIndex = useRef({row: -1, col: -1} as KeyIndex)
@@ -113,8 +118,13 @@ export default function ConfigKeyCell() {
   
   return (
     <div
-      className='flex flex-col justify-between gap-1' >
-      <div className='flex flex-row gap-2 justify-between'>
+      className={[
+        'flex-col justify-between gap-1 max-h-50 sm:max-h-70 overflow-y-auto',
+        // avoid vertical scroll bar if y-overflow to prevent x-overflow
+        'pr-3',
+        (configSection === 'key' ? 'flex' : 'hidden')
+      ].join(' ')} >
+      <div className='flex flex-row grow gap-2'>
         {/* key label pseudozone use gesture */}
         <div className='flex flex-row gap-1 justify-start text-sm'>
           <input

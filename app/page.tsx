@@ -19,13 +19,13 @@ export default function Home() {
   return (
     <div 
       className={[
-        "flex flex-col justify-start gap-2",
+        'flex flex-col justify-start gap-2',
         'h-dvh'
       ].join(' ')}>
       {/* overlay graphics canvas */}
       <canvas
         ref={canvas}
-        className="fixed w-full h-full pointer-events-none touch-none z-10" />
+        className='fixed h-full pointer-events-none touch-none z-10' />
 
       {/* header */}
       <Header />
@@ -36,7 +36,7 @@ export default function Home() {
             <ConfigEvalSection />
 
             <PageCanvasCtx value={canvas}>
-              <Suspense fallback={<div className='relative grow h-[25dvh]'></div>}>
+              <Suspense fallback={<div className='relative h-[25dvh]'></div>}>
                 <KeyGridSection />
               </Suspense>
             </PageCanvasCtx>

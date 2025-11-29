@@ -32,8 +32,7 @@ export default function RootLayout({
         className={[
           `${geistSans.variable} ${geistMono.variable} antialiased`,
           'bg-zinc-50 dark:bg-zinc-950 text-zinc-950 dark:text-zinc-50'
-        ].join(' ')}
-      >
+        ].join(' ')} >
         {children}
       </body>
     </html>
