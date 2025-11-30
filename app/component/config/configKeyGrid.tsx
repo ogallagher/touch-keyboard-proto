@@ -262,12 +262,12 @@ export default function ConfigKeyGrid(
   return (
     <div
       className={[
-        'flex flex-col justify-evenly gap-1 pb-4',
+        'flex-col justify-evenly gap-1 pb-4',
         (configSection === 'grid' ? 'flex' : 'hidden')
       ].join(' ')} >
       {/* session keyboards */}
-      <div className='flex flex-row flex-wrap justify-between gap-1'>
-        <div>session keyboards</div>
+      <div className='flex flex-row flex-wrap justify-between gap-2 text-lg'>
+        <div className='text-base'>session keyboards:</div>
 
         {/* toggle show list */}
         <button

@@ -29,7 +29,7 @@ export default function KeyCell(
   const [isCapsLock, setIsCapsLock] = useState(false)
   const [gestureSegment, setGestureSegment] = useState({} as GestureSegment)
   const [embedGrid, setEmbedGrid] = useState(null as JSX.Element|null)
-  const canvas = useContext(PageCanvasCtx)
+  const canvasCtx = useContext(PageCanvasCtx)
   const textAreaEdit = useContext(TextAreaEditCtx)
   const keyGridState = useContext(KeyGridCtx)
   const configCtx = useContext(ConfigCtx)
@@ -132,9 +132,9 @@ export default function KeyCell(
   useEffect(
     () => {
       let space: CanvasSpace|undefined
-      if (canvas.current && gesture) {
+      if (canvasCtx.canvas.current && canvasCtx.showGesturesCanvas && gesture) {
         // console.info('use canvas')
-        space = new CanvasSpace(canvas.current)
+        space = new CanvasSpace(canvasCtx.canvas.current)
         space.background = 'transparent'
         const form = space.getForm()
 
@@ -157,7 +157,7 @@ export default function KeyCell(
             ))
           }
 
-          if (gesture.complete) {
+          if (gesture.complete || !canvasCtx.showGesturesCanvas) {
             space!.stop()
           }
         })
@@ -167,7 +167,7 @@ export default function KeyCell(
 
       return () => { space?.removeAll() }
     }, 
-    [ canvas, gesture ]
+    [ canvasCtx, gesture ]
   )
 
   // listen to modifier keys

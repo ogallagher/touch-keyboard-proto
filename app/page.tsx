@@ -1,48 +1,47 @@
 'use client'
 
 import Header from "@component/header"
-import { Suspense, useRef } from "react"
-import { PageCanvasCtx } from "@context/pageCanvasCtx"
+import { Suspense} from "react"
+import { PageCanvasCtx, PageCanvasState } from "@context/pageCanvasCtx"
 import { EditTextArea, TextAreaEditCtx } from "@context/textAreaCtx"
 import ConfigEvalSection from "@component/configEvalSection"
 import KeyGridSection from "@component/keyGridSection"
 import { ConfigCtx, ConfigureKeyBoard } from "@context/configCtx"
 import { KeyGridCtx, KeyGridState } from "@context/keyGridCtx"
+import PageGraphicsCanvas from "@component/canvas"
 
 const config = new ConfigureKeyBoard()
 const keyGridState = new KeyGridState()
 const textAreaEdit = new EditTextArea()
+const canvasState = new PageCanvasState()
 
 export default function Home() {
-  const canvas = useRef(null as unknown as HTMLCanvasElement)
-  
   return (
     <div 
       className={[
         'flex flex-col justify-start gap-2',
         'h-dvh'
       ].join(' ')}>
-      {/* overlay graphics canvas */}
-      <canvas
-        ref={canvas}
-        className='fixed h-full pointer-events-none touch-none z-10' />
+      <PageCanvasCtx value={canvasState}>
+        {/* overlay graphics canvas */}
+        <PageGraphicsCanvas />
 
-      {/* header */}
-      <Header />
+        {/* header */}
+        <Header />
 
-      <KeyGridCtx value={keyGridState}>
-        <ConfigCtx value={config} >
-          <TextAreaEditCtx value={textAreaEdit}>
-            <ConfigEvalSection />
+        <KeyGridCtx value={keyGridState}>
+          <ConfigCtx value={config} >
+            <TextAreaEditCtx value={textAreaEdit}>
+              
+                <ConfigEvalSection />
 
-            <PageCanvasCtx value={canvas}>
-              <Suspense fallback={<div className='relative h-[25dvh]'></div>}>
-                <KeyGridSection />
-              </Suspense>
-            </PageCanvasCtx>
-          </TextAreaEditCtx>
-        </ConfigCtx>
-      </KeyGridCtx>
+                <Suspense fallback={<div className='relative h-[25dvh]'></div>}>
+                  <KeyGridSection />
+                </Suspense>
+            </TextAreaEditCtx>
+          </ConfigCtx>
+        </KeyGridCtx>
+      </PageCanvasCtx>
     </div>
   )
 }

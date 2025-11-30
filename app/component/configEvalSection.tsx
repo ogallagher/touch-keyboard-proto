@@ -1,4 +1,4 @@
-import { Gear, Grid3x3Gap, Grid3x3GapFill, Play, Square, SquareFill, Trash } from "react-bootstrap-icons"
+import { Gear, GearFill, Grid3x3Gap, Grid3x3GapFill, Play, Square, SquareFill, Trash } from "react-bootstrap-icons"
 import ComposerTextArea from "@component/textArea"
 import { useContext, useEffect, useState } from "react"
 import { TextAreaEditCtx } from "@context/textAreaCtx"
@@ -6,6 +6,7 @@ import { ConfigEvalMode, ConfigSection } from "@lib/control"
 import { ConfigCtx } from "@context/configCtx"
 import ConfigKeyCell from "./config/configKeyCell"
 import ConfigKeyGrid from "./config/configKeyGrid"
+import ConfigSite from "./config/configSite"
 
 export default function ConfigEvalSection() {
   const configCtx = useContext(ConfigCtx)
@@ -56,23 +57,34 @@ export default function ConfigEvalSection() {
             onClick={() => setConfigShowSection('key')} >
             {configShowSection === 'key' ? <SquareFill /> : <Square />}
           </button>
-          <button 
-            className='cursor-pointer'
-            title='configure keyboards'
-            onClick={() => setConfigShowSection('grid')} >
-              {configShowSection === 'grid' ? <Grid3x3GapFill /> : <Grid3x3Gap />}
-          </button>
+
+          <div className='flex flex-row gap-2 cursor-pointer'>
+            <button 
+              className='cursor-pointer'
+              title='configure keyboards'
+              onClick={() => setConfigShowSection('grid')} >
+                {configShowSection === 'grid' ? <Grid3x3GapFill /> : <Grid3x3Gap />}
+            </button>
+            <button 
+              className='cursor-pointer'
+              title='configure interface'
+              onClick={() => setConfigShowSection('grid')} >
+                {configShowSection === 'grid' ? <GearFill /> : <Gear />}
+            </button>
+          </div>
       </div>
 
       <section
         className={[
-          'flex-row justify-evenly gap-4 flex-wrap px-2',
+          'flex-row justify-center gap-10 flex-wrap px-2',
           mode === ConfigEvalMode.Config ? 'flex' : 'hidden'
         ].join(' ')} >
         
         <ConfigKeyCell configSection={configShowSection} />
 
         <ConfigKeyGrid configSection={configShowSection} />
+
+        <ConfigSite configSection={configShowSection} />
       </section>
 
       {/* switch between modes */}
