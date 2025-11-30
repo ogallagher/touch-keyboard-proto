@@ -54,7 +54,8 @@ export function getSwitchKeyboard(
     {
       ...instanceOpts, 
       // prevent concurrent instances of this keyboard
-      instanceId: switchKeyboardName
+      instanceId: switchKeyboardName,
+      cloneKeyboard: false
     }
   )
 }

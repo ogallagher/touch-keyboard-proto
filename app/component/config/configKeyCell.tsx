@@ -1,6 +1,6 @@
 import { ConfigCtx } from "@context/configCtx"
 import { listenerName } from "@lib/eventSync"
-import { KeyIndex } from "@lib/keyboardDefinition"
+import { KeyboardInstance, keyboardInstanceId, KeyIndex } from "@lib/keyboardDefinition"
 import { KeyDefinition } from "@lib/keyDefinition"
 import KeyLabel, { Zone } from "@lib/keyLabel"
 import KeyMap from "@lib/keyMap"
@@ -32,27 +32,28 @@ export default function ConfigKeyCell(
   const [isShift, setIsShift] = useState(false)
   const [isCapsLock, setIsCapsLock] = useState(false)
 
-  // init key load listener on new config context
+  // read from config context with key load listener
   useEffect(
     () => {
-      if (configCtx) {
-        const name = listenerName(ConfigKeyCell.name)
-        configCtx.addLoadListener(name, () => {
-          let key: KeyDefinition|undefined
-          if (configCtx.keyboardInstance && configCtx.keyIndex) {
-            keyIndex.current = configCtx.keyIndex
-            key = configCtx.getKeyDefinition(configCtx.keyIndex)
-          }
+      if (!configCtx) return
 
-          setKeyLabel(key?.label)
-          keyMap.current = key?.map
-          setKeyStroke(configCtx.keystroke?.clone())
-          setChildKeyboardId(configCtx.childKeyboardInstance?.instanceId)
-          setGesture(configCtx.gesture?.clone())
-        })
+      const name = listenerName(ConfigKeyCell.name)
+      configCtx.addLoadListener(name, () => {
+        let key: KeyDefinition|undefined
+        if (configCtx.keyboardInstance && configCtx.keyIndex) {
+          keyIndex.current = configCtx.keyIndex
+          key = configCtx.getKeyDefinition(configCtx.keyIndex)
+        }
 
-        return () => configCtx.deleteLoadListener(name)
-      }
+        setKeyLabel(key?.label)
+        keyMap.current = key?.map
+        setKeyStroke(configCtx.keystroke?.clone())
+        setChildKeyboardId(configCtx.childKeyboardInstance?.instanceId)
+        setGesture(configCtx.gesture?.clone())
+      })
+
+      return () => configCtx.deleteLoadListener(name)
+      
     },
     [ configCtx ]
   )
@@ -60,18 +61,18 @@ export default function ConfigKeyCell(
   // listen to modifier keys
   useEffect(
     () => {
-      if (gridCtx) {
-        const mkeyListeners: [Set<ModifierKeyListener>, Dispatch<SetStateAction<boolean>>][] = []
+      if (!gridCtx) return
 
-        gridCtx.shiftListeners.add(setIsShift)
-        mkeyListeners.push([gridCtx.shiftListeners, setIsShift])
+      const mkeyListeners: [Set<ModifierKeyListener>, Dispatch<SetStateAction<boolean>>][] = []
 
-        gridCtx.capsLockListeners.add(setIsCapsLock)
-        mkeyListeners.push([gridCtx.capsLockListeners, setIsCapsLock])
+      gridCtx.shiftListeners.add(setIsShift)
+      mkeyListeners.push([gridCtx.shiftListeners, setIsShift])
 
-        return () => { 
-          mkeyListeners.forEach(([ls, l]) => ls.delete(l))
-        }
+      gridCtx.capsLockListeners.add(setIsCapsLock)
+      mkeyListeners.push([gridCtx.capsLockListeners, setIsCapsLock])
+
+      return () => { 
+        mkeyListeners.forEach(([ls, l]) => ls.delete(l))
       }
     },
     [ gridCtx ]
@@ -80,13 +81,43 @@ export default function ConfigKeyCell(
   // write to config context
   useEffect(
     () => {
-      if (!configCtx || configCtx.mode !== ConfigEvalMode.Config) return
+      if (!gridCtx || !configCtx || configCtx.mode !== ConfigEvalMode.Config) return
 
       if (keyLabel && keyMap.current) {
         // don't update keyMap ref directly; delegate to configCtx in order to notify listeners
         const newKeyMap = keyMap.current.clone(false)
         if (gesture) {
-          newKeyMap.set(gesture, keyStroke)
+          const oldMapValue = keyMap.current.getKeys(gesture, false, false)
+          if (childKeyboardId) {
+            if (oldMapValue instanceof KeyboardInstance && oldMapValue.instanceId === childKeyboardId) {
+              // keyMap value for current gesture is already set to this child keyboard
+              return
+            }
+
+            // if not already child of this keyboard, clone and adopt as separate instance
+            let childKeyboard = gridCtx.getKeyboard(childKeyboardId)
+            if (!childKeyboard) {
+              console.error(`cannot map to missing keyboard instance id=${childKeyboardId} for gesture=${gesture}`)
+            }
+            else if (!configCtx.keyboardInstance) {
+              console.error(`cannot map gesture=${gesture} to child keyboard without parent instance id`)
+            }
+            else {              
+              if (childKeyboard.parentInstanceId !== configCtx.keyboardInstance.instanceId) {
+                childKeyboard = childKeyboard.clone({ 
+                  parentInstanceId: configCtx.keyboardInstance.instanceId,
+                  instanceId: keyboardInstanceId(childKeyboard.keyboard.name)
+                })
+                gridCtx.addKeyboard(childKeyboard)
+                setChildKeyboardId(childKeyboard.instanceId)
+              }
+
+              newKeyMap.set(gesture, childKeyboard)
+            }
+          }
+          else {
+            newKeyMap.set(gesture, keyStroke)
+          }
         }
 
         const keyDef = new KeyDefinition({ label: keyLabel, map: newKeyMap })
@@ -95,7 +126,7 @@ export default function ConfigKeyCell(
         }
       }
     },
-    [ configCtx, gesture, keyLabel, keyStroke ]
+    [ gridCtx, configCtx, gesture, keyLabel, keyStroke, childKeyboardId ]
   )
 
   // write modifier keys to grid context
@@ -262,6 +293,7 @@ export default function ConfigKeyCell(
 
       {/* key map */}
       <ConfigKeyMap
+        keyboardInstance={configCtx?.keyboardInstance}
         keyMap={keyMap}
         keyStroke={keyStroke} setKeyStroke={setKeyStroke}
         keyStrokeInput={keyStrokeInput}

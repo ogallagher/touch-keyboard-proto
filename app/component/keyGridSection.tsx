@@ -71,7 +71,7 @@ export default function KeyGridSection() {
     [ keyGridState, children, configCtx ]
   )
   
-  // add default grid
+  // add grid when empty
   useEffect(
     () => {
       if (children.size === 0 && keyGridState) {
@@ -89,7 +89,8 @@ export default function KeyGridSection() {
               { 
                 index: children.size,
                 persistance: KeyboardPersistance.Indefinite, 
-                size: KeyboardSize.Fill 
+                size: KeyboardSize.Fill,
+                canDelete: false
               }
             ),
             true

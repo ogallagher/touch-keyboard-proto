@@ -1,4 +1,5 @@
 import { KeyboardInstance, KeyboardPersistance } from "@lib/keyboardDefinition"
+import { switchKeyboardName } from "@lib/keyboardDefinitions/meta/switchKeyboard"
 import { MetaChar } from "@lib/keyStroke"
 import { createContext, RefObject } from "react"
 
@@ -35,7 +36,7 @@ export class KeyGridState {
   public readonly keyboardsListListeners: Map<string, KeyboardsListListener> = new Map()
 
   private _addKeyGrid = null as unknown as AddKeyGrid
-  private addKeyboard(keyboard: KeyboardInstance) {
+  addKeyboard(keyboard: KeyboardInstance) {
     const isNewKeyboard = !this._childKeyboards.has(keyboard.instanceId) && !this._keyboards.has(keyboard.instanceId)
     if (isNewKeyboard) {
       if (keyboard.parentInstanceId) {
@@ -45,23 +46,24 @@ export class KeyGridState {
         this._keyboards.set(keyboard.instanceId, keyboard)
       }
 
-      // add all descendant keyboards
-      keyboard.getDescendants().forEach(this.addKeyboard, this)
+      if (keyboard.instanceId !== switchKeyboardName) {
+        // add all descendant keyboards
+        keyboard.getDescendants().forEach(this.addKeyboard, this)
+      }
+
+      Array.from(this.keyboardsListListeners.values()).forEach(l => l())
     }
   }
   /**
    * Render a keyboard instance as a grid and register in state/context.
    */
   get addKeyGrid() { 
-    const addKeyboard: AddKeyGrid = (keyboard, configurable, onClose?) => {
+    const add: AddKeyGrid = (keyboard, configurable, onClose?) => {
       this._addKeyGrid(keyboard, configurable, onClose)
-
       this.addKeyboard(keyboard)
-      
-      Array.from(this.keyboardsListListeners.values()).forEach(l => l())
     }
 
-    return addKeyboard
+    return add
   }
   /**
    * Define how to render a keyboard instance.
@@ -71,14 +73,43 @@ export class KeyGridState {
   }
 
   private _deleteKeyGrid = null as unknown as DeleteKeyGrid
-  get deleteKeyGrid() {
-    const deleteKeyboard: DeleteKeyGrid = (keyboardInstanceId) => {
-      this._deleteKeyGrid(keyboardInstanceId)
+  public deleteKeyboard(keyboardInstanceId: string, ejectFromParent = true) {
+    const keyboard = this.getKeyboard(keyboardInstanceId)
+    if (!keyboard) return
+
+    if (keyboard.parentInstanceId && ejectFromParent) {
+      // eject from parent
+      const parentKeyboard = this.getKeyboard(keyboard.parentInstanceId)
+      parentKeyboard?.keyboard.allKeys().forEach(key => {
+        key.map.entries(false, true).forEach(([gesture, sibling]) => {
+          const siblingId = (sibling as KeyboardInstance).instanceId
+          if (siblingId === keyboardInstanceId) {
+            key.map.set(gesture, undefined)
+          }
+        })
+      })
+    }
+    // delete descendants
+    keyboard.getDescendants().forEach(descendant => {
+      this._keyboards.delete(descendant.instanceId)
+    })
+
+    if (keyboard.parentInstanceId) {
+      this._childKeyboards.delete(keyboardInstanceId)
+    }
+    else {
       this._keyboards.delete(keyboardInstanceId)
-      Array.from(this.keyboardsListListeners.values()).forEach(l => l())
     }
 
-    return deleteKeyboard
+    Array.from(this.keyboardsListListeners.values()).forEach(l => l())
+  }
+  get deleteKeyGrid() {
+    const _delete: DeleteKeyGrid = (keyboardInstanceId) => {
+      this._deleteKeyGrid(keyboardInstanceId)
+      this.deleteKeyboard(keyboardInstanceId)
+    }
+
+    return _delete
   }
   setDeleteKeyGrid(v: DeleteKeyGrid) {
     this._deleteKeyGrid = v

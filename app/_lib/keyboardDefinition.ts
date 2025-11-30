@@ -39,6 +39,16 @@ export type SerializedKeyboardInstance = {
 
 const editLockError = (name: string) => new Error(`keyboard name=${name} is locked for editing; create an editable clone first`)
 
+/**
+ * Generate a new keyboard instance id only guaranteed unique if not performed within same millisecond for same args.
+ * 
+ * @param name Keyboard name.
+ * @param index Numeric identifier, like an array index, version number, etc.
+ */
+export const keyboardInstanceId = (name: string, index=0) => {
+  return `[${index}=${name}]@${new Date().toISOString()}`
+}
+
 export default class KeyboardDefinition {
   protected _name: string
   private _prevVersion: KeyboardDefinition|undefined
@@ -205,24 +215,31 @@ export class KeyboardInstance {
   public readonly keyboard: KeyboardDefinition
   public readonly persistance: KeyboardPersistance
   public readonly size: KeyboardSize
+  private _canDelete: boolean
+  public get canDelete() {
+    return this._canDelete
+  }
 
   constructor(
     keyboard: KeyboardDefinition,
-    { instanceId, index = 0, persistance, size, name, keyOverrides = [], parentInstanceId }: { 
+    { instanceId, index = 0, persistance, size, name, canDelete = true, keyOverrides = [], parentInstanceId, cloneKeyboard = true }: { 
       instanceId?: string
       index?: number
       persistance: KeyboardPersistance
       size: KeyboardSize
       name?: string
+      canDelete?: boolean
       keyOverrides?: KeyOverride[]
       parentInstanceId?: string
+      cloneKeyboard?: boolean
     }
   ) {
-    this.keyboard = keyboard.clone(name, false)
-    this.instanceId = instanceId || `[${index}=${this.keyboard.name}]@${new Date().toISOString()}`
+    this.keyboard = cloneKeyboard ? keyboard.clone(name, false) : keyboard
+    this.instanceId = instanceId || keyboardInstanceId(this.keyboard.name, index)
     this._parentInstanceId = parentInstanceId
     this.persistance = persistance
     this.size = size
+    this._canDelete = canDelete
     
     keyOverrides.forEach(this.saveKey, this)
   }
@@ -233,6 +250,8 @@ export class KeyboardInstance {
         if (!result.has(childKeyboard.instanceId)) {
           // populate parent references on demand
           childKeyboard._parentInstanceId = this.instanceId
+          // cascade canDelete
+          childKeyboard._canDelete = this._canDelete
 
           result.set(childKeyboard.instanceId, childKeyboard)
 
@@ -251,13 +270,14 @@ export class KeyboardInstance {
   }
 
   clone(
-    { parentInstanceId }: { 
-      parentInstanceId?: string
+    { parentInstanceId, instanceId }: { 
+      parentInstanceId?: string,
+      instanceId?: string
     } = {}
   ) {
     return new KeyboardInstance(
       this.keyboard,
-      { ...this, parentInstanceId }
+      { ...this, parentInstanceId, instanceId }
     )
   }
 
