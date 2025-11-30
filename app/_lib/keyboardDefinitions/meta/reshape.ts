@@ -18,13 +18,7 @@ export function getReshapedKeyboard(
   }
 ) {
   const oldDims = keyboard.dimensions
-  const keysFlat = new Array(oldDims.height * oldDims.width)
-
-  for (let r=0; r<oldDims.height; r++) {
-    for (let c=0; c<oldDims.width; c++) {
-      keysFlat[r*oldDims.width + c] = keyboard.getKey(r, c)
-    }
-  }
+  const keysFlat = keyboard.allKeys()
 
   let shiftCount: number
   let _width: number, _height: number
@@ -54,7 +48,7 @@ export function getReshapedKeyboard(
   )
 
   let r=0, c=0
-  for (let i=0; i<keysFlat.length; i++) {
+  for (let i=0; i < _height * _width; i++) {
     keysGrid[r][c] = keysFlat[i] || new KeyDefinition({ label: new KeyLabel(), map: new KeyMap() })
 
     c++
