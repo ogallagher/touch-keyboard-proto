@@ -38,7 +38,7 @@ export default function KeyGrid(
     [ configCtx, configurable ]
   )
 
-  // TODO define all of these methods once with useRef
+  // TODO define all of these methods once with useRef if better performance
   const ignoreScroll = (e: Event) => { e.preventDefault() }
   const unlockScroll = () => scrollEventTypes.forEach((eventType) => grid.current?.removeEventListener(eventType, ignoreScroll))
   const lockScroll = () => {

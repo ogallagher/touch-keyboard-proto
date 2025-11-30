@@ -20,17 +20,24 @@ export default class KeyMap {
     }
   }
 
-  entries() {
-    const keystrokes: [AbstractTouchGesture, KeyStroke|KeyboardInstance][] = (
+  entries(includeKeystrokes = true, includeKeyboards = true) {
+    const keystrokes: [AbstractTouchGesture, KeyStroke|KeyboardInstance][] = !includeKeystrokes ? [] : (
       Array.from(this.gestureToKeystroke.entries())
       .map(([gid, keystroke]) => [this.gestures.get(gid)!, keystroke])
     )
-    const keyboards: [AbstractTouchGesture, KeyStroke|KeyboardInstance][] = (
+    const keyboards: [AbstractTouchGesture, KeyStroke|KeyboardInstance][] = !includeKeyboards ? [] : (
       Array.from(this.gestureToKeyboard.entries())
       .map(([gid, keyboard]) => [this.gestures.get(gid)!, keyboard])
     )
 
     return keystrokes.concat(keyboards)
+  }
+
+  values(includeKeystrokes = true, includeKeyboards = true) {
+    return (
+      this.entries(includeKeystrokes, includeKeyboards)
+      .map(([, keys]) => keys)
+    )
   }
 
   clone(deep: boolean = true) {

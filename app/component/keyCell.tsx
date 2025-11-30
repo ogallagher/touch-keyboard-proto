@@ -53,8 +53,10 @@ export default function KeyCell(
     () => {
       onGesture.current = !(configCtx && keyGridState) ? undefined : (gesture: TouchGesture) => {
         const keys = map.getKeys(gesture, true, true)
+        const isKeystroke = keys instanceof KeyStroke
+        const isKeyboard = keys instanceof KeyboardInstance
         
-        if (keys instanceof KeyStroke) {
+        if (isKeystroke) {
           console.info(`keystroke=${keys} for gesture=${gesture}`)
           const target = document.activeElement || document
 
@@ -68,7 +70,7 @@ export default function KeyCell(
             gesture.cancel()
           }
         }
-        else if (keys instanceof KeyboardInstance) {
+        else if (isKeyboard) {
           if (keys) {
             console.info(`keyboard=${keys.keyboard.name} for gesture=${gesture}`)
 
@@ -99,8 +101,7 @@ export default function KeyCell(
             }
             else {
               console.info(
-                `suppress auto launch of child key grid ${keys.keyboard.name} `
-                + `while in config mode`
+                `suppress auto launch of child key grid ${keys.keyboard.name} while in config mode`
               )
             }
           }

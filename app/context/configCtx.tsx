@@ -92,6 +92,7 @@ export class ConfigureKeyBoard {
     this._keyIndex = index
     this._gesture = gesture
     this._keystroke = keystroke
+
     Array.from(this.loadListeners.values()).forEach(l => l())
   }
 

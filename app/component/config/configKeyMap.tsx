@@ -1,9 +1,11 @@
 import MetaCharControl from "@component/metaChar"
 import { KeyGridCtx } from "@context/keyGridCtx"
+import { listenerName } from "@lib/eventSync"
+import { switchKeyboardName } from "@lib/keyboardDefinitions/meta/switchKeyboard"
 import KeyMap, { KeyMapValuetype } from "@lib/keyMap"
 import KeyStroke, { MetaChar } from "@lib/keyStroke"
-import { ChangeEvent, Dispatch, RefObject, SetStateAction, useContext, useState } from "react"
-import { Keyboard, KeyboardFill, XCircle } from "react-bootstrap-icons"
+import { ChangeEvent, Dispatch, RefObject, SetStateAction, useContext, useEffect, useState } from "react"
+import { BoxArrowUpRight, Keyboard, KeyboardFill, XCircle } from "react-bootstrap-icons"
 
 export default function ConfigKeyMap(
   { keyMap, keyStroke, setKeyStroke, keyStrokeInput, childKeyboardId, setChildKeyboardId }: {
@@ -17,6 +19,23 @@ export default function ConfigKeyMap(
 ) {
   const gridCtx = useContext(KeyGridCtx)
   const [mapControlsShow, setMapControlsShow] = useState(KeyMapValuetype.Keystroke)
+  const [allKeyboardIds, setAllKeyboardIds] = useState([] as string[])
+
+  // listen to session keyboards list
+  useEffect(
+    () => {
+      if (!gridCtx) return
+
+      const name = listenerName(ConfigKeyMap.name)
+      gridCtx.keyboardsListListeners.set(name, () => setAllKeyboardIds(
+        gridCtx.keyboardIds.filter(kbId => kbId !== switchKeyboardName)
+        .concat(gridCtx.childKeyboardIds)
+      ))
+
+      return () => { gridCtx.keyboardsListListeners.delete(name) }
+    },
+    [ gridCtx ]
+  )
 
   const onChildKeyboardChoice = (e: ChangeEvent<HTMLInputElement>) => {
     // set child keyboard, unset keystroke
@@ -27,8 +46,8 @@ export default function ConfigKeyMap(
     }
   }
 
-  const getKeyboardFamilyName = (kbid: string) => {
-    const keyboardInstance = gridCtx?.getKeyboard(kbid)
+  const getKeyboardFamilyName = (kbid?: string) => {
+    const keyboardInstance = kbid !== undefined ? gridCtx?.getKeyboard(kbid) : undefined
     if (!keyboardInstance) return
 
     if (keyboardInstance.parentInstanceId) {
@@ -42,6 +61,13 @@ export default function ConfigKeyMap(
     }
     
     return keyboardInstance.keyboard.name
+  }
+
+  const launchChildKeyboard = () => {
+    const childKeyboard = gridCtx?.getKeyboard(childKeyboardId!)
+    if (!gridCtx || !childKeyboard) return
+
+    gridCtx.addKeyGrid(childKeyboard, true)
   }
 
   return (
@@ -121,9 +147,9 @@ export default function ConfigKeyMap(
         <div>
           {/* child keyboard value */}
           <input
-            className='field-sizing-content text-center min-w-8 font-mono dark:bg-zinc-700 bg-zinc-300 rounded-md p-1'
+            className='field-sizing-content text-center min-w-8 text-xs font-mono dark:bg-zinc-700 bg-zinc-300 rounded-md p-1'
             id='childKeyboard'
-            defaultValue={childKeyboardId}
+            defaultValue={getKeyboardFamilyName(childKeyboardId) || childKeyboardId}
             placeholder='*'
             readOnly />
 
@@ -131,7 +157,7 @@ export default function ConfigKeyMap(
           <div className='relative'>
             <div className='absolute top-0 left-0 right-0'>
               {
-                ['pineapple', 'b', 'c'].map((kbid) => (
+                allKeyboardIds.map((kbid) => (
                   <div 
                     key={kbid}
                     className='flex flex-row gap-1 justify-start'>
@@ -155,6 +181,16 @@ export default function ConfigKeyMap(
             </div>
           </div>
         </div>
+        {/* launch/render and configure child keyboard */}
+        <button 
+          className={[
+            'cursor-pointer my-auto',
+            (childKeyboardId === undefined ? 'hidden' : '')
+          ].join(' ')} 
+          title='switch to configure child keyboard'
+          onClick={() => launchChildKeyboard() } >
+          <BoxArrowUpRight />
+        </button>
         {/* unset child keyboard */}
         <button 
           className={[
@@ -162,7 +198,7 @@ export default function ConfigKeyMap(
             (childKeyboardId === undefined ? 'hidden' : '')
           ].join(' ')} 
           title='unset child keyboard'
-          onClick={() => { setChildKeyboardId(undefined) }} >
+          onClick={() => setChildKeyboardId(undefined) } >
           <XCircle />
         </button>
       </div>

@@ -99,6 +99,24 @@ export default class KeyboardDefinition {
     this._saved = false
   }
 
+  allKeys(): KeyDefinition[] {
+    const dims = this.dimensions
+    const keys = new Array(dims.height * dims.width)
+
+    let r=0, c=0
+    for (let i=0; i<keys.length; i++) {
+      keys[i] = this.keys[r][c]
+
+      c++
+      if (c >= dims.width) {
+        c=0
+        r++
+      }
+    }
+
+    return keys
+  }
+
   private getRowSlice(row: number, length: number): KeyDefinition[] {
     let rowSlice: KeyDefinition[] = this.keys[row]?.slice(0, length) || []
 
@@ -180,7 +198,10 @@ export default class KeyboardDefinition {
 
 export class KeyboardInstance {
   public readonly instanceId: string
-  public readonly parentInstanceId: string|undefined
+  private _parentInstanceId: string|undefined
+  public get parentInstanceId() {
+    return this._parentInstanceId
+  }
   public readonly keyboard: KeyboardDefinition
   public readonly persistance: KeyboardPersistance
   public readonly size: KeyboardSize
@@ -197,13 +218,36 @@ export class KeyboardInstance {
       parentInstanceId?: string
     }
   ) {
-    this.instanceId = instanceId || `${KeyboardInstance.name}[${index}]@${new Date().toISOString()}`
-    this.parentInstanceId = parentInstanceId
     this.keyboard = keyboard.clone(name, false)
+    this.instanceId = instanceId || `[${index}=${this.keyboard.name}]@${new Date().toISOString()}`
+    this._parentInstanceId = parentInstanceId
     this.persistance = persistance
     this.size = size
     
     keyOverrides.forEach(this.saveKey, this)
+  }
+
+  protected _getDescendants(result: Map<string, KeyboardInstance>) {
+    for (const keyMap of this.keyboard.allKeys().map(k => k.map)) {
+      for (const childKeyboard of keyMap.values(false, true) as KeyboardInstance[]) {
+        if (!result.has(childKeyboard.instanceId)) {
+          // populate parent references on demand
+          childKeyboard._parentInstanceId = this.instanceId
+
+          result.set(childKeyboard.instanceId, childKeyboard)
+
+          childKeyboard._getDescendants(result)
+        }
+      }
+    }
+  }
+
+  getDescendants(): KeyboardInstance[] {
+    const descendants: Map<string, KeyboardInstance> = new Map()
+
+    this._getDescendants(descendants)
+
+    return Array.from(descendants.values())
   }
 
   clone(

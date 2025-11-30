@@ -12,29 +12,60 @@ export type KeyboardExportConfig = {
 
 export class KeyGridState {
   private readonly _keyboards: Map<string, KeyboardInstance> = new Map()
+  private readonly _childKeyboards: Map<string, KeyboardInstance> = new Map()
+
+  /**
+   * Get registered keyboard instance ids. Excludes child keyboards.
+   */
   get keyboardIds() {
     return Array.from(this._keyboards.keys())
   }
+  /**
+   * Get registered keyboard instances. Excludes child keyboards.
+   */
   get keyboards() {
     return Array.from(this._keyboards.values())
   }
+  get childKeyboardIds() {
+    return Array.from(this._childKeyboards.keys())
+  }
   getKeyboard(instanceId: string) {
-    return this._keyboards.get(instanceId)
+    return this._keyboards.get(instanceId) || this._childKeyboards.get(instanceId)
   }
   public readonly keyboardsListListeners: Map<string, KeyboardsListListener> = new Map()
 
   private _addKeyGrid = null as unknown as AddKeyGrid
+  private addKeyboard(keyboard: KeyboardInstance) {
+    const isNewKeyboard = !this._childKeyboards.has(keyboard.instanceId) && !this._keyboards.has(keyboard.instanceId)
+    if (isNewKeyboard) {
+      if (keyboard.parentInstanceId) {
+        this._childKeyboards.set(keyboard.instanceId, keyboard)
+      }
+      else {
+        this._keyboards.set(keyboard.instanceId, keyboard)
+      }
+
+      // add all descendant keyboards
+      keyboard.getDescendants().forEach(this.addKeyboard, this)
+    }
+  }
+  /**
+   * Render a keyboard instance as a grid and register in state/context.
+   */
   get addKeyGrid() { 
     const addKeyboard: AddKeyGrid = (keyboard, configurable, onClose?) => {
       this._addKeyGrid(keyboard, configurable, onClose)
 
-      this._keyboards.set(keyboard.instanceId, keyboard)
+      this.addKeyboard(keyboard)
       
       Array.from(this.keyboardsListListeners.values()).forEach(l => l())
     }
 
     return addKeyboard
   }
+  /**
+   * Define how to render a keyboard instance.
+   */
   setAddKeyGrid(v: AddKeyGrid) {
     this._addKeyGrid = v
   }
