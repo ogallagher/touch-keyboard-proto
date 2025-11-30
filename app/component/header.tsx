@@ -28,13 +28,14 @@ export default function Header() {
           <span>touch-keyboard-proto</span>
         </div>
 
-        {/* sibling pages */}
+        {/* sibling pages and header collapse */}
         <div
           className={[
             'font-mono font-bold gap-2',
             'flex md:flex-row md:flex-wrap',
             'flex-col justify-center'
           ].join(' ')}>
+          {/* toggle sibling pages */}
           <button
             className='cursor-pointer md:hidden flex flex-row justify-end'
             onClick={() => setShowLinks(!showLinks)}>
@@ -70,7 +71,8 @@ export default function Header() {
               quizcard
             </a>
           </span>
-
+          
+          {/* header collapse */}
           <button
             className={[
               'cursor-pointer md:hidden flex flex-row justify-end',
@@ -82,13 +84,14 @@ export default function Header() {
         </div>
       </nav>
 
+      {/* header expand */}
       <button
         className={[
-          'cursor-pointer md:hidden',
-          showNav ? 'hidden' : 'absolute right-0 top-0 px-4 py-2'
+          'cursor-pointer md:hidden z-10 text-center',
+          showNav ? 'hidden' : 'absolute right-0 top-0 p-2'
         ].join(' ')}
         onClick={() => setShowNav(true)}>
-        <CaretDown />
+        <CaretDown className='my-auto' />
       </button>
     </header>
   )
