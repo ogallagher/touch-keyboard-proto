@@ -89,7 +89,7 @@ export default function ConfigEvalSection() {
 
       {/* switch between modes */}
       <button 
-        className='absolute bottom-0 right-0 px-2 cursor-pointer text-lg' 
+        className='absolute bottom-0 right-4 px-2 cursor-pointer text-lg' 
         onClick={() => {
           if (mode === ConfigEvalMode.Eval) {
             setMode(ConfigEvalMode.Config)

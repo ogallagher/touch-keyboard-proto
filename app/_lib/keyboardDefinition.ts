@@ -180,22 +180,25 @@ export default class KeyboardDefinition {
 
 export class KeyboardInstance {
   public readonly instanceId: string
+  public readonly parentInstanceId: string|undefined
   public readonly keyboard: KeyboardDefinition
   public readonly persistance: KeyboardPersistance
   public readonly size: KeyboardSize
 
   constructor(
     keyboard: KeyboardDefinition,
-    { instanceId, index = 0, persistance, size, name, keyOverrides = [] }: { 
+    { instanceId, index = 0, persistance, size, name, keyOverrides = [], parentInstanceId }: { 
       instanceId?: string
       index?: number
       persistance: KeyboardPersistance
       size: KeyboardSize
       name?: string
       keyOverrides?: KeyOverride[]
+      parentInstanceId?: string
     }
   ) {
     this.instanceId = instanceId || `${KeyboardInstance.name}[${index}]@${new Date().toISOString()}`
+    this.parentInstanceId = parentInstanceId
     this.keyboard = keyboard.clone(name, false)
     this.persistance = persistance
     this.size = size
@@ -203,10 +206,14 @@ export class KeyboardInstance {
     keyOverrides.forEach(this.saveKey, this)
   }
 
-  clone() {
+  clone(
+    { parentInstanceId }: { 
+      parentInstanceId?: string
+    } = {}
+  ) {
     return new KeyboardInstance(
       this.keyboard,
-      this
+      { ...this, parentInstanceId }
     )
   }
 
@@ -280,6 +287,9 @@ export class KeyboardInstance {
     return raw.map(s => this.load(s, { persistance, size, keyOverrides }))
   }
 
+  /**
+   * Compare with other keyboard for deep equality. Ignores identifiers like `instanceId` and `parentInstanceId`.
+   */
   equals(other: KeyboardInstance, includeName: boolean = false) {
     return (
       this.keyboard.equals(other.keyboard, includeName)

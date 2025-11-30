@@ -27,7 +27,9 @@ export class KeyGridState {
   get addKeyGrid() { 
     const addKeyboard: AddKeyGrid = (keyboard, configurable, onClose?) => {
       this._addKeyGrid(keyboard, configurable, onClose)
+
       this._keyboards.set(keyboard.instanceId, keyboard)
+      
       Array.from(this.keyboardsListListeners.values()).forEach(l => l())
     }
 

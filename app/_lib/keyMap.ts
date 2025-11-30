@@ -4,6 +4,11 @@ import { KeyboardInstance, SerializedKeyboardInstance } from "./keyboardDefiniti
 
 export type SerializedKeyMap = {values: [SerializedAbstractGesture, SerializedKeyStroke|SerializedKeyboardInstance][]}
 
+export enum KeyMapValuetype {
+  Keystroke = 'keystroke',
+  Keyboard = 'keyboard'
+}
+
 export default class KeyMap {
   private readonly gestures: Map<string, AbstractTouchGesture> = new Map()
   private readonly gestureToKeystroke: Map<string, KeyStroke> = new Map()
