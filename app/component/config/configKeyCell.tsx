@@ -91,35 +91,33 @@ export default function ConfigKeyCell(
         if (gesture) {
           const oldMapValue = keyMap.current.getKeys(gesture, false, false)
           if (childKeyboardId) {
-            if (oldMapValue instanceof KeyboardInstance && oldMapValue.instanceId === childKeyboardId) {
-              // keyMap value for current gesture is already set to this child keyboard
-              return
-            }
-
-            // if not already child of this keyboard, clone and adopt as separate instance
             let childKeyboard = gridCtx.getKeyboard(childKeyboardId)
-            if (!childKeyboard) {
-              console.error(`cannot map to missing keyboard instance id=${childKeyboardId} for gesture=${gesture}`)
-            }
-            else if (!configCtx.keyboardInstance) {
-              console.error(`cannot map gesture=${gesture} to child keyboard without parent instance id`)
-            }
-            else {              
-              if (childKeyboard.parentInstanceId !== configCtx.keyboardInstance.instanceId) {
-                childKeyboard = childKeyboard.clone({ 
-                  parentInstanceId: configCtx.keyboardInstance.instanceId,
-                  instanceId: keyboardInstanceId(childKeyboard.keyboard.name)
-                })
-                gridCtx.addKeyboard(childKeyboard)
-                setChildKeyboardId(childKeyboard.instanceId)
-                
-                if (!childKeyboardConfig) {
-                  setChildKeyboardConfig(childKeyboard.config)
-                }
+            if (!(oldMapValue instanceof KeyboardInstance && oldMapValue.instanceId === childKeyboardId)) {
+              // if not already child of this keyboard, clone and adopt as separate instance
+              if (!childKeyboard) {
+                console.error(`cannot map to missing keyboard instance id=${childKeyboardId} for gesture=${gesture}`)
               }
+              else if (!configCtx.keyboardInstance) {
+                console.error(`cannot map gesture=${gesture} to child keyboard without parent instance id`)
+              }
+              else {              
+                if (childKeyboard.parentInstanceId !== configCtx.keyboardInstance.instanceId) {
+                  childKeyboard = childKeyboard.clone({ 
+                    parentInstanceId: configCtx.keyboardInstance.instanceId,
+                    instanceId: keyboardInstanceId(childKeyboard.keyboard.name)
+                  })
+                  gridCtx.addKeyboard(childKeyboard)
+                  setChildKeyboardId(childKeyboard.instanceId)
+                  
+                  if (!childKeyboardConfig) {
+                    setChildKeyboardConfig(childKeyboard.config)
+                  }
+                }
 
-              newKeyMap.set(gesture, childKeyboard)
+                newKeyMap.set(gesture, childKeyboard)
+              }
             }
+            // else, keyMap value for current gesture is already set to this child keyboard
 
             // update child keyboard config
             if (childKeyboardConfig && childKeyboard) {
@@ -164,13 +162,8 @@ export default function ConfigKeyCell(
 
       const name = listenerName(ConfigKeyCell.name)
       configCtx.addModeListener(name, () => {
-        if (configCtx.mode === ConfigEvalMode.Eval) {
-          keyIndex.current = {row: -1, col: -1}
-          setKeyLabel(undefined)
-          keyMap.current = undefined
-          setKeyStroke(undefined)
-          setChildKeyboardId(undefined)
-          setGesture(undefined)
+        if (configCtx.mode !== ConfigEvalMode.Config) {
+          configCtx.unloadKey()
         }
       })
 

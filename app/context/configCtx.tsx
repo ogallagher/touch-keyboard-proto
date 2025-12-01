@@ -100,6 +100,14 @@ export class ConfigureKeyBoard {
     Array.from(this.loadListeners.values()).forEach(l => l())
   }
 
+  unloadKey() {
+    this._keyIndex = undefined
+    this._gesture = undefined
+    this._keystroke = undefined
+
+    Array.from(this.loadListeners.values()).forEach(l => l())
+  }
+
   setGridDimensions(gridDimensions: GridDimensions) {
     if (this._keyboardInstance) {
       this._keyboardInstance.keyboard.dimensions = gridDimensions
