@@ -115,8 +115,13 @@ export default class KeyStroke {
           break
 
         case MetaChar.CLOSE_KEYBOARD:
-          keyGridState.deactivateKeyGrid.current(true)
-          closedKeyboard = true
+          if (configCtx.mode === ConfigEvalMode.Config) {
+            console.log(`suppress close of current (child) key grid while in config mode`)
+          }
+          else {
+            keyGridState.deactivateKeyGrid.current(true)
+            closedKeyboard = true
+          }
           break
         
         case MetaChar.SWITCH_KEYBOARD:

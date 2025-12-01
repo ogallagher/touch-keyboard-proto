@@ -163,7 +163,7 @@ export default function ConfigKeyMap(
               MetaChar.SHIFT, MetaChar.CAPS_LOCK,
               MetaChar.BACKSPACE, 
               MetaChar.UP, MetaChar.RIGHT, MetaChar.DOWN, MetaChar.LEFT,
-              MetaChar.SWITCH_KEYBOARD
+              MetaChar.SWITCH_KEYBOARD, MetaChar.CLOSE_KEYBOARD
             ].map(metaChar => 
               <MetaCharControl 
                 key={metaChar}
