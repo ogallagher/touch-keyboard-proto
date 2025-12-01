@@ -1,4 +1,4 @@
-import { ConfigCtx } from "@context/configCtx"
+import { ChildKeyboardConfig, ConfigCtx } from "@context/configCtx"
 import { listenerName } from "@lib/eventSync"
 import { KeyboardInstance, keyboardInstanceId, KeyIndex } from "@lib/keyboardDefinition"
 import { KeyDefinition } from "@lib/keyDefinition"
@@ -26,6 +26,7 @@ export default function ConfigKeyCell(
   const [keyStroke, setKeyStroke] = useState(undefined as KeyStroke|undefined)
   const keyStrokeInput = useRef(null as unknown as HTMLInputElement)
   const [childKeyboardId, setChildKeyboardId] = useState(undefined as string|undefined)
+  const [childKeyboardConfig, setChildKeyboardConfig] = useState(undefined as ChildKeyboardConfig|undefined)
   const [gesture, setGesture] = useState(undefined as AbstractTouchGesture|undefined)
   const [labelZoneUseGesture, setLabelZoneUseGesture] = useState(false)
   const [labelZoneUseModKeys, setLabelZoneUseModKeys] = useState(false)
@@ -49,6 +50,7 @@ export default function ConfigKeyCell(
         keyMap.current = key?.map
         setKeyStroke(configCtx.keystroke?.clone())
         setChildKeyboardId(configCtx.childKeyboardInstance?.instanceId)
+        setChildKeyboardConfig(configCtx.childKeyboardInstance?.config)
         setGesture(configCtx.gesture?.clone())
       })
 
@@ -110,9 +112,18 @@ export default function ConfigKeyCell(
                 })
                 gridCtx.addKeyboard(childKeyboard)
                 setChildKeyboardId(childKeyboard.instanceId)
+                
+                if (!childKeyboardConfig) {
+                  setChildKeyboardConfig(childKeyboard.config)
+                }
               }
 
               newKeyMap.set(gesture, childKeyboard)
+            }
+
+            // update child keyboard config
+            if (childKeyboardConfig && childKeyboard) {
+              childKeyboard.config = childKeyboardConfig
             }
           }
           else {
@@ -126,7 +137,7 @@ export default function ConfigKeyCell(
         }
       }
     },
-    [ gridCtx, configCtx, gesture, keyLabel, keyStroke, childKeyboardId ]
+    [ gridCtx, configCtx, gesture, keyLabel, keyStroke, childKeyboardId, childKeyboardConfig ]
   )
 
   // write modifier keys to grid context
@@ -297,7 +308,8 @@ export default function ConfigKeyCell(
         keyMap={keyMap}
         keyStroke={keyStroke} setKeyStroke={setKeyStroke}
         keyStrokeInput={keyStrokeInput}
-        childKeyboardId={childKeyboardId} setChildKeyboardId={setChildKeyboardId} />
+        childKeyboardId={childKeyboardId} setChildKeyboardId={setChildKeyboardId}
+        childKeyboardConfig={childKeyboardConfig} setChildKeyboardConfig={setChildKeyboardConfig} />
       
     </div>
   )

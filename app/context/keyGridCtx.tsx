@@ -1,4 +1,4 @@
-import { KeyboardInstance, KeyboardPersistance } from "@lib/keyboardDefinition"
+import { KeyboardInstance, KeyboardPersistence } from "@lib/keyboardDefinition"
 import { switchKeyboardName } from "@lib/keyboardDefinitions/meta/switchKeyboard"
 import { MetaChar } from "@lib/keyStroke"
 import { createContext, RefObject } from "react"
@@ -128,8 +128,8 @@ export class KeyGridState {
   public readonly deactivateKeyGrid: RefObject<(closeKeyboard: boolean) => void> = {
     current: null as unknown as (closeKeyboard: boolean) => void
   }
-  public readonly gridPersistance: RefObject<KeyboardPersistance> = {
-    current: KeyboardPersistance.Indefinite
+  public readonly gridPersistence: RefObject<KeyboardPersistence> = {
+    current: KeyboardPersistence.Indefinite
   }
 
   private readonly _modifierKeys: Map<MetaChar, boolean> = new Map([

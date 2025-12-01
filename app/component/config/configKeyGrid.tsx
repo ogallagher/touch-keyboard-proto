@@ -6,7 +6,7 @@ import { Orientation } from "@lib/orientation"
 import { useContext, useEffect, useRef, useState } from "react"
 import { BoxArrowInUp, BoxArrowUp, FileEarmarkArrowDown, Grid3x3, ListUl, PlusCircle, Share } from "react-bootstrap-icons"
 import SessionKeyboardListItem from "./sessionKeyboardListItem"
-import KeyboardDefinition, { KeyboardInstance, KeyboardPersistance, KeyboardSize } from "@lib/keyboardDefinition"
+import KeyboardDefinition, { KeyboardInstance, KeyboardPersistence, KeyboardSize } from "@lib/keyboardDefinition"
 import { KeyDefinition } from "@lib/keyDefinition"
 import KeyLabel from "@lib/keyLabel"
 import KeyMap from "@lib/keyMap"
@@ -116,7 +116,7 @@ export default function ConfigKeyGrid(
             { 
               // TODO not sure why this is count is inaccurate
               index: keyboardInstanceIds.length,
-              persistance: KeyboardPersistance.Indefinite,
+              persistence: KeyboardPersistence.Indefinite,
               size: KeyboardSize.Fill
             }
           ),
@@ -150,7 +150,7 @@ export default function ConfigKeyGrid(
             }
             reader.onload = () => {
               const loadOpts = {
-                persistance: KeyboardPersistance.Indefinite,
+                persistence: KeyboardPersistence.Indefinite,
                 size: KeyboardSize.Fill
               }
               const s = reader.result as string
@@ -317,7 +317,8 @@ export default function ConfigKeyGrid(
         {keyboardInstanceIds.map(keyboardInstanceId => (
           <SessionKeyboardListItem 
             key={keyboardInstanceId}
-            keyboardInstanceId={keyboardInstanceId} />
+            keyboardInstanceId={keyboardInstanceId}
+            keyboardName={configCtx?.keyboardInstance?.instanceId === keyboardInstanceId ? keyboardName : undefined} />
         ))}
         {/* add keyboard */}
         <div className='flex flex-row justify-center pb-1'>

@@ -1,5 +1,5 @@
 import GridDimensions from "@lib/gridDimensions"
-import KeyboardDefinition, { KeyboardInstance, KeyboardPersistance, KeyboardSize } from "@lib/keyboardDefinition"
+import KeyboardDefinition, { KeyboardInstance, KeyboardPersistence, KeyboardSize } from "@lib/keyboardDefinition"
 import { KeyDefinition } from "@lib/keyDefinition"
 import KeyLabel, { ZoneKey } from "@lib/keyLabel"
 import KeyMap from "@lib/keyMap"
@@ -13,7 +13,7 @@ export const switchKeyboardName = 'metaSwitchKeyboard'
 export function getSwitchKeyboard(
   keyboards: KeyboardInstance[],
   instanceOpts: {
-    persistance: KeyboardPersistance
+    persistence: KeyboardPersistence
     size: KeyboardSize
     index?: number
   }

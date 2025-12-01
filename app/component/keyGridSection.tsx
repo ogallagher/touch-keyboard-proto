@@ -2,7 +2,7 @@ import { AddKeyGrid, KeyGridCtx } from "@context/keyGridCtx"
 import KeyGrid from "@component/keyGrid"
 import { JSX, useContext, useEffect, useRef, useState } from "react"
 import { frthenKeyboard } from "@lib/keyboardDefinitions/eng_frthen"
-import { KeyboardInstance, KeyboardPersistance, KeyboardSize } from "@lib/keyboardDefinition"
+import { KeyboardInstance, KeyboardPersistence, KeyboardSize } from "@lib/keyboardDefinition"
 import { ConfigCtx } from "@context/configCtx"
 import { exportShareUrlKeyboardsQueryKey } from "@lib/path"
 import { useSearchParams } from "next/navigation"
@@ -71,7 +71,7 @@ export default function KeyGridSection() {
     [ keyGridState, children, configCtx ]
   )
   
-  // add grid when empty
+  // add keybaord grid when empty
   useEffect(
     () => {
       if (children.size === 0 && keyGridState) {
@@ -88,7 +88,7 @@ export default function KeyGridSection() {
               frthenKeyboard,
               { 
                 index: children.size,
-                persistance: KeyboardPersistance.Indefinite, 
+                persistence: KeyboardPersistence.Indefinite, 
                 size: KeyboardSize.Fill,
                 canDelete: false
               }

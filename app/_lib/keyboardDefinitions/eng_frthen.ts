@@ -1,4 +1,4 @@
-import KeyboardDefinition, { KeyboardInstance, KeyboardPersistance, KeyboardSize } from "@lib/keyboardDefinition"
+import KeyboardDefinition, { KeyboardInstance, KeyboardPersistence, KeyboardSize } from "@lib/keyboardDefinition"
 import { KeyDefinition } from "@lib/keyDefinition"
 import KeyLabel, { ZoneKey } from "@lib/keyLabel"
 import KeyMap from "@lib/keyMap"
@@ -32,7 +32,7 @@ const row1: KeyDefinition[] = [
       [
         new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.RIGHT, undefined, false), 
         new KeyboardInstance(digits1key, { 
-          persistance: KeyboardPersistance.Indefinite,
+          persistence: KeyboardPersistence.Indefinite,
           size: KeyboardSize.Embed,
           keyOverrides: [
             {row: 0, col: 0, key: {
@@ -76,7 +76,7 @@ const row1: KeyDefinition[] = [
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.LEFT), new KeyboardInstance(
         getReshapedKeyboard(yDia, { height: 2}),
         {
-          persistance: KeyboardPersistance.Brief,
+          persistence: KeyboardPersistence.Brief,
           size: KeyboardSize.Embed
         }
       )],
@@ -154,35 +154,35 @@ const row2: KeyDefinition[] = [
       [new AbstractTouchGesture(TouchGestureType.TOUCH_HOLD), new KeyboardInstance(
         getReshapedKeyboard(eDia, { height: 2 }),
         {
-          persistance: KeyboardPersistance.Brief,
+          persistence: KeyboardPersistence.Brief,
           size: KeyboardSize.Embed
         }
       )],
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.RIGHT), new KeyboardInstance(
         getReshapedKeyboard(aDia, { height: 2 }),
         {
-          persistance: KeyboardPersistance.Brief,
+          persistence: KeyboardPersistence.Brief,
           size: KeyboardSize.Embed
         }
       )],
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.DOWN), new KeyboardInstance(
         getReshapedKeyboard(uDia, { height: 2 }),
         {
-          persistance: KeyboardPersistance.Brief,
+          persistence: KeyboardPersistence.Brief,
           size: KeyboardSize.Embed
         }
       )],
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.LEFT), new KeyboardInstance(
         getReshapedKeyboard(iDia, { height: 2 }),
         {
-          persistance: KeyboardPersistance.Brief,
+          persistence: KeyboardPersistence.Brief,
           size: KeyboardSize.Embed
         }
       )],
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.UP), new KeyboardInstance(
         getReshapedKeyboard(oDia, { height: 2 }),
         {
-          persistance: KeyboardPersistance.Brief,
+          persistence: KeyboardPersistence.Brief,
           size: KeyboardSize.Embed
         }
       )],
@@ -215,7 +215,7 @@ const row2: KeyDefinition[] = [
 
       [new AbstractTouchGesture(TouchGestureType.TOUCH_HOLD), new KeyboardInstance(nDia,
         {
-          persistance: KeyboardPersistance.Brief,
+          persistence: KeyboardPersistence.Brief,
           size: KeyboardSize.Embed
         }
       )],

@@ -1,15 +1,22 @@
 import MetaCharControl from "@component/metaChar"
+import { ChildKeyboardConfig, ConfigCtx } from "@context/configCtx"
 import { KeyGridCtx } from "@context/keyGridCtx"
+import { ConfigEvalMode } from "@lib/control"
 import { listenerName } from "@lib/eventSync"
-import { KeyboardInstance } from "@lib/keyboardDefinition"
+import { KeyboardInstance, KeyboardPersistence, KeyboardSize } from "@lib/keyboardDefinition"
 import { switchKeyboardName } from "@lib/keyboardDefinitions/meta/switchKeyboard"
 import KeyMap, { KeyMapValuetype } from "@lib/keyMap"
 import KeyStroke, { MetaChar } from "@lib/keyStroke"
 import { ChangeEvent, Dispatch, RefObject, SetStateAction, useContext, useEffect, useState } from "react"
-import { BoxArrowUpRight, Cursor, CursorFill, ExclamationCircle, Keyboard, KeyboardFill, XCircle } from "react-bootstrap-icons"
+import { ArrowsFullscreen, BoxArrowUpRight, Cursor, CursorFill, ExclamationCircle, Fullscreen, HourglassBottom, Infinity, Keyboard, KeyboardFill, Pip, PipFill, XCircle } from "react-bootstrap-icons"
 
 export default function ConfigKeyMap(
-  { keyboardInstance, keyMap, keyStroke, setKeyStroke, keyStrokeInput, childKeyboardId, setChildKeyboardId }: {
+  { 
+    keyboardInstance, keyMap, 
+    keyStroke, setKeyStroke, keyStrokeInput, 
+    childKeyboardId, setChildKeyboardId,
+    childKeyboardConfig, setChildKeyboardConfig
+  }: {
     keyboardInstance: KeyboardInstance|undefined
     keyMap: RefObject<KeyMap|undefined>
     keyStroke: KeyStroke|undefined
@@ -17,9 +24,12 @@ export default function ConfigKeyMap(
     keyStrokeInput: RefObject<HTMLInputElement>
     childKeyboardId: string|undefined
     setChildKeyboardId: Dispatch<SetStateAction<string|undefined>>
+    childKeyboardConfig: ChildKeyboardConfig|undefined
+    setChildKeyboardConfig: Dispatch<SetStateAction<ChildKeyboardConfig|undefined>>
   }
 ) {
   const gridCtx = useContext(KeyGridCtx)
+  const configCtx = useContext(ConfigCtx)
   const [mapControlsShow, setMapControlsShow] = useState(KeyMapValuetype.Keystroke)
   const [allKeyboardIds, setAllKeyboardIds] = useState([] as string[])
 
@@ -29,10 +39,13 @@ export default function ConfigKeyMap(
       if (!gridCtx) return
 
       const name = listenerName(ConfigKeyMap.name)
-      gridCtx.keyboardsListListeners.set(name, () => setAllKeyboardIds(
-        gridCtx.keyboardIds.filter(kbId => kbId !== switchKeyboardName)
-        .concat(gridCtx.childKeyboardIds)
-      ))
+      gridCtx.keyboardsListListeners.set(name, () => {
+        // update list
+        setAllKeyboardIds(
+          gridCtx.keyboardIds.filter(kbId => kbId !== switchKeyboardName)
+          .concat(gridCtx.childKeyboardIds)
+        )
+      })
 
       return () => { gridCtx.keyboardsListListeners.delete(name) }
     },
@@ -80,6 +93,7 @@ export default function ConfigKeyMap(
     if (!gridCtx || !childKeyboard) return
 
     gridCtx.addKeyGrid(childKeyboard, true)
+    configCtx?.setMode(ConfigEvalMode.Eval)
   }
 
   const deleteChildKeyboard = (kbid: string) => {
@@ -89,6 +103,14 @@ export default function ConfigKeyMap(
     if (childKeyboardId === kbid) {
       setChildKeyboardId(undefined)
     }
+  }
+
+  const setChildKeyboardConfigWrapper = (size?: KeyboardSize, persistence?: KeyboardPersistence) => {
+    const newChildKeyboardConfig = {
+      persistence: persistence || childKeyboardConfig?.persistence || KeyboardPersistence.Indefinite,
+      size: size || childKeyboardConfig?.size || KeyboardSize.Fill
+    }
+    setChildKeyboardConfig(newChildKeyboardConfig)
   }
 
   return (
@@ -166,13 +188,62 @@ export default function ConfigKeyMap(
           child keyboard:
         </label>
         <div>
-          {/* child keyboard value */}
-          <input
-            className='field-sizing-content text-center min-w-8 text-xs font-mono dark:bg-zinc-700 bg-zinc-300 rounded-md p-1'
-            id='childKeyboard'
-            defaultValue={getKeyboardLineage(childKeyboardId).familyName || childKeyboardId}
-            placeholder='*'
-            readOnly />
+          <div className='flex flex-row justify-start gap-4 pb-1'>
+            {/* child keyboard value */}
+            <input
+              className='field-sizing-content text-center min-w-8 text-xs font-mono dark:bg-zinc-700 bg-zinc-300 rounded-md p-1'
+              id='childKeyboard'
+              defaultValue={getKeyboardLineage(childKeyboardId).familyName || childKeyboardId}
+              placeholder='*'
+              readOnly />
+            
+            {/* child keyboard size */}
+            <div className='flex flex-col justify-start gap-1'>
+              <button 
+                className={[
+                  'cursor-pointer',
+                  (childKeyboardConfig?.size === KeyboardSize.Embed ? '' : 'opacity-50'),
+                  (childKeyboardId === undefined ? 'hidden' : '')
+                ].join(' ')}
+                title='embedded child keyboard'
+                onClick={() => setChildKeyboardConfigWrapper(KeyboardSize.Embed) } >
+                {childKeyboardConfig?.size === KeyboardSize.Embed ? <PipFill /> : <Pip />}
+              </button>
+              <button 
+                className={[
+                  'cursor-pointer',
+                  (childKeyboardConfig?.size === KeyboardSize.Fill ? '' : 'opacity-50'),
+                  (childKeyboardId === undefined ? 'hidden' : '')
+                ].join(' ')}
+                title='full size child keyboard'
+                onClick={() => setChildKeyboardConfigWrapper(KeyboardSize.Fill) } >
+                {childKeyboardConfig?.size === KeyboardSize.Fill ? <ArrowsFullscreen /> : <Fullscreen />}
+              </button>
+            </div>
+            {/* child keyboard persistence */}
+            <div className='flex flex-col justify-start gap-1'>
+              <button 
+                className={[
+                  'cursor-pointer',
+                  (childKeyboardConfig?.persistence === KeyboardPersistence.Brief ? '' : 'opacity-50'),
+                  (childKeyboardId === undefined ? 'hidden' : '')
+                ].join(' ')}
+                title='close child keyboard on any keystroke'
+                onClick={() => setChildKeyboardConfigWrapper(undefined, KeyboardPersistence.Brief) } >
+                <HourglassBottom />
+              </button>
+              <button 
+                className={[
+                  'cursor-pointer',
+                  (childKeyboardConfig?.persistence === KeyboardPersistence.Indefinite ? '' : 'opacity-50'),
+                  (childKeyboardId === undefined ? 'hidden' : '')
+                ].join(' ')}
+                title='keep child keyboard open'
+                onClick={() => setChildKeyboardConfigWrapper(undefined, KeyboardPersistence.Indefinite) } >
+                <Infinity />
+              </button>
+            </div>
+          </div>
 
           {/* child keyboards list for selection */}
           <div className='relative'>
@@ -228,6 +299,7 @@ export default function ConfigKeyMap(
             </div>
           </div>
         </div>
+        
         {/* launch/render and configure child keyboard */}
         <button 
           className={[

@@ -1,6 +1,6 @@
 import { ConfigEvalMode } from "@lib/control"
 import GridDimensions from "@lib/gridDimensions"
-import { KeyboardInstance, KeyIndex } from "@lib/keyboardDefinition"
+import { KeyboardInstance, KeyboardPersistence, KeyboardSize, KeyIndex } from "@lib/keyboardDefinition"
 import { KeyDefinition } from "@lib/keyDefinition"
 import KeyStroke from "@lib/keyStroke"
 import { AbstractTouchGesture } from "@lib/touchGesture"
@@ -10,6 +10,10 @@ export type ClassName = string
 export type ModeListener = () => void
 export type LoadListener = () => void
 export type SaveListener = () => void
+export type ChildKeyboardConfig = {
+  persistence: KeyboardPersistence
+  size: KeyboardSize
+}
 
 export class ConfigureKeyBoard {
   private _mode = ConfigEvalMode.Eval

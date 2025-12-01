@@ -7,6 +7,7 @@ import { ConfigCtx } from "@context/configCtx"
 import ConfigKeyCell from "./config/configKeyCell"
 import ConfigKeyGrid from "./config/configKeyGrid"
 import ConfigSite from "./config/configSite"
+import { listenerName } from "@lib/eventSync"
 
 export default function ConfigEvalSection() {
   const configCtx = useContext(ConfigCtx)
@@ -22,6 +23,21 @@ export default function ConfigEvalSection() {
       configCtx.setMode(mode)
     },
     [ configCtx, mode ]
+  )
+
+  // read from config context
+  useEffect(
+    () => {
+      if (!configCtx) return
+
+      const name = listenerName(ConfigEvalSection.name)
+      configCtx.addModeListener(name, () => {
+        setMode(configCtx.mode)
+      })
+
+      return () => configCtx.deleteModeListener(name)
+    },
+    [ configCtx ]
   )
 
   return (

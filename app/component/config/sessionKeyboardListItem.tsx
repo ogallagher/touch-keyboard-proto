@@ -3,15 +3,16 @@ import { useContext, useEffect, useState } from "react"
 import { DashCircle } from "react-bootstrap-icons"
 
 export default function SessionKeyboardListItem(
-  { keyboardInstanceId }: {
+  { keyboardInstanceId, keyboardName }: {
     keyboardInstanceId: string
+    keyboardName?: string
   }
 ) {
   const htmlId = `${SessionKeyboardListItem.name}-${keyboardInstanceId}`
   const keyGridState = useContext(KeyGridCtx)
   const [exportInclude, setExportInclude] = useState(false)
 
-  const keyboardName = keyGridState?.getKeyboard(keyboardInstanceId)?.keyboard.name || '<no-name>'
+  const _keyboardName = keyboardName || keyGridState?.getKeyboard(keyboardInstanceId)?.keyboard.name || '<no-name>'
 
   // write exportInclude to grid context
   useEffect(
@@ -28,7 +29,7 @@ export default function SessionKeyboardListItem(
   return (
     <div 
       className='flex flex-row justify-between' 
-      title={keyboardName}>
+      title={_keyboardName}>
       <div className='flex flex-row gap-1'>
         
         <input 
@@ -43,7 +44,7 @@ export default function SessionKeyboardListItem(
         
         <div className='flex flex-col justify-center'>
           <label htmlFor={htmlId}>
-            {keyboardName}
+            {_keyboardName}
           </label>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { KeyboardInstance, KeyboardPersistance, KeyboardSize } from '@lib/keyboardDefinition'
+import { KeyboardInstance, KeyboardPersistence, KeyboardSize } from '@lib/keyboardDefinition'
 import { frthenKeyboard } from '@lib/keyboardDefinitions/eng_frthen'
 import KeyLabel, { ZoneKey } from '@lib/keyLabel'
 import { describe } from 'mocha'
@@ -12,7 +12,7 @@ describe('keyboard', () => {
   describe('save and load', () => {
     it('saves and loads as json format', () => {
       const frthen1 = new KeyboardInstance(frthenKeyboard, {
-        persistance: KeyboardPersistance.Indefinite,
+        persistence: KeyboardPersistence.Indefinite,
         size: KeyboardSize.Fill,
         name: 'frthen1'
       })

@@ -1,7 +1,7 @@
 import GridDimensions from "@lib/gridDimensions"
 import { KeyAttributes, KeyDefinition, SerializedKeyDefinition } from "@lib/keyDefinition"
 
-export enum KeyboardPersistance {
+export enum KeyboardPersistence {
   /**
    * Close after any keystroke.
    */
@@ -32,7 +32,7 @@ export type SerializedKeyboardDefinition = {name: string, keys: SerializedKeyDef
 export type SerializedKeyboardInstance = {
   keyboard: SerializedKeyboardDefinition
   index?: number
-  persistance: KeyboardPersistance
+  persistence: KeyboardPersistence
   size: KeyboardSize
   keyOverrides?: KeyOverride[]
 }
@@ -213,8 +213,8 @@ export class KeyboardInstance {
     return this._parentInstanceId
   }
   public readonly keyboard: KeyboardDefinition
-  public readonly persistance: KeyboardPersistance
-  public readonly size: KeyboardSize
+  private persistence: KeyboardPersistence
+  private size: KeyboardSize
   private _canDelete: boolean
   public get canDelete() {
     return this._canDelete
@@ -222,10 +222,10 @@ export class KeyboardInstance {
 
   constructor(
     keyboard: KeyboardDefinition,
-    { instanceId, index = 0, persistance, size, name, canDelete = true, keyOverrides = [], parentInstanceId, cloneKeyboard = true }: { 
+    { instanceId, index = 0, persistence, size, name, canDelete = true, keyOverrides = [], parentInstanceId, cloneKeyboard = true }: { 
       instanceId?: string
       index?: number
-      persistance: KeyboardPersistance
+      persistence: KeyboardPersistence
       size: KeyboardSize
       name?: string
       canDelete?: boolean
@@ -237,11 +237,28 @@ export class KeyboardInstance {
     this.keyboard = cloneKeyboard ? keyboard.clone(name, false) : keyboard
     this.instanceId = instanceId || keyboardInstanceId(this.keyboard.name, index)
     this._parentInstanceId = parentInstanceId
-    this.persistance = persistance
+    this.persistence = persistence
     this.size = size
     this._canDelete = canDelete
     
     keyOverrides.forEach(this.saveKey, this)
+  }
+
+  get config() {
+    return {
+      persistence: this.persistence,
+      size: this.size
+    }
+  }
+
+  set config(
+    { persistence, size }: {
+      persistence: KeyboardPersistence
+      size: KeyboardSize
+    }
+  ) {
+    this.persistence = persistence
+    this.size = size
   }
 
   protected _getDescendants(result: Map<string, KeyboardInstance>) {
@@ -270,14 +287,21 @@ export class KeyboardInstance {
   }
 
   clone(
-    { parentInstanceId, instanceId }: { 
-      parentInstanceId?: string,
+    { parentInstanceId, instanceId, canDelete }: { 
+      parentInstanceId?: string
       instanceId?: string
+      canDelete?: boolean
     } = {}
   ) {
     return new KeyboardInstance(
       this.keyboard,
-      { ...this, parentInstanceId, instanceId }
+      { 
+        instanceId: instanceId || this.instanceId,
+        parentInstanceId: parentInstanceId || this.parentInstanceId,
+        persistence: this.persistence,
+        size: this.size,
+        canDelete: canDelete
+      }
     )
   }
 
@@ -309,7 +333,7 @@ export class KeyboardInstance {
   toJSON() {
     return {
       keyboard: this.keyboard,
-      persistance: this.persistance,
+      persistence: this.persistence,
       size: this.size
     }
   }
@@ -323,15 +347,15 @@ export class KeyboardInstance {
 
   static load(
     s: KeyboardInstanceString|SerializedKeyboardInstance, 
-    { persistance, size, keyOverrides } : {
-      persistance?: KeyboardPersistance
+    { persistence, size, keyOverrides } : {
+      persistence?: KeyboardPersistence
       size?: KeyboardSize
       keyOverrides?: KeyOverride[]
     } = {}
   ) {
     const raw = typeof s === 'string' ? JSON.parse(s) : s
 
-    raw.persistance = (persistance || raw.persistance)
+    raw.persistence = (persistence || raw.persistence)
     raw.size = (size || raw.size)
     raw.keyOverrides = keyOverrides
 
@@ -340,15 +364,15 @@ export class KeyboardInstance {
 
   static loadMany(
     s: string, 
-    { persistance, size, keyOverrides } : {
-      persistance?: KeyboardPersistance
+    { persistence, size, keyOverrides } : {
+      persistence?: KeyboardPersistence
       size?: KeyboardSize
       keyOverrides?: KeyOverride[]
     } = {}
   ) {
     const raw: SerializedKeyboardInstance[] = JSON.parse(s)
 
-    return raw.map(s => this.load(s, { persistance, size, keyOverrides }))
+    return raw.map(s => this.load(s, { persistence, size, keyOverrides }))
   }
 
   /**
@@ -357,7 +381,7 @@ export class KeyboardInstance {
   equals(other: KeyboardInstance, includeName: boolean = false) {
     return (
       this.keyboard.equals(other.keyboard, includeName)
-      && this.persistance === other.persistance
+      && this.persistence === other.persistence
       && this.size === other.size
     )
   }

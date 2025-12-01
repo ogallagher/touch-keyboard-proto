@@ -1,6 +1,6 @@
 import GridDimensions from "@lib/gridDimensions"
 import KeyCell from "@component/keyCell"
-import { KeyboardInstance, KeyboardPersistance } from "@lib/keyboardDefinition"
+import { KeyboardInstance, KeyboardPersistence } from "@lib/keyboardDefinition"
 import { useContext, useEffect, useRef, useState } from "react"
 import { KeyGridCtx } from "@context/keyGridCtx"
 import { isTouchScreen } from "@lib/platform"
@@ -11,9 +11,9 @@ import { ConfigEvalMode } from "@lib/control"
 const scrollEventTypes = ['scroll', 'touchmove', 'wheel', 'drag']
 
 export default function KeyGrid(
-  { keyboard, persistance = KeyboardPersistance.Indefinite, onClose, configurable }: {
+  { keyboard, persistence = KeyboardPersistence.Indefinite, onClose, configurable }: {
     keyboard: KeyboardInstance
-    persistance?: KeyboardPersistance
+    persistence?: KeyboardPersistence
     onClose?: () => void
     configurable: boolean
   }
@@ -132,11 +132,11 @@ export default function KeyGrid(
       const deactivate = activate.current()
 
       keyGridState.deactivateKeyGrid.current = deactivate
-      keyGridState.gridPersistance.current = persistance
+      keyGridState.gridPersistence.current = persistence
 
       return () => deactivate(false)
     },
-    [ keyGridState, persistance ]
+    [ keyGridState, persistence ]
   )
 
   // deactivate on mode=config if not configurable

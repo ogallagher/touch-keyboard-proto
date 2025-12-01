@@ -1,6 +1,6 @@
 import { KeyGridState } from "@context/keyGridCtx"
 import { EditTextArea } from "@context/textAreaCtx"
-import { KeyboardPersistance, KeyboardSize } from "./keyboardDefinition"
+import { KeyboardPersistence, KeyboardSize } from "./keyboardDefinition"
 import { getSwitchKeyboard, switchKeyboardName } from "./keyboardDefinitions/meta/switchKeyboard"
 import { ConfigureKeyBoard } from "@context/configCtx"
 import { ConfigEvalMode } from "./control"
@@ -131,7 +131,7 @@ export default class KeyStroke {
               getSwitchKeyboard(
                 keyGridState.keyboards, 
                 { 
-                  persistance: KeyboardPersistance.Indefinite, 
+                  persistence: KeyboardPersistence.Indefinite, 
                   size: KeyboardSize.Fill
                 }
               ),
@@ -150,7 +150,7 @@ export default class KeyStroke {
 
           keyGridState.releaseEphemeralKeys()
 
-          if (keyGridState.gridPersistance.current === KeyboardPersistance.Brief) {
+          if (keyGridState.gridPersistence.current === KeyboardPersistence.Brief) {
             keyGridState.deactivateKeyGrid.current(true)
             closedKeyboard = true
           }
