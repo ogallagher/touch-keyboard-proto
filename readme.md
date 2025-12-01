@@ -72,17 +72,17 @@ All gestures are considered to begin in the center of the key cell.
 
 | name | graphic | description |
 | --- | --- | --- |
-| `touch` | | |
-| `touch hold` | | |
-| `swipe hold` | | |
-| `cardinal swipe` | | |
-| `diagonal swipe` | | |
-| `return swipe` | | |
-| `corner swipe` | | |
-| `diagonal return swipe` | | |
-| `diagonal corner swipe` | | |
-| `return over swipe` | | |
-| `diagonal return over swipe` | | |
+| `touch` | <img alt="circle" src="./public/gestureType/t.svg" width="80" /> | |
+| `touch hold` | <img alt="dot" src="./public/gestureType/t-h.svg" width="80" /> | |
+| `swipe hold` | <img alt="circle up to dot" src="./public/gestureType/cs-h.svg" width="80" /> | |
+| `cardinal swipe` | <img alt="circle up to circle" src="./public/gestureType/cs.svg" width="80" /> | |
+| `diagonal swipe` | <img alt="circle up-right to circle" src="./public/gestureType/ds.svg" width="80" /> | |
+| `return swipe` | <img alt="circle up to circle back to first" src="./public/gestureType/cs-r.svg" width="80" /> | |
+| `corner swipe` | <img alt="circle up to circle right to circle" src="./public/gestureType/cs-L.svg" width="80" /> | |
+| `diagonal return swipe` | <img alt="circle up-right to circle back to first" src="./public/gestureType/ds-r.svg" width="80" /> | |
+| `diagonal corner swipe` | <img alt="circle up right to circle down to circle" src="./public/gestureType/ds-L.svg" width="80" /> | |
+| `return over swipe` | <img alt="circle up to circle jump down to circle" src="./public/gestureType/cs-ro.svg" width="80" /> | |
+| `diagonal return over swipe` | <img alt="circle up-right to circle jump down-left to circle" src="./public/gestureType/ds-ro.svg" width="80" /> | |
 
 ## Preview and gesture labels
 
