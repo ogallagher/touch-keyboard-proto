@@ -91,7 +91,7 @@ export class KeyGridState {
     }
     // delete descendants
     keyboard.getDescendants().forEach(descendant => {
-      this._keyboards.delete(descendant.instanceId)
+      this._childKeyboards.delete(descendant.instanceId)
     })
 
     if (keyboard.parentInstanceId) {
