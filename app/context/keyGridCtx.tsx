@@ -125,11 +125,9 @@ export class KeyGridState {
     this._keyboardExportConfig.set(instanceId, config)
   }
 
-  public readonly deactivateKeyGrid: RefObject<(closeKeyboard: boolean) => void> = {
-    current: null as unknown as (closeKeyboard: boolean) => void
-  }
-  public readonly gridPersistence: RefObject<KeyboardPersistence> = {
-    current: KeyboardPersistence.Indefinite
+  public readonly deactivateKeyGrid: Map<string, (closeKeyboard: boolean) => void> = new Map()
+  public readonly activeKeyboardInstanceId: RefObject<string|null> = {
+    current: null
   }
 
   private readonly _modifierKeys: Map<MetaChar, boolean> = new Map([

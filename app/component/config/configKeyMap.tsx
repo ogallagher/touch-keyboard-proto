@@ -92,7 +92,24 @@ export default function ConfigKeyMap(
     const childKeyboard = gridCtx?.getKeyboard(childKeyboardId!)
     if (!gridCtx || !childKeyboard) return
 
-    gridCtx.addKeyGrid(childKeyboard, true)
+    gridCtx.addKeyGrid(
+      childKeyboard, 
+      true,
+      () => {
+        if (keyboardInstance) {
+          gridCtx.addKeyGrid(
+            keyboardInstance, 
+            true, 
+            () => {
+              const deactivate = gridCtx.deactivateKeyGrid.get(keyboardInstance.instanceId)
+              if (deactivate) {
+                deactivate(true)
+              }
+            }
+          )
+        }
+      }
+    )
     configCtx?.setMode(ConfigEvalMode.Eval)
   }
 

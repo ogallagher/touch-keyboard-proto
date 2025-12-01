@@ -1,6 +1,6 @@
 import GridDimensions from "@lib/gridDimensions"
 import KeyCell from "@component/keyCell"
-import { KeyboardInstance, KeyboardPersistence } from "@lib/keyboardDefinition"
+import { KeyboardInstance } from "@lib/keyboardDefinition"
 import { useContext, useEffect, useRef, useState } from "react"
 import { KeyGridCtx } from "@context/keyGridCtx"
 import { isTouchScreen } from "@lib/platform"
@@ -11,9 +11,8 @@ import { ConfigEvalMode } from "@lib/control"
 const scrollEventTypes = ['scroll', 'touchmove', 'wheel', 'drag']
 
 export default function KeyGrid(
-  { keyboard, persistence = KeyboardPersistence.Indefinite, onClose, configurable }: {
+  { keyboard, onClose, configurable }: {
     keyboard: KeyboardInstance
-    persistence?: KeyboardPersistence
     onClose?: () => void
     configurable: boolean
   }
@@ -85,6 +84,8 @@ export default function KeyGrid(
 
     if (closeKeyboard && onClose) {
       onClose()
+
+      keyGridState?.deactivateKeyGrid.delete(keyboard.instanceId)
     }
   })
   const activate = useRef(() => {
@@ -104,7 +105,7 @@ export default function KeyGrid(
         <KeyCell 
           key={`${row},${col}`}
           index={{ row, col }}
-          activateKeyGrid={activate}
+          keyGridOnClose={onClose}
           keyboard={keyboard} />
       )
     }
@@ -131,12 +132,12 @@ export default function KeyGrid(
 
       const deactivate = activate.current()
 
-      keyGridState.deactivateKeyGrid.current = deactivate
-      keyGridState.gridPersistence.current = persistence
+      keyGridState.deactivateKeyGrid.set(keyboard.instanceId, deactivate)
+      keyGridState.activeKeyboardInstanceId.current = keyboard.instanceId
 
       return () => deactivate(false)
     },
-    [ keyGridState, persistence ]
+    [ keyGridState ]
   )
 
   // deactivate on mode=config if not configurable

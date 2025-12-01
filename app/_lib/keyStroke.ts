@@ -77,7 +77,12 @@ export default class KeyStroke {
     return `KS[${this.chars.join('+')}]`
   }
 
-  dispatch(textAreaEdit: EditTextArea|undefined, keyGridState: KeyGridState, configCtx: ConfigureKeyBoard) {
+  dispatch(
+    textAreaEdit: EditTextArea|undefined, 
+    keyboardId: string, 
+    keyGridState: KeyGridState, 
+    configCtx: ConfigureKeyBoard
+  ) {
     let closedKeyboard = false
 
     for (const char of this.chars) {
@@ -119,8 +124,11 @@ export default class KeyStroke {
             console.log(`suppress close of current (child) key grid while in config mode`)
           }
           else {
-            keyGridState.deactivateKeyGrid.current(true)
-            closedKeyboard = true
+            const deactivate = keyGridState.deactivateKeyGrid.get(keyboardId)
+            if (deactivate) {
+              deactivate(true)
+              closedKeyboard = true
+            }
           }
           break
         
@@ -155,9 +163,14 @@ export default class KeyStroke {
 
           keyGridState.releaseEphemeralKeys()
 
-          if (keyGridState.gridPersistence.current === KeyboardPersistence.Brief) {
-            keyGridState.deactivateKeyGrid.current(true)
-            closedKeyboard = true
+          if (keyGridState.activeKeyboardInstanceId.current) {
+            if (keyGridState.getKeyboard(keyGridState.activeKeyboardInstanceId.current)?.config.persistence === KeyboardPersistence.Brief) {
+              const deactivate = keyGridState.deactivateKeyGrid.get(keyboardId)
+              if (deactivate) {
+                deactivate(true)
+                closedKeyboard = true
+              }
+            }
           }
           break
       }

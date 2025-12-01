@@ -17,9 +17,9 @@ import KeyZoneLabel from "./keyZoneLabel"
 import { KeyDefinition } from "@lib/keyDefinition"
 
 export default function KeyCell(
-  { index, activateKeyGrid, keyboard }: {
+  { index, keyGridOnClose, keyboard }: {
     index: KeyIndex
-    activateKeyGrid: RefObject<() => void>
+    keyGridOnClose?: () => void
     keyboard: KeyboardInstance
   }
 ) {
@@ -63,6 +63,7 @@ export default function KeyCell(
           // dispatch to eval composer
           const { closedKeyboard } = keys.dispatch(
             target === textAreaEdit.target ? textAreaEdit : undefined, 
+            keyboard.instanceId,
             keyGridState,
             configCtx
           )
@@ -82,7 +83,8 @@ export default function KeyCell(
                     keys, 
                     // auto switch config context
                     true, 
-                    activateKeyGrid.current
+                    // on close, launch own keyboard
+                    () => keyGridState.addKeyGrid(keyboard, true, keyGridOnClose)
                   )
                   break
 
@@ -92,7 +94,6 @@ export default function KeyCell(
                       <KeyGrid
                         keyboard={keys}
                         onClose={() => setEmbedGrid(null)}
-                        persistence={keyboardConfig.persistence}
                         // wait until context switch is explicitly requested by user
                         configurable={configCtx.keyboardInstance?.instanceId === keys.instanceId} />
                     )
@@ -119,7 +120,7 @@ export default function KeyCell(
         setGestureSegment({})
       }
     },
-    [ configCtx, keyGridState, textAreaEdit, activateKeyGrid, index, embedGrid, map ]
+    [ configCtx, keyGridState, textAreaEdit, keyGridOnClose, index, embedGrid, map ]
   )
 
   // define onGestureSegment
