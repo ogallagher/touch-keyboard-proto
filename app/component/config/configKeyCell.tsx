@@ -107,11 +107,7 @@ export default function ConfigKeyCell(
                     instanceId: keyboardInstanceId(childKeyboard.keyboard.name)
                   })
                   gridCtx.addKeyboard(childKeyboard)
-                  setChildKeyboardId(childKeyboard.instanceId)
-                  
-                  if (!childKeyboardConfig) {
-                    setChildKeyboardConfig(childKeyboard.config)
-                  }
+                  // instead of setting state for new child keyboard, read from configCtx
                 }
 
                 newKeyMap.set(gesture, childKeyboard)

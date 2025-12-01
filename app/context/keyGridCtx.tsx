@@ -1,4 +1,4 @@
-import { KeyboardInstance, KeyboardPersistence } from "@lib/keyboardDefinition"
+import { KeyboardInstance } from "@lib/keyboardDefinition"
 import { switchKeyboardName } from "@lib/keyboardDefinitions/meta/switchKeyboard"
 import { MetaChar } from "@lib/keyStroke"
 import { createContext, RefObject } from "react"

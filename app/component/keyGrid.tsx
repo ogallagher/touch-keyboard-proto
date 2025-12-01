@@ -137,7 +137,7 @@ export default function KeyGrid(
 
       return () => deactivate(false)
     },
-    [ keyGridState ]
+    [ keyGridState, keyboard ]
   )
 
   // deactivate on mode=config if not configurable

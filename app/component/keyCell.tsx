@@ -1,6 +1,6 @@
 import KeyLabel, { GestureSegment, Zone } from "@lib/keyLabel"
 import TouchGesture from "@lib/touchGesture"
-import { useRef, useContext, useEffect, useState, Dispatch, SetStateAction, RefObject, JSX } from "react"
+import { useRef, useContext, useEffect, useState, Dispatch, SetStateAction, JSX } from "react"
 import { PageCanvasCtx } from "@context/pageCanvasCtx"
 import { CanvasSpace, Circle } from "pts"
 import KeyMap from "@lib/keyMap"
@@ -120,7 +120,7 @@ export default function KeyCell(
         setGestureSegment({})
       }
     },
-    [ configCtx, keyGridState, textAreaEdit, keyGridOnClose, index, embedGrid, map ]
+    [ configCtx, keyGridState, textAreaEdit, keyboard, keyGridOnClose, index, embedGrid, map ]
   )
 
   // define onGestureSegment
