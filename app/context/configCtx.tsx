@@ -121,6 +121,7 @@ export class ConfigureKeyBoard {
   setKey(index: KeyIndex, key: KeyDefinition) {
     if (this._keyboardInstance) {
       this._keyIndex = index
+      this._keystroke = this._gesture ? key.map.getKeys(this._gesture, true, true) : undefined
       this._keyboardInstance?.keyboard.setKey(index, key)
       const ls = this.saveListeners.get(KeyDefinition.name)?.values()
       if (ls) {

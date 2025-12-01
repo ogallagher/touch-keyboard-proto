@@ -78,7 +78,7 @@ export default function ConfigKeyMap(
       gridCtx.addKeyboard(childKeyboard)
     }
 
-    keyMap.current.set(configCtx.gesture, childKeyboard)
+    // keyMap is updated by configKeyCell, where we determine whether keyDefinition changed for submit to configCtx
 
     setChildKeyboardId(childKeyboard.instanceId)
     setKeyStroke(undefined)
@@ -147,10 +147,14 @@ export default function ConfigKeyMap(
   }
 
   const setChildKeyboardConfigWrapper = (size?: KeyboardSize, persistence?: KeyboardPersistence) => {
+    const childKeyboard = configCtx?.childKeyboardInstance
+    if (!childKeyboard) return
+
     const newChildKeyboardConfig = {
       persistence: persistence || childKeyboardConfig?.persistence || KeyboardPersistence.Indefinite,
       size: size || childKeyboardConfig?.size || KeyboardSize.Fill
     }
+    childKeyboard.config = newChildKeyboardConfig
     setChildKeyboardConfig(newChildKeyboardConfig)
   }
 

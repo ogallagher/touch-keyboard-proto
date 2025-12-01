@@ -104,6 +104,8 @@ export default function ConfigKeyCell(
         const keyDef = new KeyDefinition({ label: keyLabel, map: newKeyMap })
         if (!keyDef.equals(configCtx.getKeyDefinition(keyIndex.current)!)) {
           configCtx.setKey(keyIndex.current, keyDef)
+          // after key load, configKeyCell is source of truth; don't receive map update from configCtx
+          keyMap.current = newKeyMap
         }
       }
     },
