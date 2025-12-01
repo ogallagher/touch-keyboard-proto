@@ -1,6 +1,6 @@
 import { ChildKeyboardConfig, ConfigCtx } from "@context/configCtx"
 import { listenerName } from "@lib/eventSync"
-import { KeyboardInstance, keyboardInstanceId, KeyIndex } from "@lib/keyboardDefinition"
+import { KeyboardInstance, KeyIndex } from "@lib/keyboardDefinition"
 import { KeyDefinition } from "@lib/keyDefinition"
 import KeyLabel, { Zone } from "@lib/keyLabel"
 import KeyMap from "@lib/keyMap"
@@ -55,7 +55,6 @@ export default function ConfigKeyCell(
       })
 
       return () => configCtx.deleteLoadListener(name)
-      
     },
     [ configCtx ]
   )
@@ -93,32 +92,9 @@ export default function ConfigKeyCell(
           if (childKeyboardId) {
             let childKeyboard = gridCtx.getKeyboard(childKeyboardId)
             if (!(oldMapValue instanceof KeyboardInstance && oldMapValue.instanceId === childKeyboardId)) {
-              // if not already child of this keyboard, clone and adopt as separate instance
-              if (!childKeyboard) {
-                console.error(`cannot map to missing keyboard instance id=${childKeyboardId} for gesture=${gesture}`)
-              }
-              else if (!configCtx.keyboardInstance) {
-                console.error(`cannot map gesture=${gesture} to child keyboard without parent instance id`)
-              }
-              else {              
-                if (childKeyboard.parentInstanceId !== configCtx.keyboardInstance.instanceId) {
-                  childKeyboard = childKeyboard.clone({ 
-                    parentInstanceId: configCtx.keyboardInstance.instanceId,
-                    instanceId: keyboardInstanceId(childKeyboard.keyboard.name)
-                  })
-                  gridCtx.addKeyboard(childKeyboard)
-                  // instead of setting state for new child keyboard, read from configCtx
-                }
-
-                newKeyMap.set(gesture, childKeyboard)
-              }
+              newKeyMap.set(gesture, childKeyboard)
             }
             // else, keyMap value for current gesture is already set to this child keyboard
-
-            // update child keyboard config
-            if (childKeyboardConfig && childKeyboard) {
-              childKeyboard.config = childKeyboardConfig
-            }
           }
           else {
             newKeyMap.set(gesture, keyStroke)

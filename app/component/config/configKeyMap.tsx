@@ -3,16 +3,17 @@ import { ChildKeyboardConfig, ConfigCtx } from "@context/configCtx"
 import { KeyGridCtx } from "@context/keyGridCtx"
 import { ConfigEvalMode } from "@lib/control"
 import { listenerName } from "@lib/eventSync"
-import { KeyboardInstance, KeyboardPersistence, KeyboardSize } from "@lib/keyboardDefinition"
+import { KeyboardInstance, keyboardInstanceId, KeyboardPersistence, KeyboardSize } from "@lib/keyboardDefinition"
 import { switchKeyboardName } from "@lib/keyboardDefinitions/meta/switchKeyboard"
 import KeyMap, { KeyMapValuetype } from "@lib/keyMap"
 import KeyStroke, { MetaChar } from "@lib/keyStroke"
+import { AbstractTouchGesture } from "@lib/touchGesture"
 import { ChangeEvent, Dispatch, RefObject, SetStateAction, useContext, useEffect, useState } from "react"
 import { ArrowsFullscreen, BoxArrowUpRight, Cursor, CursorFill, ExclamationCircle, Fullscreen, HourglassBottom, Infinity, Keyboard, KeyboardFill, Pip, PipFill, XCircle } from "react-bootstrap-icons"
 
 export default function ConfigKeyMap(
   { 
-    keyboardInstance, keyMap, 
+    keyboardInstance, keyMap,
     keyStroke, setKeyStroke, keyStrokeInput, 
     childKeyboardId, setChildKeyboardId,
     childKeyboardConfig, setChildKeyboardConfig
@@ -53,12 +54,35 @@ export default function ConfigKeyMap(
   )
 
   const onChildKeyboardChoice = (e: ChangeEvent<HTMLInputElement>) => {
-    // set child keyboard, unset keystroke
-    const childKeyboardId = e.target.value
-    setChildKeyboardId(childKeyboardId)
-    if (childKeyboardId) {
-      setKeyStroke(undefined)
+    if (!gridCtx || !configCtx || !keyMap.current || !configCtx.gesture) return
+
+    // set child keyboard, unset keystroke as mutually exclusive
+    const childOriginKeyboardId = e.target.value
+    
+    let childKeyboard = gridCtx.getKeyboard(childOriginKeyboardId)
+    if (!childKeyboard) {
+      console.error(`cannot map to clone of missing keyboard instance id=${childOriginKeyboardId}`)
+      return
     }
+    if (!keyboardInstance) {
+      console.error(`cannot map gesture to child keyboard without parent instance id`)
+      return
+    }
+    
+    // if not already child of this keyboard, clone and adopt as separate instance
+    if (childKeyboard.parentInstanceId !== keyboardInstance.instanceId) {
+      childKeyboard = childKeyboard.clone({ 
+        parentInstanceId: keyboardInstance.instanceId,
+        instanceId: keyboardInstanceId(childKeyboard.keyboard.name)
+      })
+      gridCtx.addKeyboard(childKeyboard)
+    }
+
+    keyMap.current.set(configCtx.gesture, childKeyboard)
+
+    setChildKeyboardId(childKeyboard.instanceId)
+    setKeyStroke(undefined)
+    setChildKeyboardConfig(childKeyboard.config)
   }
 
   const getKeyboardLineage = (kbid?: string) => {
