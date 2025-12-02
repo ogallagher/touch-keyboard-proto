@@ -251,7 +251,7 @@ export class KeyboardInstance {
     }
   }
 
-  set config(
+  setConfig(
     { persistence, size }: {
       persistence: KeyboardPersistence
       size: KeyboardSize

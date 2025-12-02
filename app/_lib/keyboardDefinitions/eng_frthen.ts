@@ -15,8 +15,8 @@ import { nDia } from "./consonantDiacritics/n"
 import { yDia } from "./pseudovowelDiacritics/y"
 import { getReshapedKeyboard } from "./meta/reshape"
 
-// row 1 = f r t
-const row1: KeyDefinition[] = [
+// row 0 = f r t
+const row0: KeyDefinition[] = [
   new KeyDefinition({
     label: new KeyLabel([
       [new ZoneKey('center'), 'f'],
@@ -108,8 +108,8 @@ const row1: KeyDefinition[] = [
     ])
   })
 ]
-// row 2 = h e n
-const row2: KeyDefinition[] = [ 
+// row 1 = h e n
+const row1: KeyDefinition[] = [ 
   new KeyDefinition({
     label: new KeyLabel([
       [new ZoneKey('center'), 'h'],
@@ -222,8 +222,8 @@ const row2: KeyDefinition[] = [
     ])
   })
 ]
-// row 3 = s k p
-const row3: KeyDefinition[] = [
+// row 2 = s k p
+const row2: KeyDefinition[] = [
   new KeyDefinition({
     label: new KeyLabel([
       [new ZoneKey('center'), 's'],
@@ -282,8 +282,8 @@ const row3: KeyDefinition[] = [
     ])
   })
 ]
-// row 4 = ' <space> .
-const row4: KeyDefinition[] = [
+// row 3 = ' <space> .
+const row3: KeyDefinition[] = [
   new KeyDefinition({
     label: new KeyLabel([
       [new ZoneKey('center'), "'"],
@@ -344,4 +344,8 @@ const row4: KeyDefinition[] = [
   })
 ]
 
-export const frthenKeyboard = new KeyboardDefinition('frthen', [row1, row2, row3, row4])
+/**
+ * First example English (compatible with some other latin alphabet languages including diacritics) touch keyboard.
+ * Named after touch keystrokes in top two rows.
+ */
+export const frthenKeyboard = new KeyboardDefinition('frthen', [row0, row1, row2, row3])
