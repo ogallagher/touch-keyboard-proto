@@ -7,7 +7,6 @@ import { KeyboardInstance, keyboardInstanceId, KeyboardPersistence, KeyboardSize
 import { switchKeyboardName } from "@lib/keyboardDefinitions/meta/switchKeyboard"
 import KeyMap, { KeyMapValuetype } from "@lib/keyMap"
 import KeyStroke, { MetaChar } from "@lib/keyStroke"
-import { AbstractTouchGesture } from "@lib/touchGesture"
 import { ChangeEvent, Dispatch, RefObject, SetStateAction, useContext, useEffect, useState } from "react"
 import { ArrowsFullscreen, BoxArrowUpRight, Cursor, CursorFill, ExclamationCircle, Fullscreen, HourglassBottom, Infinity, Keyboard, KeyboardFill, Pip, PipFill, XCircle } from "react-bootstrap-icons"
 
@@ -154,7 +153,7 @@ export default function ConfigKeyMap(
       persistence: persistence || childKeyboardConfig?.persistence || KeyboardPersistence.Indefinite,
       size: size || childKeyboardConfig?.size || KeyboardSize.Fill
     }
-    childKeyboard.config = newChildKeyboardConfig
+    childKeyboard.setConfig(newChildKeyboardConfig)
     setChildKeyboardConfig(newChildKeyboardConfig)
   }
 

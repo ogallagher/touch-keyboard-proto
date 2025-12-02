@@ -90,7 +90,7 @@ export default function ConfigKeyCell(
         if (gesture) {
           const oldMapValue = keyMap.current.getKeys(gesture, false, false)
           if (childKeyboardId) {
-            let childKeyboard = gridCtx.getKeyboard(childKeyboardId)
+            const childKeyboard = gridCtx.getKeyboard(childKeyboardId)
             if (!(oldMapValue instanceof KeyboardInstance && oldMapValue.instanceId === childKeyboardId)) {
               newKeyMap.set(gesture, childKeyboard)
             }

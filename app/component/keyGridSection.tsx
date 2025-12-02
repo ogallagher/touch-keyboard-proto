@@ -8,6 +8,7 @@ import { exportShareUrlKeyboardsQueryKey } from "@lib/path"
 import { useSearchParams } from "next/navigation"
 import { decompressString } from "@lib/data"
 import { switchKeyboardName } from "@lib/keyboardDefinitions/meta/switchKeyboard"
+import { qwertyAlphabet } from "@lib/keyboardDefinitions/eng_qwerty"
 
 export default function KeyGridSection() {
   /*
@@ -71,7 +72,7 @@ export default function KeyGridSection() {
     [ keyGridState, children, configCtx ]
   )
   
-  // add keybaord grid when empty
+  // add keyboard grid when empty
   useEffect(
     () => {
       if (children.size === 0 && keyGridState) {
@@ -82,12 +83,25 @@ export default function KeyGridSection() {
         )
 
         if (keyboards.length === 0) {
-          // add default keyboard
+          // add default keyboards
+          keyGridState.addKeyGrid(
+            new KeyboardInstance(
+              qwertyAlphabet,
+              {
+                index: 0,
+                persistence: KeyboardPersistence.Indefinite,
+                size: KeyboardSize.Fill,
+                canDelete: false
+              }
+            ),
+            true
+          )
+
           keyGridState.addKeyGrid(
             new KeyboardInstance(
               frthenKeyboard,
               { 
-                index: children.size,
+                index: 1,
                 persistence: KeyboardPersistence.Indefinite, 
                 size: KeyboardSize.Fill,
                 canDelete: false
