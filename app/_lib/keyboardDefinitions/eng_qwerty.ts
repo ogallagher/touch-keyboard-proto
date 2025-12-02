@@ -3,7 +3,7 @@ import { KeyDefinition } from "@lib/keyDefinition"
 import KeyLabel, { ZoneKey } from "@lib/keyLabel"
 import KeyMap from "@lib/keyMap"
 import KeyStroke, { MetaChar } from "@lib/keyStroke"
-import { AbstractTouchGesture, InitGestureSegmentType, TouchGestureType } from "@lib/touchGesture"
+import { AbstractTouchGesture, TouchGestureType } from "@lib/touchGesture"
 
 // more-symbols
 // row 0 = [ ] { } # % ^ * + =

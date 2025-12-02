@@ -102,9 +102,9 @@ const row0: KeyDefinition[] = [
       [new AbstractTouchGesture(TouchGestureType.TOUCH_HOLD, undefined, undefined, false), new KeyStroke("'", 't')],
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.LEFT), new KeyStroke('d')],
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE_HOLD, Direction.LEFT, undefined, false), new KeyStroke("'", 'd')],
-      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.DOWN), new KeyStroke('th')],
+      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.DOWN, undefined, false), new KeyStroke('t', 'h')],
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.RIGHT), new KeyStroke('j')],
-      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.UP), new KeyStroke('t', 'o')]
+      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.UP, undefined, false), new KeyStroke('t', 'o')]
     ])
   })
 ]
@@ -191,27 +191,32 @@ const row1: KeyDefinition[] = [
   new KeyDefinition({
     label: new KeyLabel([
       [new ZoneKey('center'), 'n'],
-      [new ZoneKey('left'), 'an'],
-      [new ZoneKey('right'), 'in'],
+      [new ZoneKey('left'), 'in'],
+      [new ZoneKey('right'), 'an'],
       [new ZoneKey('down'), 'ng'],
+      [new ZoneKey('downleft', InitGestureSegmentType.CARDINAL_SWIPE, Direction.LEFT), 'ing'],
       [new ZoneKey('up'), 'l'],
       [new ZoneKey('center', InitGestureSegmentType.CARDINAL_SWIPE, Cardinal.UP), 'nd'],
       [new ZoneKey('center', 'shift'), 'N'],
-      [new ZoneKey('left', 'shift'), 'An'],
-      [new ZoneKey('right', 'shift'), 'In'],
+      [new ZoneKey('left', 'shift'), 'In'],
+      [new ZoneKey('right', 'shift'), 'An'],
       [new ZoneKey('down', 'shift'), 'Ng'],
       [new ZoneKey('up', 'shift'), 'L'],
-      [new ZoneKey('left', 'capslock'), 'AN'],
-      [new ZoneKey('right', 'capslock'), 'IN'],
+      [new ZoneKey('left', 'capslock'), 'IN'],
+      [new ZoneKey('right', 'capslock'), 'AN'],
       [new ZoneKey('down', 'capslock'), 'NG']
     ]),
     map: new KeyMap([
       [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('n')],
-      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.LEFT), new KeyStroke('a', 'n')],
-      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.DOWN), new KeyStroke('n', 'g')],
-      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.RIGHT), new KeyStroke('i', 'n')],
+      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.LEFT, undefined, false), new KeyStroke('i', 'n')],
+      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.DOWN, undefined, false), new KeyStroke('n', 'g')],
+      [
+        new AbstractTouchGesture(TouchGestureType.CARDINAL_CORNER_SWIPE, Direction.LEFT, Direction.DOWN), 
+        new KeyStroke('i', 'n', 'g')
+      ],
+      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.RIGHT, undefined, false), new KeyStroke('a', 'n')],
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.UP), new KeyStroke('l')],
-      [new AbstractTouchGesture(TouchGestureType.CARDINAL_RETURN_SWIPE, Direction.UP), new KeyStroke('n', 'd')],
+      [new AbstractTouchGesture(TouchGestureType.CARDINAL_RETURN_SWIPE, Direction.UP, undefined, false), new KeyStroke('n', 'd')],
 
       [new AbstractTouchGesture(TouchGestureType.TOUCH_HOLD), new KeyboardInstance(nDia,
         {
@@ -242,7 +247,7 @@ const row2: KeyDefinition[] = [
       [new AbstractTouchGesture(TouchGestureType.TOUCH_HOLD, undefined, undefined, false), new KeyStroke("'", 's')],
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.LEFT), new KeyStroke('z')],
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.RIGHT), new KeyStroke('c')],
-      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.UP), new KeyStroke('s', 'h')],
+      [new AbstractTouchGesture(TouchGestureType.CARDINAL_SWIPE, Direction.UP, undefined, false), new KeyStroke('s', 'h')],
       [new AbstractTouchGesture(TouchGestureType.CARDINAL_CORNER_SWIPE, Direction.RIGHT, Direction.UP), new KeyStroke('c', 'h')],
     ])
   }),
