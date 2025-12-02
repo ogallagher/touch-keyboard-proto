@@ -15,7 +15,12 @@ Then, in theory, functional touch keyboard designs can be implemented as native 
 
 ## `eng-frthen`
 
-> **TODO** frthen preview
+<details><summary><b>frthen preview</b></summary>
+
+<p style="text-align:center;">
+  <img src="doc/eng-frthen.jpg" style="width:50em;" />
+</p>
+</details>
 
 Among vowels, E is most common, so it’s center of vowels key with other English vowels at the 4 cardinal swipes. The vowels key is also at the center of the 9 letter keys, arranged in a 3x3 grid.
 
@@ -50,17 +55,27 @@ Where there was extra space (ex. below t, th) I added a couple bigrams (letter p
 
 Whitespace and punctuation adds a bottom row; all numbers and other symbols would be in a separate view.
 
-Touch and hold or swipe and hold could provide more options, like diacritics (áüçêñ) and doubles (o→oo), (e→ee). Doubles shortcut may not be worth it.
+Touch and hold or swipe and hold provide more options, as was done for diacritics embed keyboards (áüçêñÿ).
 
-In addition to hold, a return swipe (ex from center to right, then return to center) can be a separate gesture, as used in [딩굴](https://namu.wiki/w/%EB%94%A9%EA%B5%B4%20%ED%82%A4%EB%B3%B4%EB%93%9C). Similar idea to swipe hold. For punctuation maybe ('→"), (-→=), (.→…), (,→;), (?→¿), (!→¡). For vowel pairs (e→ie).
+In addition to hold, a return swipe (ex from center to right, then return to center) is a separate gesture, as used in [딩굴](https://namu.wiki/w/%EB%94%A9%EA%B5%B4%20%ED%82%A4%EB%B3%B4%EB%93%9C). Similar idea to swipe hold. For punctuation maybe ('→"), (-→=), (.→…), (,→;), (?→¿), (!→¡). For vowel pairs (e→ie). Currently used for (r→er), close `digits1key` embed keyboard, and various arithmetic operators in `digits1key`.
 
 Also, a long/ over return swipe, which goes beyond center on return. (a→ai), (o→ou).
 
 An turn/ corner swipe could be used, similar to diagonal, but yielding 2 options for each corner. Q down = qu, g c up = ck, s c up = ch, m up = mb, l up = ld, nd left = nt. For vowel diphthongs also.
 
-## `digits-3x3`
+## `digits1key`
+<details><summary><b>digits1key preview</b></summary>
 
-> **TODO** digits preview
+<p style="text-align:center;">
+  <img src="doc/digits1key.jpg" style="width:30em;" />
+</p>
+</details>
+
+Available as an embedded 1-key keyboard within `eng-frthen`, on swipe-right-hold of the `f` key. Each outer digit is a swipe, `0` is touch, `5` is hold. 
+
+Return swipes are used for arithmetic operators, like right-return for `+` and left-return for `-`.
+
+Down-return closes the embed keyboard.
 
 # Specification
 
@@ -68,22 +83,22 @@ An abstract key cell recognizes gestures, each mapped to 0, 1, or many key strok
 
 ## Gestures
 
-All gestures are considered to begin in the center of the key cell.
+All gestures are considered to begin in the center of the key cell. The list below includes all available gestures for a single key. All gestures beyond `touch` and `touch hold` have multiple directions.
 
 | name | graphic | description |
 | --- | --- | --- |
-| `touch` | <img alt="circle" src="./public/gestureType/t.svg" width="80" /> | |
-| `touch hold` | <img alt="dot" src="./public/gestureType/t-h.svg" width="80" /> | |
-| `cardinal swipe` | <img alt="circle up to circle" src="./public/gestureType/cs.svg" width="80" /> | |
-| `cardinal swipe hold` | <img alt="circle up to dot" src="./public/gestureType/cs-h.svg" width="80" /> | |
-| `diagonal swipe` | <img alt="circle up-right to circle" src="./public/gestureType/ds.svg" width="80" /> | |
-| `diagonal swipe hold` | <img alt="circle up-right to dot" src="./public/gestureType/ds-h.svg" width="80" /> | |
-| `return swipe` | <img alt="circle up to circle back to first" src="./public/gestureType/cs-r.svg" width="80" /> | |
-| `corner swipe` | <img alt="circle up to circle right to circle" src="./public/gestureType/cs-L.svg" width="80" /> | |
-| `diagonal return swipe` | <img alt="circle up-right to circle back to first" src="./public/gestureType/ds-r.svg" width="80" /> | |
-| `diagonal corner swipe` | <img alt="circle up right to circle down to circle" src="./public/gestureType/ds-L.svg" width="80" /> | |
-| `return over swipe` | <img alt="circle up to circle jump down to circle" src="./public/gestureType/cs-ro.svg" width="80" /> | |
-| `diagonal return over swipe` | <img alt="circle up-right to circle jump down-left to circle" src="./public/gestureType/ds-ro.svg" width="80" /> | |
+| `touch` | <img alt="circle" src="./public/gestureType/t.svg" width="80em" /> | |
+| `touch hold` | <img alt="dot" src="./public/gestureType/t-h.svg" width="80em" /> | |
+| `cardinal swipe` | <img alt="circle up to circle" src="./public/gestureType/cs.svg" width="80em" /> | |
+| `cardinal swipe hold` | <img alt="circle up to dot" src="./public/gestureType/cs-h.svg" width="80em" /> | |
+| `diagonal swipe` | <img alt="circle up-right to circle" src="./public/gestureType/ds.svg" width="80em" /> | |
+| `diagonal swipe hold` | <img alt="circle up-right to dot" src="./public/gestureType/ds-h.svg" width="80em" /> | |
+| `return swipe` | <img alt="circle up to circle back to first" src="./public/gestureType/cs-r.svg" width="80em" /> | |
+| `corner swipe` | <img alt="circle up to circle right to circle" src="./public/gestureType/cs-L.svg" width="80em" /> | |
+| `diagonal return swipe` | <img alt="circle up-right to circle back to first" src="./public/gestureType/ds-r.svg" width="80em" /> | |
+| `diagonal corner swipe` | <img alt="circle up right to circle down to circle" src="./public/gestureType/ds-L.svg" width="80em" /> | |
+| `return over swipe` | <img alt="circle up to circle jump down to circle" src="./public/gestureType/cs-ro.svg" width="80em" /> | |
+| `diagonal return over swipe` | <img alt="circle up-right to circle jump down-left to circle" src="./public/gestureType/ds-ro.svg" width="80em" /> | |
 
 ## Preview and gesture labels
 
@@ -109,9 +124,9 @@ Name of the keyboard.
 
 ## Test/evaluate mode
 
-A free-form, unmonitored text area.
+An unmonitored composer text area.
 
-Integrate with an existing typing test service to evaluate one's performance with the current keyboard.
+Eventually integrate with an existing typing test service to evaluate one's performance with the current keyboard.
 
 ## Save and share
 
