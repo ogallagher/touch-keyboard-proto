@@ -24,7 +24,7 @@ export default function KeyZoneLabel(
         className={[
           'flex flex-col justify-center font-mono text-center',
           setKeyLabel ? 'select-all field-sizing-content' : 'pointer-none cursor-default',
-          zoneLabel === undefined ? 'min-w-4' : ''
+          (zoneLabel === undefined && setKeyLabel) ? 'min-w-4' : ''
         ].join(' ')}
         name={KeyZoneLabel.name}
         placeholder={setKeyLabel ? '*' : undefined}

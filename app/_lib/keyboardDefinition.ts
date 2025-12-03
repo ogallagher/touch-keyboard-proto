@@ -58,10 +58,15 @@ export default class KeyboardDefinition {
     name: string,
     protected keys: KeyDefinition[][],
     public readonly lockEdit: boolean = true,
-    prevVersion?: KeyboardDefinition
+    prevVersion?: KeyboardDefinition,
+    defineShadows: boolean = true
   ) {
     this._name = name
     this._prevVersion = prevVersion
+
+    if (defineShadows) {
+      KeyboardDefinition.defineShadows(this.keys)
+    }
   }
 
   get name() {
@@ -83,10 +88,16 @@ export default class KeyboardDefinition {
     if (this.lockEdit) {
       throw editLockError(this.name)
     }
+
+    if (this.keys[index.row][index.col].isBridge !== key.isBridge) {
+      KeyboardDefinition.defineShadow(this.keys, index, key.dimensions)
+    }
+
     const dim = this.dimensions
     if (index.row < dim.height && index.col < dim.width) {
       this.keys[index.row][index.col] = key
     }
+
     this._saved = false
   }
 
@@ -143,15 +154,38 @@ export default class KeyboardDefinition {
     return rowSlice
   }
 
+  private static defineShadow(keys: KeyDefinition[][], keyIdx: KeyIndex, keyDim: GridDimensions) {
+    // right and down neighbors are shadows
+    for (let r=0; r<keyDim.height; r++) {
+      for (let c=0; c<keyDim.width; c++) {
+        // skip self
+        if (r==0 && c==0) continue
+
+        keys[keyIdx.row + r][keyIdx.col + c].isShadow = true
+      }
+    }
+  }
+
+  private static defineShadows(keys: KeyDefinition[][]) {
+    for (let r=0; r<keys.length; r++) {
+      const row = keys[r]
+
+      for (let c=0; c<row.length; c++) {
+        const key = row[c]
+
+        if (key.isBridge) {
+          this.defineShadow(keys, {row: r, col: c}, key.dimensions)
+        }
+      }
+    }
+  }
+
   clone(name: string = this._name, lockEdit: boolean = false) {
     return new KeyboardDefinition(
       name,
       this.keys.map((row) => {
         return row.map((key) => {
-          return new KeyDefinition({ 
-            label: key.label.clone(), 
-            map: key.map.clone()
-          })
+          return key.clone()
         })
       }),
       lockEdit,

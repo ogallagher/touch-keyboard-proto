@@ -97,29 +97,23 @@ export default function KeyGrid(
     return deactivate.current
   })
 
-  function* getKeyCells(row: number) {
+  function* getKeyCells() {
+    const h = dimensions?.height || 0
     const w = dimensions?.width || 0
 
-    for (let col=0; col < w; col++) {
-      yield (
-        <KeyCell 
-          key={`${row},${col}`}
-          index={{ row, col }}
-          keyGridOnClose={onClose}
-          keyboard={keyboard} />
-      )
-    }
-  }
+    for (let row=0; row < h; row++) {
+      for (let col=0; col < w; col++) {
+        // skip shadow, whose cell location is occupied by a neighbor bridge
+        if (keyboard?.keyboard.getKey(row, col)?.isShadow) continue
 
-  function* getKeyRows() {
-    for (let row=0; row < (dimensions?.height || 0); row++) {
-      yield (
-        <div
-          key={row}
-          className='grow flex flex-row justify-evenly gap-1'>
-          {Array.from(getKeyCells(row))}
-        </div>
-      )
+        yield (
+          <KeyCell 
+            key={`${row},${col}`}
+            index={{ row, col }}
+            keyGridOnClose={onClose}
+            keyboard={keyboard} />
+        )
+      }
     }
   }
 
@@ -167,9 +161,10 @@ export default function KeyGrid(
           ref={grid}
           className={[
             'font-mono',
-            'grow flex h-full flex-col justify-evenly gap-1'
+            'h-full',
+            `grid grid-rows-${dimensions?.height || 1} grid-cols-${dimensions?.width || 1} gap-1`
           ].join(' ')}>
-          {Array.from(getKeyRows())}
+          {Array.from(getKeyCells())}
         </div>
     </div>
   )

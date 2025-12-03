@@ -1,3 +1,8 @@
+export type SerializedGridDimensions = {
+  width: number
+  height: number
+}
+
 export default class GridDimensions {
   constructor(
     /**
@@ -34,5 +39,13 @@ export default class GridDimensions {
 
   equals(other: GridDimensions) {
     return this.width === other.width && this.height === other.height
+  }
+
+  clone() {
+    return new GridDimensions(this.width, this.height)
+  }
+
+  static fromJSON(o: SerializedGridDimensions) {
+    return new GridDimensions(o.width, o.height)
   }
 }

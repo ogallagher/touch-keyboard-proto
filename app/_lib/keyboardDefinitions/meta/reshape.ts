@@ -1,7 +1,5 @@
 import KeyboardDefinition from "@lib/keyboardDefinition";
 import { KeyDefinition } from "@lib/keyDefinition";
-import KeyLabel from "@lib/keyLabel";
-import KeyMap from "@lib/keyMap";
 
 /**
  * Reshape the keys grid of an existing keyboard definition.
@@ -49,7 +47,7 @@ export function getReshapedKeyboard(
 
   let r=0, c=0
   for (let i=0; i < _height * _width; i++) {
-    keysGrid[r][c] = keysFlat[i] || new KeyDefinition({ label: new KeyLabel(), map: new KeyMap() })
+    keysGrid[r][c] = keysFlat[i] || KeyDefinition.empty()
 
     c++
     if (c >= _width) {

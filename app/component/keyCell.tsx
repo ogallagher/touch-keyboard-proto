@@ -15,6 +15,7 @@ import { listenerName } from "@lib/eventSync"
 import { ConfigEvalMode } from "@lib/control"
 import KeyZoneLabel from "./keyZoneLabel"
 import { KeyDefinition } from "@lib/keyDefinition"
+import GridDimensions from "@lib/gridDimensions"
 
 export default function KeyCell(
   { index, keyGridOnClose, keyboard }: {
@@ -40,6 +41,13 @@ export default function KeyCell(
   const [map, setMap] = useState(
     keyboard?.keyboard.getKey(index.row, index.col)?.map 
     || new KeyMap()
+  )
+  const [dim, setDim] = useState(
+    keyboard?.keyboard.getKey(index.row, index.col)?.dimensions
+    || new GridDimensions(1, 1)
+  )
+  const [isShadow, setIsShadow] = useState(
+    keyboard?.keyboard.getKey(index.row, index.col)?.isShadow
   )
   const onGesture = useRef(undefined as undefined|((g: TouchGesture) => void))
   const onGestureSegment = useRef(undefined as undefined|((gs: GestureSegment) => void))
@@ -312,7 +320,18 @@ export default function KeyCell(
   )
 
   return (
-    <div className='relative grow' >
+    <div 
+      className={[
+        'relative',
+        // unknown why tailwind grid cell classes are not working; maybe I should ask.
+        // `row-start-${index.row+1} row-span-${dim.height} col-start-${index.col+1} col-span-${dim.width}`
+        ].join(' ')}
+        style={{
+          gridRowStart: index.row+1,
+          gridRowEnd: index.row+1 + dim.height,
+          gridColumnStart: index.col+1,
+          gridColumnEnd: index.col+1 + dim.width
+        }} >
       <div 
         className={[
           'top-0 left-0 right-0 bottom-0',
@@ -324,11 +343,11 @@ export default function KeyCell(
           className={[
             'dark:bg-zinc-900 dark:hover:bg-zinc-800 bg-zinc-100 hover:bg-zinc-200',
             'select-none',
-            'grow h-full',
-            'grid grid-cols-3',
+            'h-full',
+            'grid-cols-3',
             'rounded-lg',
             'text-sm',
-            embedGrid ? 'hidden' : 'flex'
+            (embedGrid || isShadow) ? 'hidden' : 'grid'
           ].join(' ')} >
           {(['upleft', 'up', 'upright', 'left', 'center', 'right', 'downleft', 'down', 'downright'] as Zone[]).map(
             (zone) => (
