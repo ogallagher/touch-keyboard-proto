@@ -1,3 +1,4 @@
+import GridDimensions from "@lib/gridDimensions"
 import KeyboardDefinition, { KeyboardInstance, KeyboardPersistence, KeyboardSize } from "@lib/keyboardDefinition"
 import { KeyDefinition } from "@lib/keyDefinition"
 import KeyLabel, { ZoneKey } from "@lib/keyLabel"
@@ -220,16 +221,11 @@ const punctuation: KeyDefinition[] = [
     ]),
     map: new KeyMap([
       [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke(MetaChar.BACKSPACE)]
-    ])
+    ]),
+    dimensions: new GridDimensions(3, 1)
   }),
-  new KeyDefinition({
-    label: new KeyLabel(),
-    map: new KeyMap()
-  }),
-  new KeyDefinition({
-    label: new KeyLabel(),
-    map: new KeyMap()
-  }),
+  KeyDefinition.empty(),
+  KeyDefinition.empty(),
 ]
 // row 3 = <alphabet-pending> [<switch-keyboard> <space> <newline>]
 const control: KeyDefinition[] = [
@@ -243,76 +239,17 @@ const control: KeyDefinition[] = [
   }),
   new KeyDefinition({
     label: new KeyLabel([
-      [new ZoneKey('upleft'), '/'],
-      [new ZoneKey('up'), '—'],
-      [new ZoneKey('upright'), '—'],
-      [new ZoneKey('left'), '|'],
-      [new ZoneKey('center'), 's'],
-      [new ZoneKey('downleft'), '\\'],
-      [new ZoneKey('down'), '—'],
-      [new ZoneKey('downright'), '—'],
+      [new ZoneKey('center'), 'space'],
     ]),
     map: new KeyMap([
       [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke(' ')]
-    ])
-  }),
-  new KeyDefinition({
-    label: new KeyLabel([
-      [new ZoneKey('upleft'), '—'],
-      [new ZoneKey('up'), '—'],
-      [new ZoneKey('upright'), '—'],
-      [new ZoneKey('center'), 'p'],
-      [new ZoneKey('downleft'), '—'],
-      [new ZoneKey('down'), '—'],
-      [new ZoneKey('downright'), '—'],
     ]),
-    map: new KeyMap([
-      [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke(' ')]
-    ])
+    dimensions: new GridDimensions(5, 1)
   }),
-  new KeyDefinition({
-    label: new KeyLabel([
-      [new ZoneKey('upleft'), '—'],
-      [new ZoneKey('up'), '—'],
-      [new ZoneKey('upright'), '—'],
-      [new ZoneKey('center'), 'a'],
-      [new ZoneKey('downleft'), '—'],
-      [new ZoneKey('down'), '—'],
-      [new ZoneKey('downright'), '—'],
-    ]),
-    map: new KeyMap([
-      [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke(' ')]
-    ])
-  }),
-  new KeyDefinition({
-    label: new KeyLabel([
-      [new ZoneKey('upleft'), '—'],
-      [new ZoneKey('up'), '—'],
-      [new ZoneKey('upright'), '—'],
-      [new ZoneKey('center'), 'c'],
-      [new ZoneKey('downleft'), '—'],
-      [new ZoneKey('down'), '—'],
-      [new ZoneKey('downright'), '—'],
-    ]),
-    map: new KeyMap([
-      [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke(' ')]
-    ])
-  }),
-  new KeyDefinition({
-    label: new KeyLabel([
-      [new ZoneKey('upleft'), '—'],
-      [new ZoneKey('up'), '—'],
-      [new ZoneKey('upright'), '\\'],
-      [new ZoneKey('center'), 'e'],
-      [new ZoneKey('right'), '|'],
-      [new ZoneKey('downleft'), '—'],
-      [new ZoneKey('down'), '—'],
-      [new ZoneKey('downright'), '/'],
-    ]),
-    map: new KeyMap([
-      [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke(' ')]
-    ])
-  }),
+  KeyDefinition.empty(),
+  KeyDefinition.empty(),
+  KeyDefinition.empty(),
+  KeyDefinition.empty(),
   new KeyDefinition({
     label: new KeyLabel([
       [new ZoneKey('center'), '←']
@@ -344,7 +281,8 @@ export const moreSymbols = new KeyboardDefinition('moreSymbols', [
   [
     new KeyDefinition({
       label: new KeyLabel(),
-      map: new KeyMap()
+      map: new KeyMap(),
+      isShadow: true
     }),
     new KeyDefinition({
       label: new KeyLabel([
@@ -540,7 +478,8 @@ export const digitsSymbols = new KeyboardDefinition('digitsSymbols', [
   [
     new KeyDefinition({
       label: new KeyLabel(),
-      map: new KeyMap()
+      map: new KeyMap(),
+      isShadow: true
     }),
     new KeyDefinition({
       label: new KeyLabel([
@@ -729,7 +668,8 @@ const asdfRow: KeyDefinition[] = [
   }),
   new KeyDefinition({
     label: new KeyLabel(),
-    map: new KeyMap()
+    map: new KeyMap(),
+    isShadow: true
   }),
 ]
 // row 2 = <shift> z x c v b n m <backspace>
@@ -806,12 +746,10 @@ const zxcvRow: KeyDefinition[] = [
     ]),
     map: new KeyMap([
       [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke(MetaChar.BACKSPACE)]
-    ])
+    ]),
+    dimensions: new GridDimensions(2, 1)
   }),
-  new KeyDefinition({
-    label: new KeyLabel(),
-    map: new KeyMap()
-  }),
+  KeyDefinition.empty(),
 ]
 // row 3 = <digits-symbols> [<switch-keyboard> <space> <newline>]
 
