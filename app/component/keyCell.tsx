@@ -46,9 +46,6 @@ export default function KeyCell(
     keyboard?.keyboard.getKey(index.row, index.col)?.dimensions
     || new GridDimensions(1, 1)
   )
-  const [isShadow, setIsShadow] = useState(
-    keyboard?.keyboard.getKey(index.row, index.col)?.isShadow
-  )
   const onGesture = useRef(undefined as undefined|((g: TouchGesture) => void))
   const onGestureSegment = useRef(undefined as undefined|((gs: GestureSegment) => void))
 
@@ -347,7 +344,7 @@ export default function KeyCell(
             'grid-cols-3',
             'rounded-lg',
             'text-sm',
-            (embedGrid || isShadow) ? 'hidden' : 'grid'
+            embedGrid ? 'hidden' : 'grid'
           ].join(' ')} >
           {(['upleft', 'up', 'upright', 'left', 'center', 'right', 'downleft', 'down', 'downright'] as Zone[]).map(
             (zone) => (
