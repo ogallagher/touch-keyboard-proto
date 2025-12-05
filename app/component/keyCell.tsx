@@ -14,8 +14,9 @@ import { ConfigCtx } from "@context/configCtx"
 import { listenerName } from "@lib/eventSync"
 import { ConfigEvalMode } from "@lib/control"
 import KeyZoneLabel from "./keyZoneLabel"
-import { KeyDefinition } from "@lib/keyDefinition"
 import GridDimensions from "@lib/gridDimensions"
+import { KeyDefinition } from "@lib/keyDefinition"
+import { switchKeyboardName } from "@lib/keyboardDefinitions/meta/switchKeyboard"
 
 export default function KeyCell(
   { index, keyGridOnClose, keyboard }: {
@@ -46,6 +47,9 @@ export default function KeyCell(
     keyboard?.keyboard.getKey(index.row, index.col)?.dimensions
     || new GridDimensions(1, 1)
   )
+  const [isShadow, setIsShadow] = useState(
+    !!keyboard?.keyboard.getKey(index.row, index.col)?.isShadow
+  )
   const onGesture = useRef(undefined as undefined|((g: TouchGesture) => void))
   const onGestureSegment = useRef(undefined as undefined|((gs: GestureSegment) => void))
 
@@ -53,11 +57,24 @@ export default function KeyCell(
     Math.min(self.current!.clientWidth, self.current!.clientHeight) * 0.4
   )
   
-  // define onGesture, perform keystroke
+  // define onGesture, perform keystroke, load key config
   useEffect(
     () => {
       onGesture.current = !(configCtx && keyGridState) ? undefined : (gesture: TouchGesture) => {
         const keys = map.getKeys(gesture, true, true)
+        const loadKeyConfig = () => {
+          if (configCtx.mode === ConfigEvalMode.Config && keyboard.keyboard.name !== switchKeyboardName) {
+            // load in config
+            configCtx.loadKey(index, gesture, keys, isShadow, dim)
+          }
+        }
+
+        // load shadow key into config to enable set isShadow=false, do nothing else
+        if (isShadow) {
+          loadKeyConfig()
+          return
+        }
+
         const isKeystroke = keys instanceof KeyStroke
         const isKeyboard = keys instanceof KeyboardInstance
         
@@ -87,9 +104,9 @@ export default function KeyCell(
                   keyGridState.addKeyGrid(
                     keys, 
                     // auto switch config context
-                    true, 
+                    keys.keyboard.name !== switchKeyboardName, 
                     // on close, launch own keyboard
-                    () => keyGridState.addKeyGrid(keyboard, true, keyGridOnClose)
+                    () => keyGridState.addKeyGrid(keyboard, keyboard.keyboard.name !== switchKeyboardName, keyGridOnClose)
                   )
                   break
 
@@ -116,16 +133,12 @@ export default function KeyCell(
         else {
           console.info(`no mapping for gesture=${gesture}`)
         }
-
-        if (configCtx.mode === ConfigEvalMode.Config) {
-          // load in config
-          configCtx.loadKey(index, gesture, keys)
-        }
+        loadKeyConfig()
 
         setGestureSegment({})
       }
     },
-    [ configCtx, keyGridState, textAreaEdit, keyboard, keyGridOnClose, index, embedGrid, map ]
+    [ configCtx, keyGridState, textAreaEdit, keyboard, keyGridOnClose, index, embedGrid, map, isShadow ]
   )
 
   // define onGestureSegment
@@ -181,7 +194,7 @@ export default function KeyCell(
   // listen to modifier keys
   useEffect(
     () => {
-      if (!keyGridState) return
+      if (!keyGridState || isShadow) return
 
       const mkeyListeners: [Set<ModifierKeyListener>, Dispatch<SetStateAction<boolean>>][] = []
 
@@ -197,7 +210,7 @@ export default function KeyCell(
         mkeyListeners.forEach(([ls, l]) => ls.delete(l))
       }
     },
-    [ keyGridState, label ]
+    [ keyGridState, label, isShadow ]
   )
 
   // listen to mouse and touch events
@@ -230,7 +243,11 @@ export default function KeyCell(
       }
 
       const end = (e: TouchEvent|MouseEvent) => {
-        if (gesture && !gesture.complete) {
+        if (isShadow) {
+          if (!onGesture.current) return;
+          onGesture.current(TouchGesture.create(e, 0, map))
+        }
+        else if (gesture && !gesture.complete) {
           e.preventDefault()
           e.stopPropagation()
           gesture?.update(e)
@@ -249,17 +266,21 @@ export default function KeyCell(
       }
 
       if (isTouchScreen()) {
-        _self?.addEventListener('touchstart', start)
-        _self?.addEventListener('touchmove', move)
+        if (!isShadow) {
+          _self?.addEventListener('touchstart', start)
+          _self?.addEventListener('touchmove', move)
+        }
         _self?.addEventListener('touchend', end)
       }
       else {
-        _self?.addEventListener('mousedown', start)
-        _self?.addEventListener('mousemove', move)
+        if (!isShadow) {
+          _self?.addEventListener('mousedown', start)
+          _self?.addEventListener('mousemove', move)
+          _self?.addEventListener('mouseup', unsetMouseHover)
+          _self?.addEventListener('mouseleave', setMouseHover)
+          _self?.addEventListener('mouseenter', unsetMouseHover)
+        }
         _self?.addEventListener('mouseup', end)
-        _self?.addEventListener('mouseup', unsetMouseHover)
-        _self?.addEventListener('mouseleave', setMouseHover)
-        _self?.addEventListener('mouseenter', unsetMouseHover)
       }
 
       return () => {
@@ -278,7 +299,7 @@ export default function KeyCell(
         }
       }
     },
-    [ keyGridState, gesture, map ]
+    [ keyGridState, gesture, map, isShadow ]
   )
 
   // read key config updates
@@ -288,38 +309,76 @@ export default function KeyCell(
         return 
       }
 
-      const name = listenerName(KeyCell.name + `[${index.col},${index.row}]`)
-      configCtx.addSaveListener(name, KeyDefinition.name, () => {
-        if (
-          configCtx.keyboardInstance
-          && configCtx.keyIndex?.col === index.col && configCtx.keyIndex.row === index.row
-        ) {
-          const key = configCtx.getKeyDefinition(index)
+      const isKey = (configKeyIndex?: KeyIndex) => (configKeyIndex?.col === index.col && configKeyIndex.row === index.row)
+      
+      const getKey = (savedKeyIndex?: KeyIndex, newKeyIndex?: KeyIndex) => {
+        if (configCtx.keyboardInstance && isKey(savedKeyIndex)) {
+          return configCtx.getKeyDefinition(newKeyIndex || index)
+        }
+      }
 
-          const newLabel = key?.label || new KeyLabel()
-          if (!label.equals(newLabel)) {
-            setLabel(newLabel)
-          }
-          
-          const newMap = key?.map || new KeyMap()
-          // consider removing or reducing comparison that reduces render count in case it's too expensive
-          if (!map.equals(newMap)) {
-            setMap(newMap)
-          }
+      const name = listenerName(KeyCell.name + `[${index.col},${index.row}]`)
+      const onKeyDefinition = (key: KeyDefinition) => {
+        const newLabel = key?.label || new KeyLabel()
+        if (!label.equals(newLabel)) {
+          setLabel(newLabel)
+        }
+        
+        const newMap = key?.map || new KeyMap()
+        // consider removing or reducing comparison that reduces render count in case it's too expensive
+        if (!map.equals(newMap)) {
+          setMap(newMap)
+        }
+        
+        const newIsShadow = !!key?.isShadow
+        setIsShadow(newIsShadow)
+      }
+
+      configCtx.addSaveListener(name, 'KeyDefinition', () => {
+        const key = getKey(configCtx.keyIndex)
+        if (!key) return
+
+        onKeyDefinition(key)
+      })
+      configCtx.addSaveListener(name, 'KeyDefinition.dimensions', (savedKeyIndex) => {
+        const key = getKey(savedKeyIndex || configCtx.keyIndex)
+        if (!key) return
+        
+        const newDim = key?.dimensions || new GridDimensions(1, 1)
+        if (!dim.equals(newDim)) {
+          setDim(newDim)
+        }
+        
+        const newIsShadow = !!key?.isShadow
+        setIsShadow(newIsShadow)
+      })
+      // rather than moving the key cell component to a new location in the key grid, 
+      // change the underlying key definition that it represents
+      configCtx.addSaveListener(name, 'KeyIndex', (savedKeyIndex) => {
+        const key = getKey(savedKeyIndex)
+        if (!key) return
+
+        onKeyDefinition(key)
+        const newDim = key?.dimensions || new GridDimensions(1, 1)
+        if (!dim.equals(newDim)) {
+          setDim(newDim)
         }
       })
 
       return () => {
-        configCtx.deleteSaveListener(name, KeyDefinition.name)
+        configCtx.deleteSaveListener(name, 'KeyDefinition')
+        configCtx.deleteSaveListener(name, 'KeyDefinition.dimensions')
       }
     },
-    [ configCtx, index, label, map ]
+    [ configCtx, index, label, map, dim ]
   )
 
   return (
     <div 
       className={[
         'relative',
+        // place shadows behind bridges so they don't intercept mouse events
+        (isShadow ? '-z-10' : '')
         // unknown why tailwind grid cell classes are not working; maybe I should ask.
         // `row-start-${index.row+1} row-span-${dim.height} col-start-${index.col+1} col-span-${dim.width}`
         ].join(' ')}
@@ -344,7 +403,7 @@ export default function KeyCell(
             'grid-cols-3',
             'rounded-lg',
             'text-sm',
-            embedGrid ? 'hidden' : 'grid'
+            embedGrid ? 'hidden' : (isShadow ? 'invisible' : 'grid')
           ].join(' ')} >
           {(['upleft', 'up', 'upright', 'left', 'center', 'right', 'downleft', 'down', 'downright'] as Zone[]).map(
             (zone) => (

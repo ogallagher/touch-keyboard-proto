@@ -1,5 +1,6 @@
 import { KeyboardInstance, KeyboardPersistence, KeyboardSize } from '@lib/keyboardDefinition'
 import { frthenKeyboard } from '@lib/keyboardDefinitions/eng_frthen'
+import { qwertyAlphabet } from '@lib/keyboardDefinitions/eng_qwerty'
 import KeyLabel, { ZoneKey } from '@lib/keyLabel'
 import { describe } from 'mocha'
 import assert from 'node:assert'
@@ -11,36 +12,38 @@ const testDirPath = 'test'
 describe('keyboard', () => {
   describe('save and load', () => {
     it('saves and loads as json format', () => {
-      const frthen1 = new KeyboardInstance(frthenKeyboard, {
-        persistence: KeyboardPersistence.Indefinite,
-        size: KeyboardSize.Fill,
-        name: 'frthen1'
-      })
+      for (let keyboard of [frthenKeyboard, qwertyAlphabet]) {
+        const kbi1 = new KeyboardInstance(keyboard, {
+          persistence: KeyboardPersistence.Indefinite,
+          size: KeyboardSize.Fill,
+          name: `${keyboard.name}1`
+        })
 
-      const frthenStr = frthen1.save()
-      writeFileSync(path.join(testDirPath, `${frthen1.keyboard.name}.keyboard.json`), frthenStr)
-      const frthen2 = KeyboardInstance.load(frthenStr)
-      writeFileSync(path.join(testDirPath, `${frthen1.keyboard.name}-copy.keyboard.json`), frthen2.save())
+        const kbiStr = kbi1.save()
+        writeFileSync(path.join(testDirPath, `${kbi1.keyboard.name}.keyboard.json`), kbiStr)
+        const kbi2 = KeyboardInstance.load(kbiStr)
+        writeFileSync(path.join(testDirPath, `${kbi1.keyboard.name}-copy.keyboard.json`), kbi2.save())
 
-      assert(
-        frthen1.equals(frthen2), 
-        `keyboard mismatch before and after save+load`
-      )
+        assert(
+          kbi1.equals(kbi2), 
+          `${keyboard.name} keyboard mismatch before and after save+load`
+        )
 
-      frthen2.keyboard.name = 'frthen2'
-      assert(frthen1.equals(frthen2, false), `keyboard name-agnostic mismatch before and after rename`)
+        kbi2.keyboard.name = `${keyboard.name}2`
+        assert(kbi1.equals(kbi2, false), `keyboard name-agnostic mismatch before and after rename`)
 
-      const _rthen3 = KeyboardInstance.load(frthenStr, { keyOverrides: [
-        {row: 0, col: 0, key: {
-          label: new KeyLabel([
-            [new ZoneKey('center'), '']
-          ])
-        }}
-      ] })
-      assert(
-        !frthen1.equals(_rthen3), 
-        `keyboards still match after attempting key override`
-      )
+        const kbi3 = KeyboardInstance.load(kbiStr, { keyOverrides: [
+          {row: 0, col: 0, key: {
+            label: new KeyLabel([
+              [new ZoneKey('center'), '']
+            ])
+          }}
+        ] })
+        assert(
+          !kbi1.equals(kbi3), 
+          `${keyboard.name} keyboards still match after attempting key override`
+        )
+      }
     })
   })
 })

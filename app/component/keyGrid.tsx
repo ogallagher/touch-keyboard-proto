@@ -1,6 +1,6 @@
 import GridDimensions from "@lib/gridDimensions"
 import KeyCell from "@component/keyCell"
-import { KeyboardInstance } from "@lib/keyboardDefinition"
+import { KeyboardInstance, KeyIndex } from "@lib/keyboardDefinition"
 import { useContext, useEffect, useRef, useState } from "react"
 import { KeyGridCtx } from "@context/keyGridCtx"
 import { isTouchScreen } from "@lib/platform"
@@ -21,18 +21,19 @@ export default function KeyGrid(
   const keyGridState = useContext(KeyGridCtx)
   const configCtx = useContext(ConfigCtx)
   const [dimensions, setDimensions] = useState(keyboard.keyboard.dimensions as GridDimensions|undefined)
+  const [_reboundKey, setReboundKey] = useState(undefined as KeyIndex|undefined)
 
   // read subsequent keyboard config updates
   useEffect(
     () => {
-      if (configCtx && configurable) {
-        const name = listenerName(KeyGrid.name)
-        configCtx.addSaveListener(name, GridDimensions.name, () => {
-          setDimensions(configCtx.keyboardInstance?.keyboard.dimensions)
-        })
-        
-        return () => configCtx.deleteSaveListener(name, GridDimensions.name)  
-      }
+      if (!configCtx || !configurable) return
+
+      const name = listenerName(KeyGrid.name)
+      configCtx.addSaveListener(name, 'GridDimensions', () => {
+        setDimensions(configCtx.keyboardInstance?.keyboard.dimensions)
+      })
+      
+      return () => configCtx.deleteSaveListener(name, 'GridDimensions')
     },
     [ configCtx, configurable ]
   )
@@ -75,27 +76,39 @@ export default function KeyGrid(
     return disableMouseEvents
   }
 
-  const deactivate = useRef((closeKeyboard: boolean) => {
-    unlockScroll()
+  const deactivate = useRef((_closeKeyboard: boolean) => {})
+  const activate = useRef(() => {})
+  useEffect(
+    () => {
+      if (!keyGridState) return
 
-    if (disableMouseEvents) {
-      disableMouseEvents()
-    }
+      // define deactivate
+      deactivate.current = (closeKeyboard: boolean) => {
+        unlockScroll()
 
-    if (closeKeyboard && onClose) {
-      onClose()
+        if (disableMouseEvents) {
+          disableMouseEvents()
+        }
 
-      keyGridState?.deactivateKeyGrid.delete(keyboard.instanceId)
-    }
-  })
-  const activate = useRef(() => {
-    lockScroll()
-    if (enableMouseEvents) {
-      enableMouseEvents!()
-    }
+        if (closeKeyboard && onClose) {
+          onClose()
 
-    return deactivate.current
-  })
+          keyGridState?.deactivateKeyGrid.delete(keyboard.instanceId)
+        }
+      }
+
+      // define activate
+      activate.current = () => {
+        lockScroll()
+        if (enableMouseEvents) {
+          enableMouseEvents!()
+        }
+
+        keyGridState.deactivateKeyGrid.set(keyboard.instanceId, deactivate.current)
+      }
+    },
+    [ keyGridState, keyboard ]
+  )
 
   function* getKeyCells() {
     const h = dimensions?.height || 0
@@ -103,9 +116,6 @@ export default function KeyGrid(
 
     for (let row=0; row < h; row++) {
       for (let col=0; col < w; col++) {
-        // skip shadow, whose cell location is occupied by a neighbor bridge
-        if (keyboard?.keyboard.getKey(row, col)?.isShadow) continue
-
         yield (
           <KeyCell 
             key={`${row},${col}`}
@@ -117,19 +127,14 @@ export default function KeyGrid(
     }
   }
 
-  // activate
+  // activate on keyboard assignment
   useEffect(
     () => {
-      if (!keyGridState) {
-        return
-      }
+      if (!keyGridState) return
 
-      const deactivate = activate.current()
+      activate.current()
 
-      keyGridState.deactivateKeyGrid.set(keyboard.instanceId, deactivate)
-      keyGridState.activeKeyboardInstanceId.current = keyboard.instanceId
-
-      return () => deactivate(false)
+      return () => deactivate.current(false)
     },
     [ keyGridState, keyboard ]
   )
@@ -162,6 +167,7 @@ export default function KeyGrid(
           className={[
             'font-mono',
             'h-full',
+            'overflow-clip',
             `grid grid-rows-${dimensions?.height || 1} grid-cols-${dimensions?.width || 1} gap-1`
           ].join(' ')}>
           {Array.from(getKeyCells())}

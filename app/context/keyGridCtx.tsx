@@ -126,9 +126,6 @@ export class KeyGridState {
   }
 
   public readonly deactivateKeyGrid: Map<string, (closeKeyboard: boolean) => void> = new Map()
-  public readonly activeKeyboardInstanceId: RefObject<string|null> = {
-    current: null
-  }
 
   private readonly _modifierKeys: Map<MetaChar, boolean> = new Map([
     [MetaChar.SHIFT, false],

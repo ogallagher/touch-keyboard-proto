@@ -166,13 +166,12 @@ export default class KeyStroke {
 
           keyGridState.releaseEphemeralKeys()
 
-          if (keyGridState.activeKeyboardInstanceId.current) {
-            if (keyGridState.getKeyboard(keyGridState.activeKeyboardInstanceId.current)?.config.persistence === KeyboardPersistence.Brief) {
-              const deactivate = keyGridState.deactivateKeyGrid.get(keyboardId)
-              if (deactivate) {
-                deactivate(true)
-                closedKeyboard = true
-              }
+          // close brief keyboard on end of keystroke
+          if (keyGridState.getKeyboard(keyboardId)?.config.persistence === KeyboardPersistence.Brief) {
+            const deactivate = keyGridState.deactivateKeyGrid.get(keyboardId)
+            if (deactivate) {
+              deactivate(true)
+              closedKeyboard = true
             }
           }
           break

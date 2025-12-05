@@ -6,10 +6,10 @@ import KeyStroke from "@lib/keyStroke"
 import { AbstractTouchGesture } from "@lib/touchGesture"
 import { createContext } from "react"
 
-export type ClassName = string
+export type SaveKey = 'GridDimensions'|'KeyDefinition'|'KeyDefinition.dimensions'|'KeyIndex'
 export type ModeListener = () => void
 export type LoadListener = () => void
-export type SaveListener = () => void
+export type SaveListener = (kidx?: KeyIndex) => void
 export type ChildKeyboardConfig = {
   persistence: KeyboardPersistence
   size: KeyboardSize
@@ -21,9 +21,11 @@ export class ConfigureKeyBoard {
   private _keyIndex?: KeyIndex
   private _gesture?: AbstractTouchGesture
   private _keystroke?: KeyStroke|KeyboardInstance
+  private _isShadow?: boolean
+  private _keyDimensions?: GridDimensions
   private readonly modeListeners: Map<string, ModeListener> = new Map()
   private readonly loadListeners: Map<string, LoadListener> = new Map()
-  private readonly saveListeners: Map<ClassName, Map<string, SaveListener>> = new Map()
+  private readonly saveListeners: Map<SaveKey, Map<string, SaveListener>> = new Map()
 
   get mode() {
     return this._mode
@@ -54,6 +56,10 @@ export class ConfigureKeyBoard {
     }
   }
 
+  get isShadow() { return this._isShadow }
+
+  get keyDimensions() { return this._keyDimensions }
+
   getKeyDefinition(keyIndex: KeyIndex) {
     return this._keyboardInstance?.keyboard.getKey(keyIndex.row, keyIndex.col)
   }
@@ -72,13 +78,13 @@ export class ConfigureKeyBoard {
     this.loadListeners.delete(name)
   }
 
-  addSaveListener(name: string, attributeType: ClassName, listener: SaveListener) {
+  addSaveListener(name: string, attributeType: SaveKey, listener: SaveListener) {
     const attrListeners = this.saveListeners.get(attributeType) || new Map()
     attrListeners.set(name, listener)
     this.saveListeners.set(attributeType, attrListeners)
   }
 
-  deleteSaveListener(name: string, attributeTye: ClassName) {
+  deleteSaveListener(name: string, attributeTye: SaveKey) {
     this.saveListeners.get(attributeTye)?.delete(name)
   }
 
@@ -92,10 +98,12 @@ export class ConfigureKeyBoard {
     Array.from(this.loadListeners.values()).forEach(l => l())
   }
 
-  loadKey(index: KeyIndex, gesture: AbstractTouchGesture, keystroke?: KeyStroke|KeyboardInstance) {
+  loadKey(index: KeyIndex, gesture: AbstractTouchGesture, keystroke?: KeyStroke|KeyboardInstance, isShadow?: boolean, keyDimensions?: GridDimensions) {
     this._keyIndex = index
     this._gesture = gesture
     this._keystroke = keystroke
+    this._isShadow = isShadow
+    this._keyDimensions = keyDimensions
 
     Array.from(this.loadListeners.values()).forEach(l => l())
   }
@@ -104,6 +112,7 @@ export class ConfigureKeyBoard {
     this._keyIndex = undefined
     this._gesture = undefined
     this._keystroke = undefined
+    this._isShadow = undefined
 
     Array.from(this.loadListeners.values()).forEach(l => l())
   }
@@ -111,7 +120,7 @@ export class ConfigureKeyBoard {
   setGridDimensions(gridDimensions: GridDimensions) {
     if (this._keyboardInstance) {
       this._keyboardInstance.keyboard.dimensions = gridDimensions
-      const ls = this.saveListeners.get(GridDimensions.name)?.values()
+      const ls = this.saveListeners.get('GridDimensions')?.values()
       if (ls) {
         Array.from(ls).forEach(l => l())
       }
@@ -122,10 +131,49 @@ export class ConfigureKeyBoard {
     if (this._keyboardInstance) {
       this._keyIndex = index
       this._keystroke = this._gesture ? key.map.getKeys(this._gesture, true, true) : undefined
-      this._keyboardInstance?.keyboard.setKey(index, key)
-      const ls = this.saveListeners.get(KeyDefinition.name)?.values()
+      this._isShadow = key.isShadow
+      const { updateDimensions, shadowUpdateKeys } = this._keyboardInstance.keyboard.setKey(index, key)
+
+      const lsKeyDef = this.saveListeners.get('KeyDefinition')?.values()
+      if (lsKeyDef) {
+        Array.from(lsKeyDef).forEach(l => l())
+      }
+
+      if (updateDimensions) {
+        const lsKeyDim = this.saveListeners.get('KeyDefinition.dimensions')?.values()
+        if (lsKeyDim) {
+          Array.from(lsKeyDim).forEach(l => {
+            // bridge key
+            l(index)
+
+            // shadow update keys
+            for (const shadowUpdateKey of shadowUpdateKeys) {
+              l(shadowUpdateKey)
+            }
+          })
+        }
+      }
+    }
+  }
+
+  moveKey(index: KeyIndex, newIndex: KeyIndex) {
+    if (this._keyboardInstance) {
+      this._keyIndex = newIndex
+      const { shadowUpdateKeys } = this._keyboardInstance.keyboard.moveKey(index, newIndex)
+      const ls = this.saveListeners.get('KeyIndex')?.values()
       if (ls) {
-        Array.from(ls).forEach(l => l())
+        Array.from(ls).forEach(l => {
+          // prev location key
+          l(index)
+
+          // new location key
+          l(newIndex)
+
+          // shadow update keys
+          for (const shadowUpdateKey of shadowUpdateKeys) {
+            l(shadowUpdateKey)
+          }
+        })
       }
     }
   }

@@ -39,6 +39,20 @@ export type SerializedKeyboardInstance = {
 
 const editLockError = (name: string) => new Error(`keyboard name=${name} is locked for editing; create an editable clone first`)
 
+export const constrainKeyIndex = (keyIdx: KeyIndex, keyDim: GridDimensions, gridDim: GridDimensions): KeyIndex => {
+  return {
+    row: Math.min(Math.max(keyIdx.row, 0), gridDim.height - keyDim.height),
+    col: Math.min(Math.max(keyIdx.col, 0), gridDim.width - keyDim.height)
+  }
+}
+
+export const constrainKeyDimensions = (keyIdx: KeyIndex, keyDim: GridDimensions, gridDim: GridDimensions): GridDimensions => {
+  return new GridDimensions(
+    Math.min(Math.max(keyDim.width, 1), gridDim.width - keyIdx.col),
+    Math.min(Math.max(keyDim.height, 1), gridDim.height - keyIdx.row)
+  )
+}
+
 /**
  * Generate a new keyboard instance id only guaranteed unique if not performed within same millisecond for same args.
  * 
@@ -88,9 +102,18 @@ export default class KeyboardDefinition {
     if (this.lockEdit) {
       throw editLockError(this.name)
     }
-
-    if (this.keys[index.row][index.col].isBridge !== key.isBridge) {
-      KeyboardDefinition.defineShadow(this.keys, index, key.dimensions)
+    
+    const oldKeyDim = this.keys[index.row][index.col].dimensions
+    const newKeyDim = key.dimensions
+    const updateDimensions = !oldKeyDim.equals(newKeyDim)
+    let shadowUpdateKeys: KeyIndex[] = []
+    if (updateDimensions) {
+      shadowUpdateKeys = shadowUpdateKeys.concat(
+        // keys under previous location bridge are not shadows
+        KeyboardDefinition.defineShadow(this.keys, index, oldKeyDim, false),
+        // keys under new location bridge are shadows
+        KeyboardDefinition.defineShadow(this.keys, index, newKeyDim, true)
+      )
     }
 
     const dim = this.dimensions
@@ -99,6 +122,42 @@ export default class KeyboardDefinition {
     }
 
     this._saved = false
+
+    return {
+      updateDimensions,
+      shadowUpdateKeys
+    }
+  }
+
+  moveKey(index: KeyIndex, newIndex: KeyIndex) {
+    if (this.lockEdit) {
+      throw editLockError(this.name)
+    }
+
+    // previous location cell becomes empty
+    const key = this.keys[index.row][index.col]
+    this.keys[index.row][index.col] = KeyDefinition.empty()
+
+    // new location cell becomes key
+    this.keys[newIndex.row][newIndex.col] = key
+    
+    let shadowUpdateKeys: KeyIndex[] = []
+    if (key.isBridge) {
+      const dim = key.dimensions
+      
+      shadowUpdateKeys = shadowUpdateKeys.concat(
+        // keys under previous location bridge are not shadows
+        KeyboardDefinition.defineShadow(this.keys, index, dim, false),
+        // keys under new location bridge are shadows
+        KeyboardDefinition.defineShadow(this.keys, newIndex, dim, true)
+      )
+    }
+
+    this._saved = false
+
+    return {
+      shadowUpdateKeys
+    }
   }
 
   get dimensions() {
@@ -154,16 +213,23 @@ export default class KeyboardDefinition {
     return rowSlice
   }
 
-  private static defineShadow(keys: KeyDefinition[][], keyIdx: KeyIndex, keyDim: GridDimensions) {
+  private static defineShadow(keys: KeyDefinition[][], keyIdx: KeyIndex, keyDim: GridDimensions, isShadow: boolean = true) {
+    let shadowUpdateKeys: KeyIndex[] = []
+
     // right and down neighbors are shadows
     for (let r=0; r<keyDim.height; r++) {
       for (let c=0; c<keyDim.width; c++) {
         // skip self
         if (r==0 && c==0) continue
 
-        keys[keyIdx.row + r][keyIdx.col + c].isShadow = true
+        const idx: KeyIndex = {row: keyIdx.row + r, col: keyIdx.col + c}
+        keys[idx.row][idx.col].isShadow = isShadow
+
+        shadowUpdateKeys.push(idx)
       }
     }
+
+    return shadowUpdateKeys
   }
 
   private static defineShadows(keys: KeyDefinition[][]) {

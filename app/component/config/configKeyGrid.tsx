@@ -73,9 +73,11 @@ export default function ConfigKeyGrid(
   // write name to config context
   useEffect(
     () => {
-      if (!configCtx || !keyboardName) return
+      if (!configCtx || !keyboardName || !configCtx.keyboardInstance) return
 
-      configCtx.setKeyboardName(keyboardName)
+      if (configCtx.keyboardInstance.keyboard.name !== keyboardName) {
+        configCtx.setKeyboardName(keyboardName)
+      }
     },
     [ configCtx, keyboardName ]
   )
@@ -376,11 +378,13 @@ export default function ConfigKeyGrid(
         {/* config grid dimensions.width */}
         <IncDec
           orientation={Orientation.Horizontal} 
+          title='Adjust col count'
           onDec={() => setGridDimensions(gridDimensions?.colAdd(-1))}
           onInc={() => setGridDimensions(gridDimensions?.colAdd(+1))} />
         {/* config grid dimensions.height */}
         <IncDec 
           orientation={Orientation.Vertical}
+          title='Adjust row count'
           onDec={() => setGridDimensions(gridDimensions?.rowAdd(-1))}
           onInc={() => setGridDimensions(gridDimensions?.rowAdd(+1))} />
       </div>
