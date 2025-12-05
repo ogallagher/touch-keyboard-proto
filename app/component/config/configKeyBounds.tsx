@@ -1,21 +1,53 @@
 import IncDec from "@component/incDec"
+import { ConfigCtx } from "@context/configCtx"
 import GridDimensions from "@lib/gridDimensions"
-import { KeyIndex } from "@lib/keyboardDefinition"
+import { constrainKeyDimensions, constrainKeyIndex, KeyIndex } from "@lib/keyboardDefinition"
 import { Orientation } from "@lib/orientation"
-import { Dispatch, RefObject, SetStateAction, useState } from "react"
+import { Dispatch, SetStateAction, useContext, useState } from "react"
 import { BoundingBoxCircles } from "react-bootstrap-icons"
 
 export default function ConfigKeyCellBounds(
   { index, setIndex, dimensions, setDimensions }: {
-    index?: KeyIndex,
+    index: KeyIndex|undefined,
     setIndex: Dispatch<SetStateAction<KeyIndex|undefined>>
-    dimensions: GridDimensions,
+    dimensions: GridDimensions|undefined,
     setDimensions: Dispatch<SetStateAction<GridDimensions|undefined>>
   }
 ) {
+  const configCtx = useContext(ConfigCtx)
   const [showBounds, setShowBounds] = useState(false)
 
-  return (
+  const moveIndex = (delta: KeyIndex) => {
+    if (!index || !dimensions || !configCtx?.keyboardInstance) return
+
+    const validKeyIndex = constrainKeyIndex(
+      {
+        row: index.row + delta.row,
+        col: index.col + delta.col
+      }, 
+      dimensions, 
+      configCtx.keyboardInstance.keyboard.dimensions
+    )
+
+    setIndex(validKeyIndex)
+  }
+
+  const resizeDimensions = (delta: GridDimensions) => {
+    if (!index || !dimensions || !configCtx?.keyboardInstance) return
+
+    const validDimensions = constrainKeyDimensions(
+      index, 
+      new GridDimensions(
+        dimensions.width + delta.width,
+        dimensions.height + delta.height
+      ), 
+      configCtx.keyboardInstance.keyboard.dimensions
+    )
+
+    setDimensions(validDimensions)
+  }
+
+  return !dimensions ? undefined : (
     <div className='flex flex-row justify-center'>
       <div 
         className={[
@@ -34,8 +66,8 @@ export default function ConfigKeyCellBounds(
             <IncDec 
               orientation={Orientation.Vertical}
               title='Row start'
-              onDec={() => setIndex({col: index.col, row: index.row-1})}
-              onInc={() => setIndex({col: index.col, row: index.row+1})} />
+              onDec={() => moveIndex({col: 0, row: -1})}
+              onInc={() => moveIndex({col: 0, row: +1})} />
           }
         </div>
         {/* index.col */}
@@ -50,8 +82,8 @@ export default function ConfigKeyCellBounds(
             <IncDec 
               orientation={Orientation.Horizontal}
               title='Col start'
-              onDec={() => setIndex({col: index.col-1, row: index.row})}
-              onInc={() => setIndex({col: index.col+1, row: index.row})} />
+              onDec={() => moveIndex({col: -1, row: 0})}
+              onInc={() => moveIndex({col: +1, row: 0})} />
           }
         </div>
         {/* key bounds icon */}
@@ -77,8 +109,8 @@ export default function ConfigKeyCellBounds(
           <IncDec 
             orientation={Orientation.Horizontal}
             title='Col end'
-            onDec={() => setDimensions(dimensions?.colAdd(-1))}
-            onInc={() => setDimensions(dimensions?.colAdd(+1))} />
+            onDec={() => resizeDimensions(new GridDimensions(-1, 0))}
+            onInc={() => resizeDimensions(new GridDimensions(+1, 0))} />
         </div>
         {/* dimensions.row */}
         <div 
@@ -90,8 +122,8 @@ export default function ConfigKeyCellBounds(
           <IncDec 
             orientation={Orientation.Vertical}
             title='Row end'
-            onDec={() => setDimensions(dimensions?.rowAdd(-1))}
-            onInc={() => setDimensions(dimensions?.rowAdd(+1))} />
+            onDec={() => resizeDimensions(new GridDimensions(0, -1))}
+            onInc={() => resizeDimensions(new GridDimensions(0, +1))} />
         </div>
       </div>
     </div>

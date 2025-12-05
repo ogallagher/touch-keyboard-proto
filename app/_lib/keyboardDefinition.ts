@@ -37,12 +37,14 @@ export type SerializedKeyboardInstance = {
   keyOverrides?: KeyOverride[]
 }
 
+export const keyIndexesEqual = (idx1: KeyIndex, idx2: KeyIndex) => (idx1.col === idx2.col && idx1.row === idx2.row)
+
 const editLockError = (name: string) => new Error(`keyboard name=${name} is locked for editing; create an editable clone first`)
 
 export const constrainKeyIndex = (keyIdx: KeyIndex, keyDim: GridDimensions, gridDim: GridDimensions): KeyIndex => {
   return {
     row: Math.min(Math.max(keyIdx.row, 0), gridDim.height - keyDim.height),
-    col: Math.min(Math.max(keyIdx.col, 0), gridDim.width - keyDim.height)
+    col: Math.min(Math.max(keyIdx.col, 0), gridDim.width - keyDim.width)
   }
 }
 
@@ -214,7 +216,7 @@ export default class KeyboardDefinition {
   }
 
   private static defineShadow(keys: KeyDefinition[][], keyIdx: KeyIndex, keyDim: GridDimensions, isShadow: boolean = true) {
-    let shadowUpdateKeys: KeyIndex[] = []
+    const shadowUpdateKeys: KeyIndex[] = []
 
     // right and down neighbors are shadows
     for (let r=0; r<keyDim.height; r++) {

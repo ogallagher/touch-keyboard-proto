@@ -1,6 +1,6 @@
 import { ChildKeyboardConfig, ConfigCtx } from "@context/configCtx"
 import { listenerName } from "@lib/eventSync"
-import { constrainKeyDimensions, constrainKeyIndex, KeyboardInstance, KeyIndex } from "@lib/keyboardDefinition"
+import { KeyboardInstance, KeyIndex, keyIndexesEqual } from "@lib/keyboardDefinition"
 import { KeyDefinition } from "@lib/keyDefinition"
 import KeyLabel, { Zone } from "@lib/keyLabel"
 import KeyMap from "@lib/keyMap"
@@ -22,8 +22,12 @@ export default function ConfigKeyCell(
 ) {
   const configCtx = useContext(ConfigCtx)
   const gridCtx = useContext(KeyGridCtx)
-  const [keyIndex, setKeyIndex] = useState(undefined as KeyIndex|undefined)
+  // current index without any triggers
+  const keyIndex = useRef(undefined as KeyIndex|undefined)
+  // new index triggers config write
   const [keyMoveIdx, setKeyMoveIdx] = useState(undefined as KeyIndex|undefined)
+  // current index triggers render
+  const [_keyIndex, _setKeyIndex] = useState(undefined as KeyIndex|undefined)
   const [keyLabel, setKeyLabel] = useState(undefined as KeyLabel|undefined)
   const keyMap = useRef(undefined as KeyMap|undefined)
   const [keyStroke, setKeyStroke] = useState(undefined as KeyStroke|undefined)
@@ -31,7 +35,9 @@ export default function ConfigKeyCell(
   const [childKeyboardId, setChildKeyboardId] = useState(undefined as string|undefined)
   const [childKeyboardConfig, setChildKeyboardConfig] = useState(undefined as ChildKeyboardConfig|undefined)
   const [isShadow, setIsShadow] = useState(false)
-  const [dimensions, setDimensions] = useState(undefined as GridDimensions|undefined)
+  const dimensions = useRef(undefined as GridDimensions|undefined)
+  const [resizeDimensions, setResizeDimensions] = useState(undefined as GridDimensions|undefined)
+  const [_dimensions, _setDimensions] = useState(undefined as GridDimensions|undefined)
   const [gesture, setGesture] = useState(undefined as AbstractTouchGesture|undefined)
   const [labelZoneUseGesture, setLabelZoneUseGesture] = useState(false)
   const [labelZoneUseModKeys, setLabelZoneUseModKeys] = useState(false)
@@ -47,8 +53,9 @@ export default function ConfigKeyCell(
       configCtx.addLoadListener(name, () => {
         let key: KeyDefinition|undefined
         if (configCtx.keyboardInstance && configCtx.keyIndex) {
-          setKeyIndex(configCtx.keyIndex)
+          keyIndex.current = configCtx.keyIndex
           setKeyMoveIdx(undefined)
+          _setKeyIndex(keyIndex.current)
           key = configCtx.getKeyDefinition(configCtx.keyIndex)
         }
 
@@ -58,7 +65,9 @@ export default function ConfigKeyCell(
         setChildKeyboardId(configCtx.childKeyboardInstance?.instanceId)
         setChildKeyboardConfig(configCtx.childKeyboardInstance?.config)
         setIsShadow(!!configCtx.isShadow)
-        setDimensions(configCtx.keyDimensions)
+        dimensions.current = configCtx.keyDimensions
+        setResizeDimensions(undefined)
+        _setDimensions(dimensions.current)
         setGesture(configCtx.gesture?.clone())
       })
 
@@ -93,8 +102,8 @@ export default function ConfigKeyCell(
       if (
         !gridCtx 
         || !configCtx || configCtx.mode !== ConfigEvalMode.Config || !configCtx.keyboardInstance
-        || !keyIndex
-        || !dimensions
+        || !keyIndex.current
+        || !dimensions.current
       ) return
 
       if (keyLabel && keyMap.current) {
@@ -114,37 +123,30 @@ export default function ConfigKeyCell(
           }
         }
 
-        // constrain key dimensions
-        const newDimensions = constrainKeyDimensions(keyIndex, dimensions, configCtx.keyboardInstance.keyboard.dimensions)
-
         const keyDef = new KeyDefinition({ 
           label: keyLabel, 
           map: newKeyMap, 
           isShadow, 
-          dimensions: newDimensions
+          dimensions: resizeDimensions || dimensions.current
         })
         
-        if (!keyDef.equals(configCtx.getKeyDefinition(keyIndex)!)) {
-          configCtx.setKey(keyIndex, keyDef)
+        if (!keyDef.equals(configCtx.getKeyDefinition(keyIndex.current)!)) {
+          configCtx.setKey(keyIndex.current, keyDef)
           // after key load, configKeyCell is source of truth; don't receive map update from configCtx
           keyMap.current = newKeyMap
+          dimensions.current = keyDef.dimensions
+          _setDimensions(dimensions.current)
         }
       }
 
-      const keyIndexesEqual = (idx1: KeyIndex, idx2: KeyIndex) => (idx1.col === idx2.col && idx1.row === idx2.row)
-
-      if (keyMoveIdx && !keyIndexesEqual(keyIndex, keyMoveIdx)) {
-        // constrain key index
-        const validKeyMoveIdx = constrainKeyIndex(keyMoveIdx, dimensions, configCtx.keyboardInstance.keyboard.dimensions)
-
-        if (keyIndexesEqual(keyMoveIdx, validKeyMoveIdx)) {
-          configCtx.moveKey(keyIndex, keyMoveIdx)
-          // update index
-          setKeyIndex(keyMoveIdx)
-        }
+      if (keyMoveIdx && !keyIndexesEqual(keyIndex.current, keyMoveIdx)) {
+        configCtx.moveKey(keyIndex.current, keyMoveIdx)
+        // update index
+        keyIndex.current = keyMoveIdx
+        _setKeyIndex(keyIndex.current)
       }
     },
-    [ gridCtx, configCtx, gesture, keyLabel, keyStroke, childKeyboardId, childKeyboardConfig, isShadow, dimensions, keyIndex, keyMoveIdx ]
+    [ gridCtx, configCtx, gesture, keyLabel, keyStroke, childKeyboardId, childKeyboardConfig, isShadow, keyMoveIdx, resizeDimensions ]
   )
 
   // write modifier keys to grid context
@@ -225,13 +227,11 @@ export default function ConfigKeyCell(
         </div>
 
         {/* key bounds */}
-        {dimensions === undefined ? undefined : (
-          <div className='flex flex-row justify-center'>
-            <ConfigKeyCellBounds
-              index={keyIndex} setIndex={setKeyMoveIdx}
-              dimensions={dimensions} setDimensions={setDimensions} />
-          </div>
-        )}
+        <div className='flex flex-row justify-center'>
+          <ConfigKeyCellBounds
+            index={_keyIndex} setIndex={setKeyMoveIdx}
+            dimensions={_dimensions} setDimensions={setResizeDimensions} />
+        </div>
         
         {/* modifier keys */}
         <div className='flex flex-row gap-2 justify-center'>   

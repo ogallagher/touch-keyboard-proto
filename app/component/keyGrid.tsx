@@ -1,6 +1,6 @@
 import GridDimensions from "@lib/gridDimensions"
 import KeyCell from "@component/keyCell"
-import { KeyboardInstance, KeyIndex } from "@lib/keyboardDefinition"
+import { KeyboardInstance } from "@lib/keyboardDefinition"
 import { useContext, useEffect, useRef, useState } from "react"
 import { KeyGridCtx } from "@context/keyGridCtx"
 import { isTouchScreen } from "@lib/platform"
@@ -21,7 +21,6 @@ export default function KeyGrid(
   const keyGridState = useContext(KeyGridCtx)
   const configCtx = useContext(ConfigCtx)
   const [dimensions, setDimensions] = useState(keyboard.keyboard.dimensions as GridDimensions|undefined)
-  const [_reboundKey, setReboundKey] = useState(undefined as KeyIndex|undefined)
 
   // read subsequent keyboard config updates
   useEffect(
@@ -38,14 +37,17 @@ export default function KeyGrid(
     [ configCtx, configurable ]
   )
 
-  // TODO define all of these methods once with useRef if better performance
-  const ignoreScroll = (e: Event) => { e.preventDefault() }
-  const unlockScroll = () => scrollEventTypes.forEach((eventType) => grid.current?.removeEventListener(eventType, ignoreScroll))
-  const lockScroll = () => {
+  const ignoreScroll = useRef(
+    (e: Event) => { e.preventDefault() }
+  )
+  const unlockScroll = useRef(
+    () => scrollEventTypes.forEach((eventType) => grid.current?.removeEventListener(eventType, ignoreScroll.current))
+  )
+  const lockScroll = useRef(() => {
     scrollEventTypes.forEach((eventType) => {
       grid.current?.addEventListener(
         eventType, 
-        ignoreScroll,
+        ignoreScroll.current,
         {
           passive: false
         }
@@ -53,9 +55,9 @@ export default function KeyGrid(
     })
 
     return unlockScroll
-  }
+  })
 
-  const relayMouseEvent = isTouchScreen() ? undefined : (e: MouseEvent) => {
+  const relayMouseEvent = useRef(isTouchScreen() ? undefined : (e: MouseEvent) => {
     const _e = new MouseEvent(
       e.type,
       {
@@ -64,19 +66,19 @@ export default function KeyGrid(
       }
     )
     keyGridState?.mouseHoverKeyCell.current?.dispatchEvent(_e)
-  }
-  const disableMouseEvents = !relayMouseEvent ? undefined : () => {
-    window.removeEventListener('mousemove', relayMouseEvent)
-    window.removeEventListener('mouseup', relayMouseEvent)
-  }
-  const enableMouseEvents = !relayMouseEvent ? undefined : () => {
-    window.addEventListener('mousemove', relayMouseEvent)
-    window.addEventListener('mouseup', relayMouseEvent)
+  })
+  const disableMouseEvents = useRef(!relayMouseEvent ? undefined : () => {
+    window.removeEventListener('mousemove', relayMouseEvent.current!)
+    window.removeEventListener('mouseup', relayMouseEvent.current!)
+  })
+  const enableMouseEvents = useRef(!relayMouseEvent ? undefined : () => {
+    window.addEventListener('mousemove', relayMouseEvent.current!)
+    window.addEventListener('mouseup', relayMouseEvent.current!)
 
     return disableMouseEvents
-  }
+  })
 
-  const deactivate = useRef((_closeKeyboard: boolean) => {})
+  const deactivate = useRef(undefined as unknown as (closeKeyboard: boolean) => void)
   const activate = useRef(() => {})
   useEffect(
     () => {
@@ -84,10 +86,10 @@ export default function KeyGrid(
 
       // define deactivate
       deactivate.current = (closeKeyboard: boolean) => {
-        unlockScroll()
+        unlockScroll.current()
 
-        if (disableMouseEvents) {
-          disableMouseEvents()
+        if (disableMouseEvents.current) {
+          disableMouseEvents.current()
         }
 
         if (closeKeyboard && onClose) {
@@ -99,15 +101,15 @@ export default function KeyGrid(
 
       // define activate
       activate.current = () => {
-        lockScroll()
-        if (enableMouseEvents) {
-          enableMouseEvents!()
+        lockScroll.current()
+        if (enableMouseEvents.current) {
+          enableMouseEvents.current()
         }
 
         keyGridState.deactivateKeyGrid.set(keyboard.instanceId, deactivate.current)
       }
     },
-    [ keyGridState, keyboard ]
+    [ keyGridState, keyboard, onClose ]
   )
 
   function* getKeyCells() {

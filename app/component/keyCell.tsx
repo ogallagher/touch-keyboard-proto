@@ -138,7 +138,7 @@ export default function KeyCell(
         setGestureSegment({})
       }
     },
-    [ configCtx, keyGridState, textAreaEdit, keyboard, keyGridOnClose, index, embedGrid, map, isShadow ]
+    [ configCtx, keyGridState, textAreaEdit, keyboard, keyGridOnClose, index, embedGrid, map, dim, isShadow ]
   )
 
   // define onGestureSegment

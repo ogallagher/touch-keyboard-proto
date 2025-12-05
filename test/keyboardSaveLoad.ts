@@ -12,7 +12,7 @@ const testDirPath = 'test'
 describe('keyboard', () => {
   describe('save and load', () => {
     it('saves and loads as json format', () => {
-      for (let keyboard of [frthenKeyboard, qwertyAlphabet]) {
+      for (const keyboard of [frthenKeyboard, qwertyAlphabet]) {
         const kbi1 = new KeyboardInstance(keyboard, {
           persistence: KeyboardPersistence.Indefinite,
           size: KeyboardSize.Fill,
