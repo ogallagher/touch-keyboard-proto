@@ -38,7 +38,7 @@ Consonants grouped by similarity of sound and relative frequency[^1]. Relative f
 | `h` <.06> |  |
 | `r` `w` `y` <.03> | |
 
-Where there was extra space (ex. below t, th) I added a couple bigrams (letter pairs). Top 10 by relative frequency[^1]:
+Where there was extra space (ex. below t, th) I added a some bigrams (letter pairs). Top 10 by relative frequency[^1]:
 
 - th = .039
 - he = .037
@@ -59,7 +59,7 @@ Touch and hold or swipe and hold provide more options, as was done for diacritic
 
 In addition to hold, a return swipe (ex from center to right, then return to center) is a separate gesture, as used in [딩굴](https://namu.wiki/w/%EB%94%A9%EA%B5%B4%20%ED%82%A4%EB%B3%B4%EB%93%9C). Similar idea to swipe hold. For punctuation maybe ('→"), (-→=), (.→…), (,→;), (?→¿), (!→¡). For vowel pairs (e→ie). Currently used for (r→er), close `digits1key` embed keyboard, and various arithmetic operators in `digits1key`.
 
-Also, a long/ over return swipe, which goes beyond center on return. (a→ai), (o→ou).
+A long/ over return swipe, which goes beyond center on return. (a→ai), (o→ou).
 
 An turn/ corner swipe could be used, similar to diagonal, but yielding 2 options for each corner. Q down = qu, g c up = ck, s c up = ch, m up = mb, l up = ld, nd left = nt. For vowel diphthongs also.
 
@@ -76,6 +76,131 @@ Available as an embedded 1-key keyboard within `eng-frthen`, on swipe-right-hold
 Return swipes are used for arithmetic operators, like right-return for `+` and left-return for `-`.
 
 Down-return closes the embed keyboard.
+
+## `eng-qwerty`
+<details><summary><b>eng-qwerty preview</b></summary>
+
+<p style="text-align:center;">
+  <img src="doc/eng-qwerty.jpg" style="width:30em;" />
+</p>
+</details>
+
+English QWERTY keyboard based on common existing touch screen keyboards. \
+All digits and symbols are in separate child keyboards (other implementations would add a top row of digits). \
+Inludes diacritics on hold.
+
+It also showcases bridge keys (whose dimensions are greater than 1x1) and gaps.
+
+Missing key strokes and labels are pending in [#37](https://github.com/ogallagher/touch-keyboard-proto/issues/37).
+
+# Use/evaluate/test keyboards
+
+The default view is for `eval` mode, presenting a composer text box above and the current active keyboard below.
+
+The keyboard will only write when the composer is selected/focused. It auto focuses on page load, and when returning to `eval` mode.
+
+Perform [gestures](#gestures) on the keys to view keystrokes in the composer.
+
+## Switch keyboard
+
+There is no dedicated UI control to switch to a different keyboard. However, one of the available keystrokes is to switch keyboards (`<switch-keyb>`). In [eng-frthen](#eng-frthen), for example, left swipe on the `f` key is mapped to the switch keyboard keystroke.
+
+## Typing test integration
+
+This is pending in [#47](https://github.com/ogallagher/touch-keyboard-proto/issues/47).
+
+# Edit/configure keyboards
+
+In `eval` mode, to the right of the composer is a button with **gear** icon to switch to `config` mode. Press it again to return to `eval` mode.
+
+## Edit key
+
+In `config` mode, switch to the key section (square button at the top).
+
+### Current gesture
+
+pending
+
+### Key bounds
+
+pending
+
+### Add and remove key
+
+pending
+
+### Current modifier keys
+
+pending
+
+### Key label
+
+pending
+
+### Keystroke
+
+pending
+
+#### Keystroke characters
+
+pending
+
+#### Keystroke child keyboard
+
+pending
+
+## Edit keyboards
+
+In `config` mode, switch to the keyboards section (grid button at the top).
+
+### Session keyboards
+
+There are three buttons here, for managing the list of keyboards in the session, importing keyboards from files, and exporting keyboards as files or share links.
+
+#### Manage session keyboards list
+
+Press the list button to show this control.
+
+Below is a list keyboards by name. \
+The checkbox controls whether the keyboard is included in [export](#export-keyboards-as-files-and-links). \
+The minus button at the end of each row deletes the keyboard. \
+The plus button at the end of the list adds a new empty single key keyboard.
+
+Currently there is no dedicated control to switch keyboards (do so with switch keyboard keystroke), but if it is added, it will likely be here.
+
+#### Import keyboards from files
+
+Use this arrow into box button to import `json` files containing one or many keyboards.
+
+#### Export keyboards as files and links
+
+These are ways to save and share keyboards.
+
+Press the arrow out of box button to open export buttons below. In both cases, the keyboards to include in export are [selected in the session keyboards list](#manage-session-keyboards-list). 
+
+The first downloads keyboards as a `json` file.
+
+The second creates a share link with the keyboards embedded in the url search params.
+
+### Keyboard dimensions
+
+Next to the large 3x3 grid icon are two pairs of **`-`/`+`** buttons. Use these to add and remove columns and rows.
+
+### Keyboard viewport height
+
+Adjust the range slider labeled **viewport height** to change the height of the keyboard without changing the row count.
+
+### Keyboard name
+
+Edit the text input labeled **name** to customize the name of the active keyboard.
+
+## Site settings
+
+In `config` mode, switch to the site section (gear button at top, currently grouped with keyboards section).
+
+### Toggle gesture overlay canvas
+
+By default, an overlay canvas is enabled to draw the gesture line segments ontop of the keyboard. This can be disabled by pressing the button that looks like an asterisk or sea urchin to the far right.
 
 # Specification
 
