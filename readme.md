@@ -239,7 +239,7 @@ By default, an overlay canvas is enabled to draw the gesture line segments ontop
 
 # Specification
 
-An abstract key cell recognizes gestures, each mapped to 0, 1, or many key strokes.
+An key recognizes gestures, each mapped to a keystroke character sequence or child keyboard.
 
 ## Gestures
 
@@ -259,35 +259,3 @@ All gestures are considered to begin in the center of the key cell. The list bel
 | `diagonal corner swipe` | <img alt="circle up right to circle down to circle" src="./public/gestureType/ds-L.svg" width="80em" /> | |
 | `return over swipe` | <img alt="circle up to circle jump down to circle" src="./public/gestureType/cs-ro.svg" width="80em" /> | |
 | `diagonal return over swipe` | <img alt="circle up-right to circle jump down-left to circle" src="./public/gestureType/ds-ro.svg" width="80em" /> | |
-
-## Preview and gesture labels
-
-The labels to show the current gesture type and keystroke output can either be static, or float above the pointer like a context menu during the gesture.
-
-## Choice from multiple options
-
-In cases where a gesture opens multiple options (ex. touch hold for diacritics), a static vertical list context menu opens just above the pointer.
-
-## Edit/configure mode
-
-In edit mode, text inputs and related controls for typing performance evaluation are replaced with config options. 
-
-Site settings/config (ex. floating vs static preview and gesture labels).
-
-Define the keystroke output for the current key gesture.
-
-Key options include which keystroke labels to show at rest within the key cell.
-
-Keyboard grid dimensions, row and column counts.
-
-Name of the keyboard.
-
-## Test/evaluate mode
-
-An unmonitored composer text area.
-
-Eventually integrate with an existing typing test service to evaluate one's performance with the current keyboard.
-
-## Save and share
-
-A configured key grid (keyboard) is saved in url query params as a sharable link.
