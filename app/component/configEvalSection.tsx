@@ -1,5 +1,5 @@
 import { Gear, GearFill, Grid3x3Gap, Grid3x3GapFill, Play, Square, SquareFill, Trash } from "react-bootstrap-icons"
-import ComposerTextArea from "@component/textArea"
+import ComposerTextArea from "@component/composer"
 import { useContext, useEffect, useState } from "react"
 import { TextAreaEditCtx } from "@context/textAreaCtx"
 import { ConfigEvalMode, ConfigSection } from "@lib/control"

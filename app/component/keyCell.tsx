@@ -401,7 +401,7 @@ export default function KeyCell(
             'select-none',
             'h-full',
             'grid-cols-3',
-            'rounded-lg',
+            'rounded-sm',
             'text-sm',
             embedGrid ? 'hidden' : (isShadow ? 'grid opacity-0' : 'grid')
           ].join(' ')} >

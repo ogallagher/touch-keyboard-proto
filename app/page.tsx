@@ -29,18 +29,21 @@ export default function Home() {
         {/* header */}
         <Header />
 
-        <KeyGridCtx value={keyGridState}>
-          <ConfigCtx value={config} >
-            <TextAreaEditCtx value={textAreaEdit}>
-              
-                <ConfigEvalSection />
+        <div
+          className='flex flex-col justify-between gap-2 grow'>
+          <KeyGridCtx value={keyGridState}>
+            <ConfigCtx value={config} >
+              <TextAreaEditCtx value={textAreaEdit}>
+                
+                  <ConfigEvalSection />
 
-                <Suspense fallback={<div className='relative h-[25dvh]'></div>}>
-                  <KeyGridSection />
-                </Suspense>
-            </TextAreaEditCtx>
-          </ConfigCtx>
-        </KeyGridCtx>
+                  <Suspense fallback={<div className='relative h-[25dvh]'></div>}>
+                    <KeyGridSection />
+                  </Suspense>
+              </TextAreaEditCtx>
+            </ConfigCtx>
+          </KeyGridCtx>
+        </div>
       </PageCanvasCtx>
     </div>
   )

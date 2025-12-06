@@ -6,7 +6,7 @@ import KeyStroke from "@lib/keyStroke"
 import { AbstractTouchGesture } from "@lib/touchGesture"
 import { createContext } from "react"
 
-export type SaveKey = 'GridDimensions'|'KeyDefinition'|'KeyDefinition.dimensions'|'KeyIndex'
+export type SaveKey = 'GridDimensions'|'KeyDefinition'|'KeyDefinition.dimensions'|'KeyIndex'|'KeyGridViewportHeight'
 export type ModeListener = () => void
 export type LoadListener = () => void
 export type SaveListener = (kidx?: KeyIndex) => void
@@ -18,6 +18,7 @@ export type ChildKeyboardConfig = {
 export class ConfigureKeyBoard {
   private _mode = ConfigEvalMode.Eval
   private _keyboardInstance?: KeyboardInstance
+  private _gridViewportHeight?: number
   private _keyIndex?: KeyIndex
   private _gesture?: AbstractTouchGesture
   private _keystroke?: KeyStroke|KeyboardInstance
@@ -45,6 +46,8 @@ export class ConfigureKeyBoard {
   }
 
   get keyboardInstance() { return this._keyboardInstance }
+
+  get gridViewportHeight() { return this._gridViewportHeight }
 
   get keyIndex() { return this._keyIndex }
 
@@ -121,6 +124,16 @@ export class ConfigureKeyBoard {
     if (this._keyboardInstance) {
       this._keyboardInstance.keyboard.dimensions = gridDimensions
       const ls = this.saveListeners.get('GridDimensions')?.values()
+      if (ls) {
+        Array.from(ls).forEach(l => l())
+      }
+    }
+  }
+
+  setGridViewportHeight(viewportHeight?: number) {
+    if (this._keyboardInstance) {
+      this._gridViewportHeight = viewportHeight
+      const ls = this.saveListeners.get('KeyGridViewportHeight')?.values()
       if (ls) {
         Array.from(ls).forEach(l => l())
       }

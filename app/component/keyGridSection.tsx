@@ -9,6 +9,7 @@ import { useSearchParams } from "next/navigation"
 import { decompressString } from "@lib/data"
 import { switchKeyboardName } from "@lib/keyboardDefinitions/meta/switchKeyboard"
 import { qwertyAlphabet } from "@lib/keyboardDefinitions/eng_qwerty"
+import { listenerName } from "@lib/eventSync"
 
 export default function KeyGridSection() {
   /*
@@ -22,6 +23,7 @@ export default function KeyGridSection() {
   const searchQueryParams = useSearchParams()
   const addChild = useRef(null as unknown as AddKeyGrid)
   const loadedSearchQuery = useRef(false)
+  const [gridViewportHeight, setGridViewportHeight] = useState(undefined as number|undefined)
 
   // update definition of add
   useEffect(
@@ -70,6 +72,21 @@ export default function KeyGridSection() {
       })
     },
     [ keyGridState, children, configCtx ]
+  )
+
+  // read viewport height from config ctx
+  useEffect(
+    () => {
+      if (!configCtx) return
+
+      const name = listenerName(KeyGridSection.name)
+      configCtx.addSaveListener(name, 'KeyGridViewportHeight', () => {
+        setGridViewportHeight(configCtx.gridViewportHeight)
+      })
+
+      return () => configCtx.deleteSaveListener(name, 'KeyGridViewportHeight')
+    },
+     [ configCtx ]
   )
   
   // add keyboard grid when empty
@@ -151,7 +168,14 @@ export default function KeyGridSection() {
   )
   
   return (
-    <div className='relative grow' >
+    <div 
+      className={[
+        'relative',
+        (gridViewportHeight ? '' : 'grow')
+      ].join(' ')}
+      style={!gridViewportHeight ? undefined : {
+        height: `${Math.round(gridViewportHeight)}em`
+      }} >
       {Array.from(children.values())}
     </div>
   )

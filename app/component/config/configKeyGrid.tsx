@@ -14,6 +14,7 @@ import { exportShareUrlKeyboardsQueryKey, keyboardFilePartDelim, keyboardFileSuf
 import { compressString } from "@lib/data"
 import { ConfigSection } from "@lib/control"
 import { switchKeyboardName } from "@lib/keyboardDefinitions/meta/switchKeyboard"
+import { dvhToPx, fontSizeToPx, pxToDvh, pxToFontSize } from "@lib/unit"
 
 type OnExport = (exportType: 'file'|'url') => void
 
@@ -38,6 +39,10 @@ export default function ConfigKeyGrid(
   const [ exportUrl, setExportUrl ] = useState(undefined as URL|undefined)
   const [ exportFilename, setExportFilename ] = useState(undefined as string|undefined)
   const onExport = useRef(null as unknown as OnExport)
+  /**
+   * Key grid viewport height, in font size (~em).
+   */
+  const [keyGridViewportHeight, setKeyGridViewportHeight] = useState(undefined as number|undefined)
 
   // listen to session keyboards list
   useEffect(
@@ -63,6 +68,9 @@ export default function ConfigKeyGrid(
       configCtx.addLoadListener(name, () => {
         setGridDimensions(configCtx.keyboardInstance?.keyboard.dimensions)
         setKeyboardName(configCtx.keyboardInstance?.keyboard.name)
+
+        const dvh = !configCtx.gridViewportHeight ? undefined : pxToDvh(fontSizeToPx(configCtx.gridViewportHeight))
+        setKeyGridViewportHeight(dvh)
       })
 
       return () => configCtx.deleteLoadListener(name)
@@ -91,6 +99,16 @@ export default function ConfigKeyGrid(
       }
     },
     [ configCtx, gridDimensions ]
+  )
+  // write viewport height to config context
+  useEffect(
+    () => {
+      if (!configCtx) return
+
+      const em = !keyGridViewportHeight ? undefined : pxToFontSize(dvhToPx(keyGridViewportHeight))
+      configCtx.setGridViewportHeight(em)
+    },
+    [ configCtx, keyGridViewportHeight ]
   )
 
   // define addKeyboard
@@ -367,27 +385,51 @@ export default function ConfigKeyGrid(
         </button>
       </div>
 
-      {/* grid dimensions */}
-      <div 
-        className='flex flex-row justify-center gap-2 text-2xl'
-        title='Keyboard grid dimensions' >
-        <div className='flex flex-col justify-center pr-2'>
-          <Grid3x3 className='text-4xl' />
+      {/* grid size */}
+      <div
+        className='flex flex-row justify-center gap-8'>
+        {/* grid dimensions */}
+        <div 
+          className='flex flex-row justify-center gap-2 text-2xl'
+          title='Keyboard grid dimensions' >
+          <div className='flex flex-col justify-center pr-2'>
+            <Grid3x3 className='text-4xl' />
+          </div>
+
+          {/* config grid dimensions.width */}
+          <IncDec
+            orientation={Orientation.Horizontal} 
+            title='Adjust col count'
+            onDec={() => setGridDimensions(gridDimensions?.colAdd(-1))}
+            onInc={() => setGridDimensions(gridDimensions?.colAdd(+1))} />
+          {/* config grid dimensions.height */}
+          <IncDec 
+            orientation={Orientation.Vertical}
+            title='Adjust row count'
+            onDec={() => setGridDimensions(gridDimensions?.rowAdd(-1))}
+            onInc={() => setGridDimensions(gridDimensions?.rowAdd(+1))} />
         </div>
 
-        {/* config grid dimensions.width */}
-        <IncDec
-          orientation={Orientation.Horizontal} 
-          title='Adjust col count'
-          onDec={() => setGridDimensions(gridDimensions?.colAdd(-1))}
-          onInc={() => setGridDimensions(gridDimensions?.colAdd(+1))} />
-        {/* config grid dimensions.height */}
-        <IncDec 
-          orientation={Orientation.Vertical}
-          title='Adjust row count'
-          onDec={() => setGridDimensions(gridDimensions?.rowAdd(-1))}
-          onInc={() => setGridDimensions(gridDimensions?.rowAdd(+1))} />
+        {/* grid viewport height */}
+        <div className='flex flex-ro gap-2'>
+          <label
+            className='my-auto'
+            htmlFor='configGridViewportHeight'>
+            Viewport height:
+          </label>
+          <input 
+            id='configGridViewportHeight'
+            type='range'
+            className='h-full'
+            // unit is dynamic view height percentage (dvh)
+            min={10} max={70} step={5}
+            value={keyGridViewportHeight || 0}
+            onChange={(e) => {
+              setKeyGridViewportHeight(Number.parseInt(e.target.value))
+            }} />
+        </div>
       </div>
+      
 
       {/* name */}
       <div
