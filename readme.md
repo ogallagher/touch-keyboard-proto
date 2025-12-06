@@ -113,37 +113,60 @@ This is pending in [#47](https://github.com/ogallagher/touch-keyboard-proto/issu
 
 In `eval` mode, to the right of the composer is a button with **gear** icon to switch to `config` mode. Press it again to return to `eval` mode.
 
+When editing, be aware that there is **no undo** feature!
+
 ## Edit key
 
 In `config` mode, switch to the key section (square button at the top).
 
+To edit a key, perform a gesture on one of the keys in the active keyboard below (ex. touch, swipe).
+
 ### Current gesture
 
-pending
+The gesture is illustrated by a pair of [gesture icons](#gestures). 
+
+The first is the **start segment**, and the second is the **full gesture**. If the gesture is a simple touch or swipe, these will be identical. More complex gestures like return swipes and corner swipes will be shown in the **full gesture**.
+
+The [key label](#key-label) can depend on the current gesture start segment. \
+For example, the [`digits1key`](#digits1key) center is labeled as `0 5` at rest, because touch keystroke is `0`, and hold is `5`. However, down return swipe maps to close keyboard (`<close-kb>`), so during a down swipe, the center is labeled as `ABC` to indicate that returning to the center will close child `digits1key` and return to the parent alphabet key.
+
+The accompanying checkbox toggles whether we are specifying labels only for the current start segment.
 
 ### Key bounds
 
-pending
+Press the key bounds button (square with a circle on each corner) to open **`-`/`+`** buttons at the 4 edges. \
+The button pairs above and left move the current key. \
+The button pairs below and right change the dimensions (width and height) of the current key.
 
 ### Add and remove key
 
-pending
+The button that is either a minus or a plus in a square is to add or remove the current key (cell).
 
 ### Current modifier keys
 
-pending
+The current modifier keys are indicated and selected with radio buttons and check boxes here. 
+
+The [key label](#key-label) can depend on the current set of pressed/active modifier keys. \
+For example, a key right label `re` can show `Re` during `<shift>`, and `RE` during `<caps-lock>`.
+
+The accompanying check box toggles whether we are specifying labels only for the current modifer keys.
 
 ### Key label
 
-pending
+A key label is split into 6 zones (up left, up, up right, left, center, right, down left, down, down right). \
+Each can be set with a corresponding text box here.
+
+See [current gesture](#current-gesture) and [current modifier keys](#current-modifier-keys) for setting label zones dependent on each.
 
 ### Keystroke
 
-pending
+A key gesture's keystroke can be either a sequence of characters (and meta characters), or a child keyboard.
+
+Switch between them with the pointer and keyboard icon buttons at the left.
 
 #### Keystroke characters
 
-pending
+Labeled **keystroke** is the text box for typing keystroke characters. Meta characters (ex. modifiers, cursor moves, switch keyboard, close keyboard) can be added with corresponding buttons beside the text box. The keystroke can be a combination of characters and meta characters.
 
 #### Keystroke child keyboard
 

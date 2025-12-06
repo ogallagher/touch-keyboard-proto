@@ -189,7 +189,7 @@ export default function ConfigKeyMap(
           className='field-sizing-content select-all min-w-8 text-base font-mono dark:bg-zinc-700 bg-zinc-300 rounded-md p-1'
           id='keyStroke'
           value={keyStroke?.toChars().join('') || ''}
-          placeholder='none'
+          placeholder='*'
           disabled={keyMap === undefined}
           onChange={e => {
             // set keystroke, unset child keyboard
