@@ -241,7 +241,13 @@ export default class TouchGesture extends AbstractTouchGesture {
   private times: Date[] = []
   private readonly segmentLength: number
   private readonly map: KeyMap
-  private holdTimeout?: NodeJS.Timeout
+  /**
+   * Timeout after which `addHoldSegment` is called on the active gesture. Can be repeated if `chainOnHold`.
+   * 
+   * To avoid losing the hold timeout reference in the case that a touch end/release event is missed,
+   * assuming only a single gesture can be in progress at a time (and no multitouch), this is a static member.
+   */
+  private static holdTimeout?: NodeJS.Timeout
 
   constructor(
     {type, direction, cornerDirection, origin, whenStart, segmentLength, map, onComplete, onSegment}: {
@@ -306,13 +312,13 @@ export default class TouchGesture extends AbstractTouchGesture {
   }
 
   protected clearHoldTimeout() {
-    clearTimeout(this.holdTimeout)
+    clearTimeout(TouchGesture.holdTimeout)
   }
 
   public startHoldTimeout(delaySec = holdDelaySec) {
     this.clearHoldTimeout()
 
-    this.holdTimeout = setTimeout(
+    TouchGesture.holdTimeout = setTimeout(
       () => this.addHoldSegment(), 
       delaySec * 1000
     )
