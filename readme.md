@@ -176,6 +176,8 @@ Below is the list of available session keyboards, both parents and children. Sel
 
 When a keyboard is adopted as a keystroke, which was not already a child of this keyboard, a clone of the keyboard to adopt is created, so that **editing the new child does not change the original**.
 
+Child keyboards can also open nested child keyboards in the same way. When doing so, avoid creating cycles (ex. where a keyboard is a child of its own child). They appear to work, but may cause problems. In such cases, a close-keyboard or switch-keyboard keystroke is probably best.
+
 Right of the child keyboard selection is the control for **size**: whether it is embedded within the parent key, or fills the entire key grid.
 
 Next controls **persistence**: whether the child keyboard will close on any keystroke, or remain open until a `<close-kb>` stroke happens.
