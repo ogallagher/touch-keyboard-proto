@@ -170,7 +170,19 @@ Labeled **keystroke** is the text box for typing keystroke characters. Meta char
 
 #### Keystroke child keyboard
 
-pending
+Labeled **child keyboard** is a text box showing the parent name + child name of the selected child keyboard.
+
+Below is the list of available session keyboards, both parents and children. Select an item from this list as the child keyboard.
+
+When a keyboard is adopted as a keystroke, which was not already a child of this keyboard, a clone of the keyboard to adopt is created, so that **editing the new child does not change the original**.
+
+Right of the child keyboard selection is the control for **size**: whether it is embedded within the parent key, or fills the entire key grid.
+
+Next controls **persistence**: whether the child keyboard will close on any keystroke, or remain open until a `<close-kb>` stroke happens.
+
+Next is a (arrow diagonal out of box) button to open and configure the child keyboard. In this case it is always shown as if it were `size=fill`. To see it as `size=embed`, switch back from `config` to `eval` mode.
+
+Last is a (`X` in circle) button to unset the child keyboard.
 
 ## Edit keyboards
 
