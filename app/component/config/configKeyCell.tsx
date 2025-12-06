@@ -14,6 +14,7 @@ import { ConfigEvalMode, ConfigSection } from "@lib/control"
 import ConfigKeyMap from "./configKeyMap"
 import GridDimensions from "@lib/gridDimensions"
 import ConfigKeyCellBounds from "./configKeyBounds"
+import { DashSquare, PlusSquare } from "react-bootstrap-icons"
 
 export default function ConfigKeyCell(
   { configSection }: {
@@ -227,10 +228,24 @@ export default function ConfigKeyCell(
         </div>
 
         {/* key bounds */}
-        <div className='flex flex-row justify-center'>
-          <ConfigKeyCellBounds
-            index={_keyIndex} setIndex={setKeyMoveIdx}
-            dimensions={_dimensions} setDimensions={setResizeDimensions} />
+        <ConfigKeyCellBounds
+          index={_keyIndex} setIndex={setKeyMoveIdx}
+          dimensions={_dimensions} setDimensions={setResizeDimensions}
+          isShadow={isShadow} />
+
+        {/* key isShadow */}
+        <div className='flex flex-col justify-center'>
+          <div className='flex flex-row gap-1'>
+            <button
+              id='configKeyIsShadow'
+              className='cursor-pointer'
+              onClick={() => setIsShadow(!isShadow)} >
+              {isShadow ? <PlusSquare /> : <DashSquare />}
+            </button>
+            <label htmlFor='configKeyIsShadow'>
+              {isShadow ? 'Add key' : 'Remove key'}
+            </label>
+          </div>
         </div>
         
         {/* modifier keys */}
@@ -318,13 +333,16 @@ export default function ConfigKeyCell(
       </div>
 
       {/* key map */}
-      <ConfigKeyMap
-        keyboardInstance={configCtx?.keyboardInstance}
-        keyMap={keyMap}
-        keyStroke={keyStroke} setKeyStroke={setKeyStroke}
-        keyStrokeInput={keyStrokeInput}
-        childKeyboardId={childKeyboardId} setChildKeyboardId={setChildKeyboardId}
-        childKeyboardConfig={childKeyboardConfig} setChildKeyboardConfig={setChildKeyboardConfig} />
+      {
+        isShadow ? undefined :
+        <ConfigKeyMap
+          keyboardInstance={configCtx?.keyboardInstance}
+          keyMap={keyMap}
+          keyStroke={keyStroke} setKeyStroke={setKeyStroke}
+          keyStrokeInput={keyStrokeInput}
+          childKeyboardId={childKeyboardId} setChildKeyboardId={setChildKeyboardId}
+          childKeyboardConfig={childKeyboardConfig} setChildKeyboardConfig={setChildKeyboardConfig} />
+      }
     </div>
   )
 }

@@ -28,7 +28,7 @@ export default function PageGraphicsCanvas() {
     <canvas
       ref={canvas}
       className={[
-        'h-full pointer-events-none touch-none z-10',
+        'h-full pointer-events-none touch-none z-20',
         (showGesturesCanvas ? 'fixed' : 'hidden')
       ].join(' ')} />
   )

@@ -378,7 +378,7 @@ export default function KeyCell(
       className={[
         'relative',
         // place shadows behind bridges so they don't intercept mouse events
-        (isShadow ? '-z-10' : '')
+        (isShadow ? 'z-0' : 'z-10')
         // unknown why tailwind grid cell classes are not working; maybe I should ask.
         // `row-start-${index.row+1} row-span-${dim.height} col-start-${index.col+1} col-span-${dim.width}`
         ].join(' ')}
@@ -403,7 +403,7 @@ export default function KeyCell(
             'grid-cols-3',
             'rounded-lg',
             'text-sm',
-            embedGrid ? 'hidden' : (isShadow ? 'invisible' : 'grid')
+            embedGrid ? 'hidden' : (isShadow ? 'grid opacity-0' : 'grid')
           ].join(' ')} >
           {(['upleft', 'up', 'upright', 'left', 'center', 'right', 'downleft', 'down', 'downright'] as Zone[]).map(
             (zone) => (

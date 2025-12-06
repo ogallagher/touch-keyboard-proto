@@ -7,11 +7,12 @@ import { Dispatch, SetStateAction, useContext, useState } from "react"
 import { BoundingBoxCircles } from "react-bootstrap-icons"
 
 export default function ConfigKeyCellBounds(
-  { index, setIndex, dimensions, setDimensions }: {
+  { index, setIndex, dimensions, setDimensions, isShadow }: {
     index: KeyIndex|undefined,
     setIndex: Dispatch<SetStateAction<KeyIndex|undefined>>
     dimensions: GridDimensions|undefined,
     setDimensions: Dispatch<SetStateAction<GridDimensions|undefined>>
+    isShadow: boolean
   }
 ) {
   const configCtx = useContext(ConfigCtx)
@@ -47,12 +48,13 @@ export default function ConfigKeyCellBounds(
     setDimensions(validDimensions)
   }
 
-  return !dimensions ? undefined : (
+  return isShadow || !dimensions ? undefined : (
     <div className='flex flex-row justify-center'>
       <div 
         className={[
           'grid gap-1',
-          `grid-cols-${showBounds ? 3 : 1} grid-rows-${showBounds ? 3 : 1}`
+          `grid-cols-${showBounds ? 3 : 1} grid-rows-${showBounds ? 3 : 1}`,
+          'my-auto'
         ].join(' ')}>
         {/* index.row */}
         <div 

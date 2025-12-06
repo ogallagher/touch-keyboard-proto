@@ -36,6 +36,7 @@ export class KeyDefinition implements KeyAttributes {
       && this.label.equals(other.label) 
       && this.map.equals(other.map)
       && this.dimensions.equals(other.dimensions)
+      && this.isShadow === other.isShadow
     )
   }
 
