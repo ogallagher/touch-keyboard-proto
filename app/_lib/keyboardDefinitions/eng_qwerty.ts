@@ -5,6 +5,13 @@ import KeyLabel, { ZoneKey } from "@lib/keyLabel"
 import KeyMap from "@lib/keyMap"
 import KeyStroke, { MetaChar } from "@lib/keyStroke"
 import { AbstractTouchGesture, TouchGestureType } from "@lib/touchGesture"
+import { eDia } from "./vowelDiacritics/e"
+import { yDia } from "./pseudovowelDiacritics/y"
+import { uDia } from "./vowelDiacritics/u"
+import { iDia } from "./vowelDiacritics/i"
+import { oDia } from "./vowelDiacritics/o"
+import { aDia } from "./vowelDiacritics/a"
+import { nDia } from "./consonantDiacritics/n"
 
 // more-symbols
 // row 0 = [ ] { } # % ^ * + =
@@ -513,7 +520,8 @@ export const digitsSymbols = new KeyboardDefinition('digitsSymbols', [
 const qwertyRow: KeyDefinition[] = [
   new KeyDefinition({
     label: new KeyLabel([
-      [new ZoneKey('center'), 'q']
+      [new ZoneKey('center'), 'q'],
+      [new ZoneKey('center', 'shift'), 'Q'],
     ]),
     map: new KeyMap([
       [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('q')]
@@ -521,7 +529,8 @@ const qwertyRow: KeyDefinition[] = [
   }),
   new KeyDefinition({
     label: new KeyLabel([
-      [new ZoneKey('center'), 'w']
+      [new ZoneKey('center'), 'w'],
+      [new ZoneKey('center', 'shift'), 'W'],
     ]),
     map: new KeyMap([
       [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('w')]
@@ -529,15 +538,21 @@ const qwertyRow: KeyDefinition[] = [
   }),
   new KeyDefinition({
     label: new KeyLabel([
-      [new ZoneKey('center'), 'e']
+      [new ZoneKey('center'), 'e'],
+      [new ZoneKey('center', 'shift'), 'E'],
     ]),
     map: new KeyMap([
-      [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('e')]
+      [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('e')],
+      [new AbstractTouchGesture(TouchGestureType.TOUCH_HOLD), new KeyboardInstance(eDia, {
+        persistence: KeyboardPersistence.Brief,
+        size: KeyboardSize.Fill
+      })],
     ])
   }),
   new KeyDefinition({
     label: new KeyLabel([
-      [new ZoneKey('center'), 'r']
+      [new ZoneKey('center'), 'r'],
+      [new ZoneKey('center', 'shift'), 'R'],
     ]),
     map: new KeyMap([
       [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('r')]
@@ -545,7 +560,8 @@ const qwertyRow: KeyDefinition[] = [
   }),
   new KeyDefinition({
     label: new KeyLabel([
-      [new ZoneKey('center'), 't']
+      [new ZoneKey('center'), 't'],
+      [new ZoneKey('center', 'shift'), 'T'],
     ]),
     map: new KeyMap([
       [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('t')]
@@ -553,39 +569,60 @@ const qwertyRow: KeyDefinition[] = [
   }),
   new KeyDefinition({
     label: new KeyLabel([
-      [new ZoneKey('center'), 'y']
+      [new ZoneKey('center'), 'y'],
+      [new ZoneKey('center', 'shift'), 'Y'],
     ]),
     map: new KeyMap([
-      [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('y')]
+      [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('y')],
+      [new AbstractTouchGesture(TouchGestureType.TOUCH_HOLD), new KeyboardInstance(yDia, {
+        persistence: KeyboardPersistence.Brief,
+        size: KeyboardSize.Fill
+      })],
     ])
   }),
   new KeyDefinition({
     label: new KeyLabel([
-      [new ZoneKey('center'), 'u']
+      [new ZoneKey('center'), 'u'],
+      [new ZoneKey('center', 'shift'), 'U'],
     ]),
     map: new KeyMap([
-      [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('u')]
+      [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('u')],
+      [new AbstractTouchGesture(TouchGestureType.TOUCH_HOLD), new KeyboardInstance(uDia, {
+        persistence: KeyboardPersistence.Brief,
+        size: KeyboardSize.Fill
+      })],
     ])
   }),
   new KeyDefinition({
     label: new KeyLabel([
-      [new ZoneKey('center'), 'i']
+      [new ZoneKey('center'), 'i'],
+      [new ZoneKey('center', 'shift'), 'I'],
     ]),
     map: new KeyMap([
-      [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('i')]
+      [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('i')],
+      [new AbstractTouchGesture(TouchGestureType.TOUCH_HOLD), new KeyboardInstance(iDia, {
+        persistence: KeyboardPersistence.Brief,
+        size: KeyboardSize.Fill
+      })],
     ])
   }),
   new KeyDefinition({
     label: new KeyLabel([
-      [new ZoneKey('center'), 'o']
+      [new ZoneKey('center'), 'o'],
+      [new ZoneKey('center', 'shift'), 'O'],
     ]),
     map: new KeyMap([
-      [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('o')]
+      [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('o')],
+      [new AbstractTouchGesture(TouchGestureType.TOUCH_HOLD), new KeyboardInstance(oDia, {
+        persistence: KeyboardPersistence.Brief,
+        size: KeyboardSize.Fill
+      })],
     ])
   }),
   new KeyDefinition({
     label: new KeyLabel([
-      [new ZoneKey('center'), 'p']
+      [new ZoneKey('center'), 'p'],
+      [new ZoneKey('center', 'shift'), 'P'],
     ]),
     map: new KeyMap([
       [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('p')]
@@ -596,15 +633,21 @@ const qwertyRow: KeyDefinition[] = [
 const asdfRow: KeyDefinition[] = [
   new KeyDefinition({
     label: new KeyLabel([
-      [new ZoneKey('center'), 'a']
+      [new ZoneKey('center'), 'a'],
+      [new ZoneKey('center', 'shift'), 'A'],
     ]),
     map: new KeyMap([
-      [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('a')]
+      [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('a')],
+      [new AbstractTouchGesture(TouchGestureType.TOUCH_HOLD), new KeyboardInstance(aDia, {
+        persistence: KeyboardPersistence.Brief,
+        size: KeyboardSize.Fill
+      })],
     ])
   }),
   new KeyDefinition({
     label: new KeyLabel([
-      [new ZoneKey('center'), 's']
+      [new ZoneKey('center'), 's'],
+      [new ZoneKey('center', 'shift'), 'S'],
     ]),
     map: new KeyMap([
       [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('s')]
@@ -612,7 +655,8 @@ const asdfRow: KeyDefinition[] = [
   }),
   new KeyDefinition({
     label: new KeyLabel([
-      [new ZoneKey('center'), 'd']
+      [new ZoneKey('center'), 'd'],
+      [new ZoneKey('center', 'shift'), 'D'],
     ]),
     map: new KeyMap([
       [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('d')]
@@ -620,7 +664,8 @@ const asdfRow: KeyDefinition[] = [
   }),
   new KeyDefinition({
     label: new KeyLabel([
-      [new ZoneKey('center'), 'f']
+      [new ZoneKey('center'), 'f'],
+      [new ZoneKey('center', 'shift'), 'F'],
     ]),
     map: new KeyMap([
       [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('f')]
@@ -628,7 +673,8 @@ const asdfRow: KeyDefinition[] = [
   }),
   new KeyDefinition({
     label: new KeyLabel([
-      [new ZoneKey('center'), 'g']
+      [new ZoneKey('center'), 'g'],
+      [new ZoneKey('center', 'shift'), 'G'],
     ]),
     map: new KeyMap([
       [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('g')]
@@ -636,7 +682,8 @@ const asdfRow: KeyDefinition[] = [
   }),
   new KeyDefinition({
     label: new KeyLabel([
-      [new ZoneKey('center'), 'h']
+      [new ZoneKey('center'), 'h'],
+      [new ZoneKey('center', 'shift'), 'H'],
     ]),
     map: new KeyMap([
       [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('h')]
@@ -644,7 +691,8 @@ const asdfRow: KeyDefinition[] = [
   }),
   new KeyDefinition({
     label: new KeyLabel([
-      [new ZoneKey('center'), 'j']
+      [new ZoneKey('center'), 'j'],
+      [new ZoneKey('center', 'shift'), 'J'],
     ]),
     map: new KeyMap([
       [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('j')]
@@ -652,7 +700,8 @@ const asdfRow: KeyDefinition[] = [
   }),
   new KeyDefinition({
     label: new KeyLabel([
-      [new ZoneKey('center'), 'k']
+      [new ZoneKey('center'), 'k'],
+      [new ZoneKey('center', 'shift'), 'K'],
     ]),
     map: new KeyMap([
       [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('k')]
@@ -660,7 +709,8 @@ const asdfRow: KeyDefinition[] = [
   }),
   new KeyDefinition({
     label: new KeyLabel([
-      [new ZoneKey('center'), 'l']
+      [new ZoneKey('center'), 'l'],
+      [new ZoneKey('center', 'shift'), 'L'],
     ]),
     map: new KeyMap([
       [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('l')]
@@ -686,7 +736,8 @@ const zxcvRow: KeyDefinition[] = [
   }),
   new KeyDefinition({
     label: new KeyLabel([
-      [new ZoneKey('center'), 'z']
+      [new ZoneKey('center'), 'z'],
+      [new ZoneKey('center', 'shift'), 'Z'],
     ]),
     map: new KeyMap([
       [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('z')]
@@ -694,7 +745,8 @@ const zxcvRow: KeyDefinition[] = [
   }),
   new KeyDefinition({
     label: new KeyLabel([
-      [new ZoneKey('center'), 'x']
+      [new ZoneKey('center'), 'x'],
+      [new ZoneKey('center', 'shift'), 'X'],
     ]),
     map: new KeyMap([
       [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('x')]
@@ -702,7 +754,8 @@ const zxcvRow: KeyDefinition[] = [
   }),
   new KeyDefinition({
     label: new KeyLabel([
-      [new ZoneKey('center'), 'c']
+      [new ZoneKey('center'), 'c'],
+      [new ZoneKey('center', 'shift'), 'C'],
     ]),
     map: new KeyMap([
       [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('c')]
@@ -710,7 +763,8 @@ const zxcvRow: KeyDefinition[] = [
   }),
   new KeyDefinition({
     label: new KeyLabel([
-      [new ZoneKey('center'), 'v']
+      [new ZoneKey('center'), 'v'],
+      [new ZoneKey('center', 'shift'), 'V'],
     ]),
     map: new KeyMap([
       [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('v')]
@@ -718,7 +772,8 @@ const zxcvRow: KeyDefinition[] = [
   }),
   new KeyDefinition({
     label: new KeyLabel([
-      [new ZoneKey('center'), 'b']
+      [new ZoneKey('center'), 'b'],
+      [new ZoneKey('center', 'shift'), 'B'],
     ]),
     map: new KeyMap([
       [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('b')]
@@ -729,12 +784,17 @@ const zxcvRow: KeyDefinition[] = [
       [new ZoneKey('center'), 'n']
     ]),
     map: new KeyMap([
-      [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('n')]
+      [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('n')],
+      [new AbstractTouchGesture(TouchGestureType.TOUCH_HOLD), new KeyboardInstance(nDia, {
+        persistence: KeyboardPersistence.Brief,
+        size: KeyboardSize.Fill
+      })],
     ])
   }),
   new KeyDefinition({
     label: new KeyLabel([
-      [new ZoneKey('center'), 'm']
+      [new ZoneKey('center'), 'm'],
+      [new ZoneKey('center', 'shift'), 'M'],
     ]),
     map: new KeyMap([
       [new AbstractTouchGesture(TouchGestureType.TOUCH), new KeyStroke('m')]
