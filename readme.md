@@ -164,6 +164,8 @@ A key gesture's keystroke can be either a sequence of characters (and meta chara
 
 Switch between them with the pointer and keyboard icon buttons at the left.
 
+Unlike [key label](#key-label), the modifer keys (shift, caps-lock) are currently automatically applied to keystroke characters.
+
 #### Keystroke characters
 
 Labeled **keystroke** is the text box for typing keystroke characters. Meta characters (ex. modifiers, cursor moves, switch keyboard, close keyboard) can be added with corresponding buttons beside the text box. The keystroke can be a combination of characters and meta characters.
