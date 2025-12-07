@@ -88,6 +88,34 @@ export default function KeyGridSection() {
     },
      [ configCtx ]
   )
+
+  // load keyboards from search query
+  useEffect(
+    () => {
+      if (!keyGridState || !searchQueryParams || loadedSearchQuery.current) return
+
+      const keyboardsCompressed = searchQueryParams.get(exportShareUrlKeyboardsQueryKey)
+      if (keyboardsCompressed) {
+        const keyboardsStr = (
+          decompressString(keyboardsCompressed)
+          .trimStart()
+        )
+        const keyboardInstances: KeyboardInstance[] = []
+        if (keyboardsStr[0] === '[') {
+          keyboardInstances.push(...KeyboardInstance.loadMany(keyboardsStr))
+        }
+        else {
+          keyboardInstances.push(KeyboardInstance.load(keyboardsStr))
+        }
+        console.info(`loaded count=${keyboardInstances.length} keyboard instances from url search query`)
+        keyboardInstances.forEach((keyboardInstance) => {
+          keyGridState.addKeyGrid(keyboardInstance, true)
+        })
+      }
+      loadedSearchQuery.current = true
+    },
+    [ keyGridState, searchQueryParams, children.size ]
+  )
   
   // add keyboard grid when empty
   useEffect(
@@ -137,34 +165,6 @@ export default function KeyGridSection() {
       }
     },
     [ keyGridState, children.size ]
-  )
-
-  // load keyboards from search query
-  useEffect(
-    () => {
-      if (!keyGridState || !searchQueryParams || loadedSearchQuery.current) return
-
-      const keyboardsCompressed = searchQueryParams.get(exportShareUrlKeyboardsQueryKey)
-      if (keyboardsCompressed) {
-        const keyboardsStr = (
-          decompressString(keyboardsCompressed)
-          .trimStart()
-        )
-        const keyboardInstances: KeyboardInstance[] = []
-        if (keyboardsStr[0] === '[') {
-          keyboardInstances.push(...KeyboardInstance.loadMany(keyboardsStr))
-        }
-        else {
-          keyboardInstances.push(KeyboardInstance.load(keyboardsStr))
-        }
-        console.info(`loaded count=${keyboardInstances.length} keyboard instances from url search query`)
-        keyboardInstances.forEach((keyboardInstance) => {
-          keyGridState.addKeyGrid(keyboardInstance, true)
-        })
-      }
-      loadedSearchQuery.current = true
-    },
-    [ keyGridState, searchQueryParams, children.size ]
   )
   
   return (
