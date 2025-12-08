@@ -2,6 +2,8 @@
 
 Web app to configure and test prototype touchscreen keyboards with variable gestures and layouts.
 
+[demo 2025-12-07](https://github.com/user-attachments/assets/3f9b656a-8f3c-48c8-bb9d-0dad17e99dd9)
+
 # Justification
 
 When typing in languages with non latin script characters on touch screen devices, there is a growing number of options that break away from the classic keyboard of touch/button keys that is a direct virtual representation of a physical keyboard with layouts like QWERTY.
