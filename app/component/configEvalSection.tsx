@@ -1,4 +1,4 @@
-import { Gear, GearFill, Grid3x3Gap, Grid3x3GapFill, Play, Square, SquareFill, Trash } from "react-bootstrap-icons"
+import { Gear, GearFill, Grid3x3Gap, Grid3x3GapFill, Lock, Unlock, Play, Square, SquareFill, Trash } from "react-bootstrap-icons"
 import ComposerTextArea from "@component/composer"
 import { useContext, useEffect, useState } from "react"
 import { TextAreaEditCtx } from "@context/textAreaCtx"
@@ -14,6 +14,7 @@ export default function ConfigEvalSection() {
   const textAreaEdit = useContext(TextAreaEditCtx)
   const [mode, setMode] = useState(configCtx?.mode || ConfigEvalMode.Eval)
   const [configShowSection, setConfigShowSection] = useState('key' as ConfigSection)
+  const [composerLocked, setComposerLocked] = useState(true)
 
   // write to config context
   useEffect(
@@ -40,23 +41,38 @@ export default function ConfigEvalSection() {
     [ configCtx ]
   )
 
+  // write to composer context
+  useEffect(
+    () => {
+      if (textAreaEdit.locked !== composerLocked) {
+        textAreaEdit.setLocked(composerLocked)
+      }
+    },
+    [ textAreaEdit, composerLocked ]
+  )
+
   return (
     <div className="relative pointer-none">
       {/* eval mode */}
       <section
         className={[
-          'flex-row justify-center gap-2',
+          'flex-row justify-center gap-2 px-2',
           mode === ConfigEvalMode.Eval ? 'flex' : 'hidden' 
         ].join(' ')} >
         <ComposerTextArea visible={mode === ConfigEvalMode.Eval} />
 
         <button
           className="cursor-pointer"
-          onClick={() => {
-            textAreaEdit.reset()
-          }}
-          title='clear composer text area' >
+          onClick={() => textAreaEdit.reset()}
+          title='Clear composer text area' >
           <Trash />
+        </button>
+
+        <button
+          className="cursor-pointer"
+          onClick={() => setComposerLocked(!composerLocked)}
+          title='Toggle composer lock to attach proto keyboard' >
+          {composerLocked ? <Lock /> : <Unlock />}
         </button>
       </section>
       
